@@ -1,9 +1,12 @@
-// // include/imgengine/api.h
+// include/imgengine/api.h
 
 #ifndef IMG_API_H
 #define IMG_API_H
 
-#include "context.h"
+// ❌ REMOVE context.h include (breaks cycle)
+
+// forward declaration
+struct img_ctx;
 
 typedef enum
 {
@@ -11,15 +14,16 @@ typedef enum
     IMG_FILL
 } img_scale_mode_t;
 
-typedef struct
+typedef struct img_job
 {
     float photo_w_cm;
     float photo_h_cm;
     int dpi;
 
-    int bleed_px;       // extra outer pixels
-    int crop_mark_px;   // length of crop mark lines
-    int crop_thickness; // line thickness
+    int bleed_px;
+    int crop_mark_px;
+    int crop_thickness;
+    int crop_offset_px;
 
     int cols;
     int rows;
@@ -36,8 +40,9 @@ typedef struct
 
 } img_job_t;
 
+// ✅ FIXED SIGNATURE
 int imgengine_run(
-    img_ctx_t *ctx,
+    struct img_ctx *ctx,
     const char *input,
     const char *output,
     const img_job_t *job);

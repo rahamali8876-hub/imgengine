@@ -57,3 +57,12 @@
 
     pipeline/
     plugin_runner.c
+
+
+### 🔥 3. IMPORTANT ORDER (CRITICAL)
+
+    👉 Plugin execution order must be:
+
+    1. layout_grid
+    2. bleed plugin   ✅ FIRST
+    3. crop marks     ✅ AFTER
