@@ -22,6 +22,10 @@ set(IMGENGINE_PUBLIC_HEADERS
     include/imgengine/resize.h
     include/imgengine/border.h
     include/imgengine/layout.h
+    # plugins 
+    include/imgengine/plugins/plugin_registry.h
+    include/imgengine/plugins/plugin_runner.h
+    include/imgengine/plugins/plugin.h
 )
 
 set(IMGENGINE_PRIVATE_SOURCES
@@ -44,6 +48,16 @@ set(IMGENGINE_PRIVATE_SOURCES
 
     # io
     src/io/stb_impl.c
+
+    # plugin
+    src/plugins/pdf_write.c
+    src/plugins/bleed_plugin.c
+    src/plugins/crop_plugin.c
+    src/plugins/plugin_registry.c
+    src/plugins/registers_all.c
+
+    # pipeline
+    src/pipeline/plugin_runner.c
 
     # api
     src/api/api.c

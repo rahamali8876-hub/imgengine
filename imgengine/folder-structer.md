@@ -40,3 +40,20 @@
     │
     └── cli/
         └── main.c
+
+### FINAL ARCHITECTURE
+
+    core/
+    api.c
+
+    layout/
+    grid_layout.c
+
+    plugins/
+    plugin_registry.c
+    bleed_plugin.c
+    crop_plugin.c
+    (future: cmyk, icc, pdf)
+
+    pipeline/
+    plugin_runner.c

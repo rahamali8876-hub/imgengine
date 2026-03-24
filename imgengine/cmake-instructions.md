@@ -43,7 +43,7 @@
     --height 3.0 \
     --padding 20
 
-### ✔ PRO PRINT MODE (recommended)
+### ✔ PRO PRINT MODE (recommended) WITH ( PDF )
 
     ./imgengine_cli \
     --input ../input.jpg \
@@ -58,9 +58,28 @@
     --crop-mark 25 \
     --crop-thick 2
 
+    **** PDF **** 
+    
+        ./imgengine_cli \
+    --input ../input.jpg \
+    --output final_output.pdf \
+    --cols 6 \
+    --rows 2 \
+    --gap 15 \
+    --width 3.5 \
+    --height 3.0 \
+    --padding 20
+
 ### Help menu
+
     ./imgengine_cli --help
 
 cd ..
 rm -rf build
 rm -rf build && mkdir build && cd build && cmake .. && make
+
+rm -rf build
+mkdir build
+cd build
+cmake ..
+make -j$(nproc)

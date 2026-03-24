@@ -1,4 +1,4 @@
-// // imgengine/layout.h
+// imgengine/layout.h
 // #include "image.h"
 
 // #ifndef IMG_LAYOUT_H
@@ -11,6 +11,8 @@
 //                 img_ctx_t *ctx);
 
 // #endif
+
+// imgengine/layout.h
 
 #ifndef IMG_LAYOUT_H
 #define IMG_LAYOUT_H

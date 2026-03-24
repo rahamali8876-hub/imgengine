@@ -8,8 +8,13 @@
 #include "imgengine/resize.h"
 #include "imgengine/border.h"
 #include "imgengine/layout.h"
+#include "imgengine/plugins/plugin_runner.h"
+#include "imgengine/plugins/plugin_registry.h"
+
+// #include "imgengine/plugin/register_all.h"
 
 #include <stdio.h>
+#include <string.h>
 
 // 🔥 PRECHECK FUNCTION
 static int layout_fits(int canvas_w, int canvas_h,
@@ -68,16 +73,6 @@ int imgengine_run(img_ctx_t *ctx,
 
     printf("Manual layout cols=%d rows=%d\n", cols, rows);
 
-    // 🔥 STRICT PRECHECK (NO AUTO FIX)
-    // if (!layout_fits(canvas.width, canvas.height,
-    //                  bordered.width, bordered.height,
-    //                  cols, rows,
-    //                  job->gap, job->padding))
-    // {
-    //     printf("❌ Layout does NOT fit on canvas\n");
-    //     printf("👉 Reduce cols/rows, gap, padding or photo size\n");
-    //     return IMG_ERR_INVALID;
-    // }
     int fits = layout_fits(canvas.width, canvas.height,
                            bordered.width, bordered.height,
                            cols, rows,
@@ -89,14 +84,30 @@ int imgengine_run(img_ctx_t *ctx,
         // printf("Scale factor: %.2f\n", scale);
     }
 
-    // if (!layout_grid(&canvas, &bordered, cols, rows, job->gap, job->padding, ctx))
-    //     return IMG_ERR_INVALID;
+    register_all_plugins();
 
     if (!layout_grid(&canvas, &bordered, job, ctx))
         return IMG_ERR_INVALID;
 
-    if (!img_save_png(output, &canvas))
-        return IMG_ERR_IO;
+    if (!run_plugins(ctx, &canvas, job))
+        return IMG_ERR_INVALID;
+
+    // detect output format
+    const char *ext = strrchr(output, '.');
+
+    if (ext && strcmp(ext, ".pdf") == 0)
+    {
+        if (!img_save_pdf(output, &canvas))
+            return IMG_ERR_IO;
+    }
+    else
+    {
+        if (!img_save_png(output, &canvas))
+            return IMG_ERR_IO;
+    }
+
+    // if (!img_save_png(output, &canvas))
+    //     return IMG_ERR_IO;
 
     return IMG_OK;
 }
