@@ -1,0 +1,34 @@
+services:
+
+  api:
+    build: ../backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../data:/data
+    depends_on:
+      - redis
+      - db
+
+  worker:
+    build: ../backend
+    # command: celery -A app.workers.tasks worker --loglevel=info
+    # Prefix the command with 'uv run'
+    command: uv run celery -A app.workers.tasks worker --loglevel=info
+    volumes:
+      - ../data:/data
+    depends_on:
+      - redis
+      - db
+
+  redis:
+    image: redis:7
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: imgengine
+      POSTGRES_PASSWORD: imgengine
+      POSTGRES_DB: imgengine
+    ports:
+      - "5432:5432"
