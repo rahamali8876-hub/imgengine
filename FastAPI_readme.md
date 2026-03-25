@@ -159,56 +159,361 @@
 
     imgengine-saas/
     │
-    ├── backend/                # FastAPI backend
+    ├── backend/                         # FastAPI backend
     │   ├── app/
-    │   │   ├── api/
+    │   │   ├── api/                     # API layer
     │   │   │   ├── routes/
-    │   │   │   │   └── generate.py
-    │   │   │   └── deps.py
+    │   │   │   │   └── generate.py      # Image generation endpoint
+    │   │   │   └── deps.py              # Dependency injection
     │   │   │
-    │   │   ├── core/
+    │   │   ├── core/                    # Core configs & utilities
     │   │   │   ├── config.py
-    │   │   │   └── security.py
-                    limiter.py
-                    db.py
-
-                models/
-                    job.py
+    │   │   │   ├── security.py
+    │   │   │   ├── limiter.py           # Rate limiting
+    │   │   │   └── db.py                # DB connection
     │   │   │
-    │   │   ├── services/
-    │   │   │   └── engine_runner.py   # CLI bridge
-    │   │   │
-    │   │   ├── workers/
-    │   │   │   └── tasks.py           # Celery tasks
-    │   │   │
-    │   │   ├── schemas/
+    │   │   ├── models/                  # ORM models
     │   │   │   └── job.py
     │   │   │
-    │   │   ├── main.py                # FastAPI entry
+    │   │   ├── schemas/                 # Pydantic schemas
+    │   │   │   └── job.py
+    │   │   │
+    │   │   ├── services/                # Business logic
+    │   │   │   └── engine_runner.py     # CLI bridge (C binary executor)
+    │   │   │
+    │   │   ├── workers/                 # Background tasks
+    │   │   │   └── tasks.py             # Celery jobs
+    │   │   │
+    │   │   ├── main.py                  # FastAPI entrypoint
     │   │   └── __init__.py
     │   │
     │   ├── requirements.txt
     │   └── Dockerfile
     │
-    ├── worker/                       # Celery worker
+    ├── worker/                          # Celery worker service
     │   ├── worker.py
-    │   └── Dockerfile
-            imgengine_cli.exe          # Compiled C binary
-            pyproject.toml
-            uv.lock
-            .python-version
+    │   ├── Dockerfile
+    │   ├── imgengine_cli.exe            # Compiled C binary
+    │   ├── pyproject.toml
+    │   ├── uv.lock
+    │   └── .python-version
     │
-    ├── infra/                        # Infrastructure configs
+    ├── infra/                           # Infrastructure & DevOps
     │   ├── docker-compose.yml
     │   ├── nginx.conf
     │   └── .devcontainer/
     │       └── devcontainer.json
     │
-    ├── data/                         # Persistent storage
-    │   ├── uploads/
-    │   └── outputs/
+    ├── data/                            # Persistent storage
+    │   ├── uploads/                     # Incoming images
+    │   └── outputs/                     # Processed results
     │
-    │
-    ├── frontend/                     # Future UI (React/Nuxt)
+    ├── frontend/                        # Future UI (React / Nuxt)
     │
     └── README.md
+
+# 🚀 ImgEngine SaaS
+
+A high-performance, asynchronous image processing SaaS powered by a C-based engine, FastAPI, and distributed workers.
+
+---
+
+# 📌 Overview
+
+ImgEngine SaaS enables scalable image transformation workflows (e.g., passport photo layouts, resizing, grid generation) using a **queue-based architecture**.
+
+The system is designed to evolve from a **modular monolith** into a **microservices architecture**, ensuring both rapid development and long-term scalability.
+
+---
+
+# 🧠 Architecture Philosophy
+
+This system follows key engineering principles:
+
+* **Separation of Concerns**
+* **Asynchronous Processing First**
+* **Loose Coupling via Queues**
+* **Incremental Microservices Adoption**
+* **Operational Simplicity over Premature Complexity**
+
+---
+
+# 🏗️ Current Architecture (Phase 1)
+
+## Modular Monolith + Worker
+
+```
+          ┌───────────────┐
+          │   FastAPI     │
+          │  (API Layer)  │
+          └──────┬────────┘
+                 │
+                 ▼
+          ┌───────────────┐
+          │    Redis      │
+          │   (Queue)     │
+          └──────┬────────┘
+                 │
+                 ▼
+          ┌───────────────┐
+          │   Worker      │
+          │  (Celery)     │
+          └──────┬────────┘
+                 │
+                 ▼
+          ┌───────────────┐
+          │ imgengine_cli │
+          │   (C Binary)  │
+          └───────────────┘
+```
+
+---
+
+# ⚙️ How It Works
+
+1. Client uploads image via API
+2. API validates request and creates a job
+3. Job is pushed to Redis queue
+4. Worker consumes job asynchronously
+5. Worker executes C binary (`imgengine_cli`)
+6. Output is stored in `/data/outputs`
+7. Job status is updated
+
+---
+
+# 📁 Project Structure
+
+```
+imgengine-saas/
+
+├── services/
+│   ├── api-service/          # FastAPI service
+│   ├── worker-service/       # Celery worker
+│
+├── infra/                    # DevOps & deployment
+│   ├── docker-compose.yml
+│   ├── nginx.conf
+│
+├── data/                     # Persistent storage
+│   ├── uploads/
+│   └── outputs/
+```
+
+---
+
+# 🚧 Target Architecture (Phase 2)
+
+## Service-Oriented Split
+
+```
+        ┌───────────────┐
+        │  API Service  │
+        └──────┬────────┘
+               │
+               ▼
+        ┌───────────────┐
+        │   Redis       │
+        │  (Broker)     │
+        └──────┬────────┘
+               │
+               ▼
+        ┌───────────────┐
+        │ Worker Service│
+        └──────┬────────┘
+               │
+               ▼
+        ┌───────────────┐
+        │ Processing    │
+        │ Engine (C)    │
+        └───────────────┘
+```
+
+---
+
+# 🔹 Service Responsibilities
+
+## API Service
+
+**Owns:**
+
+* Request validation
+* File upload handling
+* Job creation
+* Status retrieval
+
+**Does NOT:**
+
+* Process images
+* Execute CLI
+
+---
+
+## Worker Service
+
+**Owns:**
+
+* Queue consumption
+* Image processing
+* Job execution
+* Output generation
+
+---
+
+# 📦 Job Contract (API → Worker)
+
+```json
+{
+  "job_id": "uuid",
+  "input_path": "/data/uploads/input.jpg",
+  "params": {
+    "cols": 6,
+    "rows": 1,
+    "width": 3.5,
+    "height": 3.0,
+    "gap": 10,
+    "padding": 10
+  }
+}
+```
+
+---
+
+# 🧱 Infrastructure
+
+## docker-compose services
+
+* api-service
+* worker-service
+* redis
+* postgres (optional, recommended)
+
+---
+
+# ▶️ Running Locally
+
+```bash
+docker-compose up --build
+```
+
+---
+
+# 📈 Scaling Strategy
+
+| Component      | Scaling Method             |
+| -------------- | -------------------------- |
+| API Service    | Horizontal (more replicas) |
+| Worker Service | Queue-based scaling        |
+| Redis          | Vertical / managed service |
+| Storage        | Move to S3 (future)        |
+
+---
+
+# 🚀 Evolution Roadmap
+
+## Phase 1 (Current)
+
+* Modular monolith
+* Background worker
+* Local storage
+
+---
+
+## Phase 2 (Next)
+
+* API service separation
+* Worker isolation
+* Queue contracts
+
+---
+
+## Phase 3
+
+* Storage abstraction (S3)
+* Job service separation
+
+---
+
+## Phase 4
+
+* Auth service (API keys)
+* Billing system
+* Multi-tenant support
+
+---
+
+# ❌ Anti-Patterns (Avoid These)
+
+* Splitting into too many services early
+* Sharing internal modules across services
+* Synchronous API → Worker calls
+* Premature Kubernetes adoption
+* Over-engineering infrastructure
+
+---
+
+# 🔐 Future Enhancements
+
+* API key authentication
+* Rate limiting per user
+* Observability (logs, metrics, tracing)
+* Retry & dead-letter queues
+
+---
+
+# 🧠 Engineering Insight
+
+Microservices are not a starting point —
+they are an **outcome of scaling needs**.
+
+This system is intentionally designed to:
+
+> Start simple → Scale safely → Evolve incrementally
+
+---
+
+# 👨‍💻 Authoring Philosophy
+
+This architecture prioritizes:
+
+* Developer velocity
+* System reliability
+* Clear boundaries
+* Incremental complexity
+
+---
+
+# 📌 Final Note
+
+If you're building this alone or in a small team:
+
+👉 Stay in **Phase 2 as long as possible**
+👉 Only move forward when scaling demands it
+
+---
+
+# 🏁 Status
+
+| Stage              | Status         |
+| ------------------ | -------------- |
+| Monolith           | ✅ Completed    |
+| Worker Integration | ✅ Completed    |
+| Service Split      | 🚧 In Progress |
+| Full Microservices | ⏳ Future       |
+
+---
+
+### Final one imgengine-saas/ Microservices 
+
+    ├── imgengine-saas/
+    │   ├── api-service/
+    │   │   ├── app/
+    │   │   ├── Dockerfile
+    │   │
+    │   ├── worker-service/
+    │   │   ├── tasks.py
+    │   │   ├── engine_runner.py
+    │   │   ├── imgengine_cli
+    │   │   ├── Dockerfile
+    │
+    ├── infra/
+    │   └── docker-compose.yml

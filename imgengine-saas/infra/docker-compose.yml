@@ -1,7 +1,8 @@
+# infra/docker-compose.yaml
 services:
 
   api:
-    build: ../backend
+    build: ../api-service
     ports:
       - "8000:8000"
     volumes:
@@ -11,10 +12,8 @@ services:
       - db
 
   worker:
-    build: ../backend
-    # command: celery -A app.workers.tasks worker --loglevel=info
-    # Prefix the command with 'uv run'
-    command: uv run celery -A app.workers.tasks worker --loglevel=info
+    build: ../worker-service
+    command: celery -A tasks worker --loglevel=info
     volumes:
       - ../data:/data
     depends_on:
@@ -30,5 +29,3 @@ services:
       POSTGRES_USER: imgengine
       POSTGRES_PASSWORD: imgengine
       POSTGRES_DB: imgengine
-    ports:
-      - "5432:5432"

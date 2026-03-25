@@ -1,3 +1,5 @@
+# backend/core/config.py 
+
 import os
 
 DATABASE_URL = os.getenv(
