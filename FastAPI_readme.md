@@ -171,6 +171,9 @@
     │   │   │   └── security.py
                     limiter.py
                     db.py
+
+                models/
+                    job.py
     │   │   │
     │   │   ├── services/
     │   │   │   └── engine_runner.py   # CLI bridge
@@ -190,6 +193,10 @@
     ├── worker/                       # Celery worker
     │   ├── worker.py
     │   └── Dockerfile
+            imgengine_cli.exe          # Compiled C binary
+            pyproject.toml
+            uv.lock
+            .python-version
     │
     ├── infra/                        # Infrastructure configs
     │   ├── docker-compose.yml
@@ -201,7 +208,6 @@
     │   ├── uploads/
     │   └── outputs/
     │
-    ├── imgengine_cli                 # Compiled C binary
     │
     ├── frontend/                     # Future UI (React/Nuxt)
     │
