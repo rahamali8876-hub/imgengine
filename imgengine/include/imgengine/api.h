@@ -3,35 +3,18 @@
 #ifndef IMG_API_H
 #define IMG_API_H
 
-#include <stdint.h>
-#include <stddef.h>
 #include "common.h" // <--- CLEANER
-
-// #if defined(_WIN32)
-// #define IE_API __declspec(dllexport)
-// #else
-// #define IE_API __attribute__((visibility("default")))
-// #endif
+#include <stddef.h>
+#include <stdint.h>
 
 /* Opaque Handle: Keeps internal struct changes from breaking external apps */
 typedef struct img_ctx img_ctx_t;
 
-typedef enum
-{
-    IMG_OK = 0,
-    IMG_ERR_ALLOC = 1,
-    IMG_ERR_IO = 2,
-    IMG_ERR_INVALID = 3
-} img_status_t;
+typedef enum { IMG_OK = 0, IMG_ERR_ALLOC = 1, IMG_ERR_IO = 2, IMG_ERR_INVALID = 3 } img_status_t;
 
-typedef enum
-{
-    IMG_FIT,
-    IMG_FILL
-} img_scale_mode_t;
+typedef enum { IMG_FIT, IMG_FILL } img_scale_mode_t;
 
-typedef struct img_job
-{
+typedef struct img_job {
     float photo_w_cm;
     float photo_h_cm;
     int dpi;
@@ -51,20 +34,16 @@ typedef struct img_job
 } img_job_t;
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
-    /* --- Lifecycle Management --- */
-    IE_API img_status_t imgengine_create(img_ctx_t **out_ctx, size_t pool_size);
-    IE_API void imgengine_destroy(img_ctx_t *ctx);
+/* --- Lifecycle Management --- */
+IE_API img_status_t imgengine_create(img_ctx_t **out_ctx, size_t pool_size);
+IE_API void imgengine_destroy(img_ctx_t *ctx);
 
-    /* --- The Main Pipeline --- */
-    IE_API img_status_t imgengine_run(
-        img_ctx_t *ctx,
-        const char *input,
-        const char *output,
-        const img_job_t *job);
+/* --- The Main Pipeline --- */
+IE_API img_status_t imgengine_run(img_ctx_t *ctx, const char *input, const char *output,
+                                  const img_job_t *job);
 
 #ifdef __cplusplus
 }
