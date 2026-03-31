@@ -1,134 +1,127 @@
-cmake_minimum_required(VERSION 3.16)
+# # imgengine/CMakeLists.txt
+# cmake_minimum_required(VERSION 3.10)
+# project(imgengine C)
 
+# set(CMAKE_C_STANDARD 11)
+
+# # Optimization & Hardening Flags
+# set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -march=native -Wall -Wextra -Werror")
+# set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fvisibility=hidden -fno-plt -fPIC")
+
+# # Standard Search Paths
+# include_directories(
+#     api/v1 
+#     src/ 
+#     include/ 
+#     memory/ 
+#     runtime/ 
+#     arch/
+#     pipeline/
+#     plugins/
+#     io/
+# )
+
+# # Find External Dependencies
+# find_package(Threads REQUIRED)
+# find_library(TURBOJPEG_LIB NAMES turbojpeg)
+
+# # Collect all internal source files
+# file(GLOB_RECURSE ENGINE_SOURCES 
+#     "src/*.c" 
+#     "arch/*.c" 
+#     "pipeline/*.c" 
+#     "plugins/*.c" 
+#     "io/*.c" 
+#     "runtime/*.c" 
+#     "memory/*.c"
+# )
+
+# # 1. Generate the Shared Library (v1.0 API)
+# add_library(imgengine SHARED ${ENGINE_SOURCES})
+# target_link_libraries(imgengine PRIVATE Threads::Threads ${TURBOJPEG_LIB} m)
+
+# # 2. Generate the CLI Executable
+# add_executable(imgengine_cli cmd/imgengine/main.c cmd/imgengine/args.c)
+# target_link_libraries(imgengine_cli PRIVATE imgengine)
+
+# # 3. Performance Benchmarking Tool
+# add_executable(bench_lat cmd/bench/lat_bench.c)
+# target_link_libraries(bench_lat PRIVATE imgengine)
+
+
+cmake_minimum_required(VERSION 3.10)
 project(imgengine C)
 
 set(CMAKE_C_STANDARD 11)
-set(CMAKE_C_STANDARD_REQUIRED ON)
 
-option(IMGENGINE_BUILD_SHARED "Build shared library" OFF)
+# --- 1. HARDENING & OPTIMIZATION FLAGS ---
+# -march=native: Uses current CPU's SIMD (AVX2/AVX512)
+# -fno-plt: Bypasses PLT for faster calls
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -march=native -Wall -Wextra -Werror")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fvisibility=hidden -fno-plt -fPIC")
 
-# =========================
-# SOURCES
-# =========================
-
-set(IMGENGINE_PUBLIC_HEADERS
-    include/imgengine/api.h
-    include/imgengine/context.h
-    include/imgengine/memory_pool.h
-    include/imgengine/image.h
-    include/imgengine/error.h
-    include/imgengine/io.h
-    include/imgengine/crop.h
-    include/imgengine/resize.h
-    include/imgengine/border.h
-    include/imgengine/layout.h
-    # plugins 
-    include/imgengine/plugins/plugin_registry.h
-    include/imgengine/plugins/plugin_runner.h
-    include/imgengine/plugins/plugin.h
-)
-
-set(IMGENGINE_PRIVATE_SOURCES
-
-    # core
-    src/core/memory_pool.c
-    src/core/context.c
-    src/core/image.c
-    src/core/lbit_avx2.c   # ✅ ADD THIS
-
-    # ops
-    src/ops/crop.c
-    src/ops/resize.c
-    src/ops/border.c
-
-    # layout
-    src/layout/grid_layout.c
-    src/layout/auto_fit.c
-    src/layout/crop_marks.c
-
-    # io
-    src/io/stb_impl.c
-
-    # plugin
-    src/plugins/pdf_write.c
-    src/plugins/bleed_plugin.c
-    src/plugins/crop_plugin.c
-    src/plugins/plugin_registry.c
-    src/plugins/registers_all.c
-
-    # pipeline
-    src/pipeline/plugin_runner.c
-
-    # api
-    src/api/api.c
-)
-
-# =========================
-# LIBRARY
-# =========================
-
-if(IMGENGINE_BUILD_SHARED)
-    add_library(imgengine SHARED
-        ${IMGENGINE_PUBLIC_HEADERS}
-        ${IMGENGINE_PRIVATE_SOURCES}
-    )
+# --- 2. ARCHITECTURE DETECTION (CRITICAL) ---
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|amd64")
+    set(ARCH_DIR "arch/x86_64")
+    add_definitions(-DARCH_X86_64)
+    message(STATUS "Build target: x86_64 (AVX-512/AVX2)")
+elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|arm64")
+    set(ARCH_DIR "arch/aarch64")
+    add_definitions(-DARCH_AARCH64)
+    message(STATUS "Build target: aarch64 (NEON)")
 else()
-    add_library(imgengine STATIC
-        ${IMGENGINE_PUBLIC_HEADERS}
-        ${IMGENGINE_PRIVATE_SOURCES}
-    )
+    set(ARCH_DIR "arch/scalar")
+    message(STATUS "Build target: Generic Scalar Fallback")
 endif()
 
-# =========================
-# INCLUDE STRUCTURE
-# =========================
-
-target_include_directories(imgengine
-    PUBLIC
-        ${PROJECT_SOURCE_DIR}/include   # exposed to users
-
-    PRIVATE
-        ${PROJECT_SOURCE_DIR}/src        # internal only
-        ${PROJECT_SOURCE_DIR}/third_party
+# --- 3. SEARCH PATHS ---
+include_directories(
+    .
+    api/v1 
+    src 
+    include 
+    memory 
+    runtime 
+    pipeline 
+    plugins 
+    io
 )
 
-if (MSVC)
-    target_compile_options(imgengine PRIVATE /W4)
-else()
-    target_compile_options(imgengine PRIVATE 
-        -Wall -Wextra -Wpedantic
-        -O3
-        -mavx2
-        -mfma
-        -march=native
-        -fopenmp
-    )
+# --- 4. EXTERNAL DEPENDENCIES ---
+find_package(Threads REQUIRED)
+# Reliable search for TurboJPEG on Ubuntu/Codespaces
+find_path(TURBOJPEG_INCLUDE_DIR NAMES turbojpeg.h)
+find_library(TURBOJPEG_LIB NAMES turbojpeg)
 
-    target_link_libraries(imgengine PRIVATE m gomp)
-endif()
+# if(NOT TURBOJPEG_LIB)
+#     message(FATAL_ERROR "libturbojpeg not found. Run: sudo apt-get install libturbojpeg0-dev")
+# endif()
 
-# =========================
-# CLI
-# =========================
-
-add_executable(imgengine_cli
-    cli/main.c
+# --- 5. SOURCE COLLECTION (Filtered by Arch) ---
+file(GLOB_RECURSE ENGINE_SOURCES 
+    "src/*.c" 
+    "pipeline/*.c" 
+    "plugins/*.c" 
+    "io/*.c" 
+    "runtime/*.c" 
+    "memory/*.c"
+    "${ARCH_DIR}/*.c" # Only pulls the compatible silicon logic
 )
 
-target_link_libraries(imgengine_cli PRIVATE imgengine m)
+# --- 6. TARGETS ---
 
-# CLI needs public headers too
-target_include_directories(imgengine_cli
-    PRIVATE
-        ${PROJECT_SOURCE_DIR}/include
-)
+# A. The Core Shared Library
+add_library(imgengine SHARED ${ENGINE_SOURCES})
+target_include_directories(imgengine PRIVATE ${TURBOJPEG_INCLUDE_DIR})
+target_link_libraries(imgengine PRIVATE Threads::Threads ${TURBOJPEG_LIB} m)
 
-# =========================
-# WARNINGS
-# =========================
+# B. The Production CLI Tool
+add_executable(imgengine_cli cmd/imgengine/main.c cmd/imgengine/args.c)
+target_link_libraries(imgengine_cli PRIVATE imgengine)
 
-if (MSVC)
-    target_compile_options(imgengine PRIVATE /W4)
-else()
-    target_compile_options(imgengine PRIVATE -Wall -Wextra -Wpedantic)
+# C. The Latency Benchmarker
+# Ensure this file exists: touch cmd/bench/lat_bench.c
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/cmd/bench/lat_bench.c")
+    add_executable(bench_lat cmd/bench/lat_bench.c)
+    target_link_libraries(bench_lat PRIVATE imgengine)
 endif()

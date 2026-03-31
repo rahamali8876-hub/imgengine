@@ -1,73 +1,31 @@
-// // // src/core/context.c
+/* src/core/context.c */
+#include "core/context.h"
+#include "memory/slab.h"
+#include "core/dispatcher.h"
+#include <stdlib.h>
 
-#include "imgengine/context.h"
-#include "imgengine/layout.h"
-#include "imgengine/memory_pool.h"
-
-void img_ctx_init(img_ctx_t *ctx, size_t pool_size)
+img_ctx_t *img_ctx_init(uint32_t worker_id, size_t slab_size, size_t num_slabs)
 {
-    mp_init(&ctx->pool, pool_size);
-    ctx->layout = NULL;
+    img_ctx_t *ctx = malloc(sizeof(img_ctx_t));
+    if (!ctx)
+        return NULL;
+
+    ctx->worker_id = worker_id;
+
+    // 1. Initialize thread-local Slab Allocator (Zero Fragmentation)
+    ctx->pool = img_slab_init(slab_size, num_slabs);
+
+    // 2. Cache CPU capabilities for O(1) dispatching
+    ctx->cpu_caps = img_get_cpu_arch();
+
+    return ctx;
 }
 
 void img_ctx_destroy(img_ctx_t *ctx)
 {
-    mp_destroy(&ctx->pool);
+    if (ctx)
+    {
+        img_slab_destroy(ctx->pool);
+        free(ctx);
+    }
 }
-
-void layout_store(img_ctx_t *ctx,
-                  img_cell_t *cells,
-                  int count)
-{
-    img_layout_info_t *info =
-        (img_layout_info_t *)mp_alloc(&ctx->pool, sizeof(img_layout_info_t));
-
-    if (!info)
-        return;
-
-    info->cells = cells;
-    info->count = count;
-
-    ctx->layout = info;
-}
-
-img_layout_info_t *layout_get(img_ctx_t *ctx)
-{
-    return ctx->layout;
-}
-
-// #include "imgengine/context.h"
-// #include "imgengine/layout.h"
-// #include "imgengine/memory_pool.h"
-
-// void img_ctx_init(img_ctx_t *ctx, size_t pool_size)
-// {
-//     mp_init(&ctx->pool, pool_size);
-//     ctx->layout = NULL;
-// }
-
-// void img_ctx_destroy(img_ctx_t *ctx)
-// {
-//     mp_destroy(&ctx->pool);
-// }
-
-// void layout_store(img_ctx_t *ctx,
-//                   img_cell_t *cells,
-//                   int count)
-// {
-//     img_layout_info_t *info =
-//         (img_layout_info_t *)mp_alloc(&ctx->pool, sizeof(img_layout_info_t));
-
-//     if (!info)
-//         return;
-
-//     info->cells = cells;
-//     info->count = count;
-
-//     ctx->layout = info;
-// }
-
-// img_layout_info_t *layout_get(img_ctx_t *ctx)
-// {
-//     return ctx->layout;
-// }

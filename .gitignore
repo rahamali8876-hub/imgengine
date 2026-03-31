@@ -1,2 +1,78 @@
-*build
-*.venv
+# ==========================================
+# 1. Build Artifacts (The "Dirty" Files)
+# ==========================================
+build/
+bin/
+obj/
+*.o
+*.so
+*.a
+*.la
+*.lo
+*.out
+*.app
+
+# ==========================================
+# 2. Executables (CLI & Benchmarks)
+# ==========================================
+imgengine
+imgengine_cli
+bench_lat
+bench_mem
+test_runner
+
+# ==========================================
+# 3. CMake Metadata & Cache
+# ==========================================
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+cmake_install.cmake
+install_manifest.txt
+Makefile
+_deps/
+vcpkg_installed/
+.cmake/
+
+# ==========================================
+# 4. Dependency & System Specific
+# ==========================================
+node_modules/
+.venv/
+env/
+vendor/
+*.log
+*.swp
+*~
+.DS_Store
+Thumbs.db
+
+# ==========================================
+# 5. IDE / Editor Configurations
+# ==========================================
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.project
+.settings/
+.classpath
+
+# ==========================================
+# 6. Test Data & Corpus (Large Files)
+# ==========================================
+tests/corpus/*.jpg
+tests/corpus/*.png
+!tests/corpus/.gitkeep
+valgrind-out*
+gmon.out
+*.gcda
+*.gcno
+*.gcov
+
+# ==========================================
+# 7. Security & Secrets
+# ==========================================
+.env
+*.pem
+*.key
