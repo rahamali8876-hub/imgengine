@@ -1,6 +1,6 @@
 /* arch/x86_64/avx2/color_avx2.c */
 #include <immintrin.h>
-#include "arch/arch_kernels.h"
+#include "arch/arch_interface.h"
 
 void img_arch_avx2_grayscale(img_buffer_t *buf)
 {

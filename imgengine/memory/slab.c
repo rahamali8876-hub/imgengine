@@ -16,6 +16,7 @@ struct img_slab_pool
     size_t total_size;
     size_t block_size;
     size_t block_count;
+    int numa_node; // 🔥 NEW
 };
 
 img_slab_pool_t *img_slab_create(size_t total_size, size_t block_size)
@@ -27,7 +28,11 @@ img_slab_pool_t *img_slab_create(size_t total_size, size_t block_size)
     // Align block size to 64 bytes
     block_size = (block_size + 63) & ~63;
 
-    pool->memory = aligned_alloc(64, total_size);
+    // pool->memory = aligned_alloc(64, total_size);
+    int node = img_numa_get_node();
+    pool->memory = img_numa_alloc_onnode(total_size, node);
+    pool->numa_node = node;
+
     pool->total_size = total_size;
     pool->block_size = block_size;
     pool->block_count = total_size / block_size;
@@ -71,6 +76,6 @@ void img_slab_destroy(img_slab_pool_t *pool)
     if (!pool)
         return;
 
-    free(pool->memory);
+    img_numa_free(pool->memory, pool->total_size);
     free(pool);
 }

@@ -299,6 +299,30 @@ arch/x86_64/scalar/color_scalar.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/arch/x86_64/scalar/color_scalar.c.s
 .PHONY : arch/x86_64/scalar/color_scalar.c.s
 
+arch/x86_64/scalar/resize_scalar.o: arch/x86_64/scalar/resize_scalar.c.o
+.PHONY : arch/x86_64/scalar/resize_scalar.o
+
+# target to build an object file
+arch/x86_64/scalar/resize_scalar.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/arch/x86_64/scalar/resize_scalar.c.o
+.PHONY : arch/x86_64/scalar/resize_scalar.c.o
+
+arch/x86_64/scalar/resize_scalar.i: arch/x86_64/scalar/resize_scalar.c.i
+.PHONY : arch/x86_64/scalar/resize_scalar.i
+
+# target to preprocess a source file
+arch/x86_64/scalar/resize_scalar.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/arch/x86_64/scalar/resize_scalar.c.i
+.PHONY : arch/x86_64/scalar/resize_scalar.c.i
+
+arch/x86_64/scalar/resize_scalar.s: arch/x86_64/scalar/resize_scalar.c.s
+.PHONY : arch/x86_64/scalar/resize_scalar.s
+
+# target to generate assembly for a file
+arch/x86_64/scalar/resize_scalar.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/arch/x86_64/scalar/resize_scalar.c.s
+.PHONY : arch/x86_64/scalar/resize_scalar.c.s
+
 cmd/bench/lat_bench.o: cmd/bench/lat_bench.c.o
 .PHONY : cmd/bench/lat_bench.o
 
@@ -371,6 +395,30 @@ cmd/imgengine/main.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine_cli.dir/build.make CMakeFiles/imgengine_cli.dir/cmd/imgengine/main.c.s
 .PHONY : cmd/imgengine/main.c.s
 
+io/decoder/decoder_entry.o: io/decoder/decoder_entry.c.o
+.PHONY : io/decoder/decoder_entry.o
+
+# target to build an object file
+io/decoder/decoder_entry.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/io/decoder/decoder_entry.c.o
+.PHONY : io/decoder/decoder_entry.c.o
+
+io/decoder/decoder_entry.i: io/decoder/decoder_entry.c.i
+.PHONY : io/decoder/decoder_entry.i
+
+# target to preprocess a source file
+io/decoder/decoder_entry.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/io/decoder/decoder_entry.c.i
+.PHONY : io/decoder/decoder_entry.c.i
+
+io/decoder/decoder_entry.s: io/decoder/decoder_entry.c.s
+.PHONY : io/decoder/decoder_entry.s
+
+# target to generate assembly for a file
+io/decoder/decoder_entry.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/io/decoder/decoder_entry.c.s
+.PHONY : io/decoder/decoder_entry.c.s
+
 io/decoder/jpeg/jpeg_decoder.o: io/decoder/jpeg/jpeg_decoder.c.o
 .PHONY : io/decoder/jpeg/jpeg_decoder.o
 
@@ -442,6 +490,30 @@ io/decoder/stb_bridge.s: io/decoder/stb_bridge.c.s
 io/decoder/stb_bridge.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/io/decoder/stb_bridge.c.s
 .PHONY : io/decoder/stb_bridge.c.s
+
+io/encoder/encoder_entry.o: io/encoder/encoder_entry.c.o
+.PHONY : io/encoder/encoder_entry.o
+
+# target to build an object file
+io/encoder/encoder_entry.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/io/encoder/encoder_entry.c.o
+.PHONY : io/encoder/encoder_entry.c.o
+
+io/encoder/encoder_entry.i: io/encoder/encoder_entry.c.i
+.PHONY : io/encoder/encoder_entry.i
+
+# target to preprocess a source file
+io/encoder/encoder_entry.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/io/encoder/encoder_entry.c.i
+.PHONY : io/encoder/encoder_entry.c.i
+
+io/encoder/encoder_entry.s: io/encoder/encoder_entry.c.s
+.PHONY : io/encoder/encoder_entry.s
+
+# target to generate assembly for a file
+io/encoder/encoder_entry.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/io/encoder/encoder_entry.c.s
+.PHONY : io/encoder/encoder_entry.c.s
 
 io/encoder/jpeg_encoder.o: io/encoder/jpeg_encoder.c.o
 .PHONY : io/encoder/jpeg_encoder.o
@@ -1091,6 +1163,30 @@ runtime/backpressure.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/runtime/backpressure.c.s
 .PHONY : runtime/backpressure.c.s
 
+runtime/queue_mpmc.o: runtime/queue_mpmc.c.o
+.PHONY : runtime/queue_mpmc.o
+
+# target to build an object file
+runtime/queue_mpmc.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/runtime/queue_mpmc.c.o
+.PHONY : runtime/queue_mpmc.c.o
+
+runtime/queue_mpmc.i: runtime/queue_mpmc.c.i
+.PHONY : runtime/queue_mpmc.i
+
+# target to preprocess a source file
+runtime/queue_mpmc.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/runtime/queue_mpmc.c.i
+.PHONY : runtime/queue_mpmc.c.i
+
+runtime/queue_mpmc.s: runtime/queue_mpmc.c.s
+.PHONY : runtime/queue_mpmc.s
+
+# target to generate assembly for a file
+runtime/queue_mpmc.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/runtime/queue_mpmc.c.s
+.PHONY : runtime/queue_mpmc.c.s
+
 runtime/queue_spsc.o: runtime/queue_spsc.c.o
 .PHONY : runtime/queue_spsc.o
 
@@ -1480,6 +1576,9 @@ help:
 	@echo "... arch/x86_64/scalar/color_scalar.o"
 	@echo "... arch/x86_64/scalar/color_scalar.i"
 	@echo "... arch/x86_64/scalar/color_scalar.s"
+	@echo "... arch/x86_64/scalar/resize_scalar.o"
+	@echo "... arch/x86_64/scalar/resize_scalar.i"
+	@echo "... arch/x86_64/scalar/resize_scalar.s"
 	@echo "... cmd/bench/lat_bench.o"
 	@echo "... cmd/bench/lat_bench.i"
 	@echo "... cmd/bench/lat_bench.s"
@@ -1489,6 +1588,9 @@ help:
 	@echo "... cmd/imgengine/main.o"
 	@echo "... cmd/imgengine/main.i"
 	@echo "... cmd/imgengine/main.s"
+	@echo "... io/decoder/decoder_entry.o"
+	@echo "... io/decoder/decoder_entry.i"
+	@echo "... io/decoder/decoder_entry.s"
 	@echo "... io/decoder/jpeg/jpeg_decoder.o"
 	@echo "... io/decoder/jpeg/jpeg_decoder.i"
 	@echo "... io/decoder/jpeg/jpeg_decoder.s"
@@ -1498,6 +1600,9 @@ help:
 	@echo "... io/decoder/stb_bridge.o"
 	@echo "... io/decoder/stb_bridge.i"
 	@echo "... io/decoder/stb_bridge.s"
+	@echo "... io/encoder/encoder_entry.o"
+	@echo "... io/encoder/encoder_entry.i"
+	@echo "... io/encoder/encoder_entry.s"
 	@echo "... io/encoder/jpeg_encoder.o"
 	@echo "... io/encoder/jpeg_encoder.i"
 	@echo "... io/encoder/jpeg_encoder.s"
@@ -1579,6 +1684,9 @@ help:
 	@echo "... runtime/backpressure.o"
 	@echo "... runtime/backpressure.i"
 	@echo "... runtime/backpressure.s"
+	@echo "... runtime/queue_mpmc.o"
+	@echo "... runtime/queue_mpmc.i"
+	@echo "... runtime/queue_mpmc.s"
 	@echo "... runtime/queue_spsc.o"
 	@echo "... runtime/queue_spsc.i"
 	@echo "... runtime/queue_spsc.s"

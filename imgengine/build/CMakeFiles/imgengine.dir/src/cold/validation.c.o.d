@@ -26,5 +26,6 @@ CMakeFiles/imgengine.dir/src/cold/validation.c.o: \
  /workspaces/imgengine/imgengine/./memory/slab.h \
  /usr/lib/gcc/x86_64-linux-gnu/13/include/stddef.h \
  /workspaces/imgengine/imgengine/./arch/cpu_caps.h \
+ /usr/include/turbojpeg.h \
  /workspaces/imgengine/imgengine/src/core/image.h \
  /workspaces/imgengine/imgengine/src/hot/batch.h

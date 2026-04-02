@@ -1,5 +1,5 @@
 /* arch/x86_64/scalar/color_scalar.c */
-#include "arch/arch_kernels.h"
+#include "arch/arch_interface.h"
 
 void img_arch_scalar_grayscale(img_buffer_t *buf)
 {

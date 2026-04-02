@@ -25,6 +25,7 @@ CMakeFiles/imgengine.dir/src/core/init.c.o: \
  /workspaces/imgengine/imgengine/src/core/context.h \
  /workspaces/imgengine/imgengine/./memory/slab.h \
  /usr/lib/gcc/x86_64-linux-gnu/13/include/stddef.h \
+ /usr/include/turbojpeg.h \
  /workspaces/imgengine/imgengine/src/core/image.h \
  /workspaces/imgengine/imgengine/src/hot/batch.h \
  /workspaces/imgengine/imgengine/./observability/metrics.h

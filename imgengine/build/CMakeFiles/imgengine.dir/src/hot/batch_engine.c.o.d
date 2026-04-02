@@ -24,5 +24,6 @@ CMakeFiles/imgengine.dir/src/hot/batch_engine.c.o: \
  /workspaces/imgengine/imgengine/./memory/slab.h \
  /usr/lib/gcc/x86_64-linux-gnu/13/include/stddef.h \
  /workspaces/imgengine/imgengine/./arch/cpu_caps.h \
+ /usr/include/turbojpeg.h \
  /workspaces/imgengine/imgengine/./pipeline/pipeline.h \
  /workspaces/imgengine/imgengine/./pipeline/jump_table.h

@@ -3,6 +3,8 @@ CMakeFiles/imgengine.dir/src/cold/debug.c.o: \
  /usr/include/stdc-predef.h \
  /workspaces/imgengine/imgengine/src/cold/debug.h \
  /workspaces/imgengine/imgengine/./src/core/context.h \
+ /workspaces/imgengine/imgengine/./memory/slab.h \
+ /usr/lib/gcc/x86_64-linux-gnu/13/include/stddef.h \
  /usr/lib/gcc/x86_64-linux-gnu/13/include/stdint.h /usr/include/stdint.h \
  /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
  /usr/include/features.h /usr/include/features-time64.h \
@@ -19,9 +21,8 @@ CMakeFiles/imgengine.dir/src/cold/debug.c.o: \
  /usr/include/x86_64-linux-gnu/bits/stdint-intn.h \
  /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h \
  /usr/include/x86_64-linux-gnu/bits/stdint-least.h \
- /workspaces/imgengine/imgengine/./memory/slab.h \
- /usr/lib/gcc/x86_64-linux-gnu/13/include/stddef.h \
- /workspaces/imgengine/imgengine/./arch/cpu_caps.h /usr/include/stdio.h \
+ /workspaces/imgengine/imgengine/./arch/cpu_caps.h \
+ /usr/include/turbojpeg.h /usr/include/stdio.h \
  /usr/lib/gcc/x86_64-linux-gnu/13/include/stdarg.h \
  /usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h \
  /usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h \
