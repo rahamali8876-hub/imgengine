@@ -9,6 +9,8 @@
 #define OP_RESIZE 0x01
 #define OP_CROP 0x02
 #define OP_GRAYSCALE 0x03
+#define OP_RESIZE_H 0x10
+#define OP_RESIZE_V 0x11
 
 // Plugin descriptor (future dynamic loading support)
 typedef struct
