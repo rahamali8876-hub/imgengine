@@ -27,7 +27,7 @@ void *img_numa_alloc_onnode(size_t size, int node)
         return aligned_alloc(64, size);
     }
 
-    return numa_alloc_onnode(size, node);
+    return img_numa_alloc_onnode(size, node);
 }
 
 void img_numa_free(void *ptr, size_t size)
@@ -41,7 +41,7 @@ void img_numa_free(void *ptr, size_t size)
         return;
     }
 
-    numa_free(ptr, size);
+    img_numa_free(ptr, size);
 }
 
 // #define _GNU_SOURCE

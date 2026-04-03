@@ -1,9 +1,7 @@
 CMakeFiles/imgengine.dir/src/core/context.c.o: \
  /workspaces/imgengine/imgengine/src/core/context.c \
  /usr/include/stdc-predef.h \
- /workspaces/imgengine/imgengine/src/core/context.h \
- /workspaces/imgengine/imgengine/./memory/slab.h \
- /usr/lib/gcc/x86_64-linux-gnu/13/include/stddef.h \
+ /workspaces/imgengine/imgengine/include/core/context_internal.h \
  /usr/lib/gcc/x86_64-linux-gnu/13/include/stdint.h /usr/include/stdint.h \
  /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
  /usr/include/features.h /usr/include/features-time64.h \
@@ -20,8 +18,11 @@ CMakeFiles/imgengine.dir/src/core/context.c.o: \
  /usr/include/x86_64-linux-gnu/bits/stdint-intn.h \
  /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h \
  /usr/include/x86_64-linux-gnu/bits/stdint-least.h \
+ /usr/lib/gcc/x86_64-linux-gnu/13/include/stddef.h \
+ /workspaces/imgengine/imgengine/./api/v1/img_core.h \
  /workspaces/imgengine/imgengine/./arch/cpu_caps.h \
- /usr/include/turbojpeg.h /usr/include/stdlib.h \
+ /workspaces/imgengine/imgengine/./memory/slab.h \
+ /workspaces/imgengine/imgengine/./memory/arena.h /usr/include/stdlib.h \
  /usr/include/x86_64-linux-gnu/bits/waitflags.h \
  /usr/include/x86_64-linux-gnu/bits/waitstatus.h \
  /usr/include/x86_64-linux-gnu/bits/floatn.h \

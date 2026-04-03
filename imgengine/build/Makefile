@@ -275,6 +275,30 @@ arch/x86_64/avx512/avx512.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/arch/x86_64/avx512/avx512.c.s
 .PHONY : arch/x86_64/avx512/avx512.c.s
 
+arch/x86_64/cpu_detect.o: arch/x86_64/cpu_detect.c.o
+.PHONY : arch/x86_64/cpu_detect.o
+
+# target to build an object file
+arch/x86_64/cpu_detect.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/arch/x86_64/cpu_detect.c.o
+.PHONY : arch/x86_64/cpu_detect.c.o
+
+arch/x86_64/cpu_detect.i: arch/x86_64/cpu_detect.c.i
+.PHONY : arch/x86_64/cpu_detect.i
+
+# target to preprocess a source file
+arch/x86_64/cpu_detect.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/arch/x86_64/cpu_detect.c.i
+.PHONY : arch/x86_64/cpu_detect.c.i
+
+arch/x86_64/cpu_detect.s: arch/x86_64/cpu_detect.c.s
+.PHONY : arch/x86_64/cpu_detect.s
+
+# target to generate assembly for a file
+arch/x86_64/cpu_detect.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/arch/x86_64/cpu_detect.c.s
+.PHONY : arch/x86_64/cpu_detect.c.s
+
 arch/x86_64/scalar/color_scalar.o: arch/x86_64/scalar/color_scalar.c.o
 .PHONY : arch/x86_64/scalar/color_scalar.o
 
@@ -419,30 +443,6 @@ io/decoder/decoder_entry.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/io/decoder/decoder_entry.c.s
 .PHONY : io/decoder/decoder_entry.c.s
 
-io/decoder/jpeg/jpeg_decoder.o: io/decoder/jpeg/jpeg_decoder.c.o
-.PHONY : io/decoder/jpeg/jpeg_decoder.o
-
-# target to build an object file
-io/decoder/jpeg/jpeg_decoder.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/io/decoder/jpeg/jpeg_decoder.c.o
-.PHONY : io/decoder/jpeg/jpeg_decoder.c.o
-
-io/decoder/jpeg/jpeg_decoder.i: io/decoder/jpeg/jpeg_decoder.c.i
-.PHONY : io/decoder/jpeg/jpeg_decoder.i
-
-# target to preprocess a source file
-io/decoder/jpeg/jpeg_decoder.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/io/decoder/jpeg/jpeg_decoder.c.i
-.PHONY : io/decoder/jpeg/jpeg_decoder.c.i
-
-io/decoder/jpeg/jpeg_decoder.s: io/decoder/jpeg/jpeg_decoder.c.s
-.PHONY : io/decoder/jpeg/jpeg_decoder.s
-
-# target to generate assembly for a file
-io/decoder/jpeg/jpeg_decoder.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/io/decoder/jpeg/jpeg_decoder.c.s
-.PHONY : io/decoder/jpeg/jpeg_decoder.c.s
-
 io/decoder/png_decoder.o: io/decoder/png_decoder.c.o
 .PHONY : io/decoder/png_decoder.o
 
@@ -538,30 +538,6 @@ io/encoder/jpeg_encoder.s: io/encoder/jpeg_encoder.c.s
 io/encoder/jpeg_encoder.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/io/encoder/jpeg_encoder.c.s
 .PHONY : io/encoder/jpeg_encoder.c.s
-
-io/encoder/output_writer.o: io/encoder/output_writer.c.o
-.PHONY : io/encoder/output_writer.o
-
-# target to build an object file
-io/encoder/output_writer.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/io/encoder/output_writer.c.o
-.PHONY : io/encoder/output_writer.c.o
-
-io/encoder/output_writer.i: io/encoder/output_writer.c.i
-.PHONY : io/encoder/output_writer.i
-
-# target to preprocess a source file
-io/encoder/output_writer.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/io/encoder/output_writer.c.i
-.PHONY : io/encoder/output_writer.c.i
-
-io/encoder/output_writer.s: io/encoder/output_writer.c.s
-.PHONY : io/encoder/output_writer.s
-
-# target to generate assembly for a file
-io/encoder/output_writer.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/io/encoder/output_writer.c.s
-.PHONY : io/encoder/output_writer.c.s
 
 io/vfs/memory_stream.o: io/vfs/memory_stream.c.o
 .PHONY : io/vfs/memory_stream.o
@@ -706,30 +682,6 @@ memory/numa.s: memory/numa.c.s
 memory/numa.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/memory/numa.c.s
 .PHONY : memory/numa.c.s
-
-memory/pool.o: memory/pool.c.o
-.PHONY : memory/pool.o
-
-# target to build an object file
-memory/pool.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/memory/pool.c.o
-.PHONY : memory/pool.c.o
-
-memory/pool.i: memory/pool.c.i
-.PHONY : memory/pool.i
-
-# target to preprocess a source file
-memory/pool.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/memory/pool.c.i
-.PHONY : memory/pool.c.i
-
-memory/pool.s: memory/pool.c.s
-.PHONY : memory/pool.s
-
-# target to generate assembly for a file
-memory/pool.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/memory/pool.c.s
-.PHONY : memory/pool.c.s
 
 memory/slab.o: memory/slab.c.o
 .PHONY : memory/slab.o
@@ -1283,6 +1235,30 @@ security/sandbox.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/security/sandbox.c.s
 .PHONY : security/sandbox.c.s
 
+src/api/api.o: src/api/api.c.o
+.PHONY : src/api/api.o
+
+# target to build an object file
+src/api/api.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/src/api/api.c.o
+.PHONY : src/api/api.c.o
+
+src/api/api.i: src/api/api.c.i
+.PHONY : src/api/api.i
+
+# target to preprocess a source file
+src/api/api.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/src/api/api.c.i
+.PHONY : src/api/api.c.i
+
+src/api/api.s: src/api/api.c.s
+.PHONY : src/api/api.s
+
+# target to generate assembly for a file
+src/api/api.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/src/api/api.c.s
+.PHONY : src/api/api.c.s
+
 src/cold/debug.o: src/cold/debug.c.o
 .PHONY : src/cold/debug.o
 
@@ -1403,29 +1379,29 @@ src/core/context.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/src/core/context.c.s
 .PHONY : src/core/context.c.s
 
-src/core/dispatcher.o: src/core/dispatcher.c.o
-.PHONY : src/core/dispatcher.o
+src/core/dispatcher_removed.o: src/core/dispatcher_removed.c.o
+.PHONY : src/core/dispatcher_removed.o
 
 # target to build an object file
-src/core/dispatcher.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/src/core/dispatcher.c.o
-.PHONY : src/core/dispatcher.c.o
+src/core/dispatcher_removed.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/src/core/dispatcher_removed.c.o
+.PHONY : src/core/dispatcher_removed.c.o
 
-src/core/dispatcher.i: src/core/dispatcher.c.i
-.PHONY : src/core/dispatcher.i
+src/core/dispatcher_removed.i: src/core/dispatcher_removed.c.i
+.PHONY : src/core/dispatcher_removed.i
 
 # target to preprocess a source file
-src/core/dispatcher.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/src/core/dispatcher.c.i
-.PHONY : src/core/dispatcher.c.i
+src/core/dispatcher_removed.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/src/core/dispatcher_removed.c.i
+.PHONY : src/core/dispatcher_removed.c.i
 
-src/core/dispatcher.s: src/core/dispatcher.c.s
-.PHONY : src/core/dispatcher.s
+src/core/dispatcher_removed.s: src/core/dispatcher_removed.c.s
+.PHONY : src/core/dispatcher_removed.s
 
 # target to generate assembly for a file
-src/core/dispatcher.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/src/core/dispatcher.c.s
-.PHONY : src/core/dispatcher.c.s
+src/core/dispatcher_removed.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/imgengine.dir/build.make CMakeFiles/imgengine.dir/src/core/dispatcher_removed.c.s
+.PHONY : src/core/dispatcher_removed.c.s
 
 src/core/image.o: src/core/image.c.o
 .PHONY : src/core/image.o
@@ -1549,6 +1525,9 @@ help:
 	@echo "... arch/x86_64/avx512/avx512.o"
 	@echo "... arch/x86_64/avx512/avx512.i"
 	@echo "... arch/x86_64/avx512/avx512.s"
+	@echo "... arch/x86_64/cpu_detect.o"
+	@echo "... arch/x86_64/cpu_detect.i"
+	@echo "... arch/x86_64/cpu_detect.s"
 	@echo "... arch/x86_64/scalar/color_scalar.o"
 	@echo "... arch/x86_64/scalar/color_scalar.i"
 	@echo "... arch/x86_64/scalar/color_scalar.s"
@@ -1567,9 +1546,6 @@ help:
 	@echo "... io/decoder/decoder_entry.o"
 	@echo "... io/decoder/decoder_entry.i"
 	@echo "... io/decoder/decoder_entry.s"
-	@echo "... io/decoder/jpeg/jpeg_decoder.o"
-	@echo "... io/decoder/jpeg/jpeg_decoder.i"
-	@echo "... io/decoder/jpeg/jpeg_decoder.s"
 	@echo "... io/decoder/png_decoder.o"
 	@echo "... io/decoder/png_decoder.i"
 	@echo "... io/decoder/png_decoder.s"
@@ -1582,9 +1558,6 @@ help:
 	@echo "... io/encoder/jpeg_encoder.o"
 	@echo "... io/encoder/jpeg_encoder.i"
 	@echo "... io/encoder/jpeg_encoder.s"
-	@echo "... io/encoder/output_writer.o"
-	@echo "... io/encoder/output_writer.i"
-	@echo "... io/encoder/output_writer.s"
 	@echo "... io/vfs/memory_stream.o"
 	@echo "... io/vfs/memory_stream.i"
 	@echo "... io/vfs/memory_stream.s"
@@ -1603,9 +1576,6 @@ help:
 	@echo "... memory/numa.o"
 	@echo "... memory/numa.i"
 	@echo "... memory/numa.s"
-	@echo "... memory/pool.o"
-	@echo "... memory/pool.i"
-	@echo "... memory/pool.s"
 	@echo "... memory/slab.o"
 	@echo "... memory/slab.i"
 	@echo "... memory/slab.s"
@@ -1675,6 +1645,9 @@ help:
 	@echo "... security/sandbox.o"
 	@echo "... security/sandbox.i"
 	@echo "... security/sandbox.s"
+	@echo "... src/api/api.o"
+	@echo "... src/api/api.i"
+	@echo "... src/api/api.s"
 	@echo "... src/cold/debug.o"
 	@echo "... src/cold/debug.i"
 	@echo "... src/cold/debug.s"
@@ -1690,9 +1663,9 @@ help:
 	@echo "... src/core/context.o"
 	@echo "... src/core/context.i"
 	@echo "... src/core/context.s"
-	@echo "... src/core/dispatcher.o"
-	@echo "... src/core/dispatcher.i"
-	@echo "... src/core/dispatcher.s"
+	@echo "... src/core/dispatcher_removed.o"
+	@echo "... src/core/dispatcher_removed.i"
+	@echo "... src/core/dispatcher_removed.s"
 	@echo "... src/core/image.o"
 	@echo "... src/core/image.i"
 	@echo "... src/core/image.s"

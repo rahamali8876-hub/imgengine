@@ -1,3 +1,5 @@
+// arch/x86_64/avx52/avx52.c
+
 #include <immintrin.h>
 #include "arch/arch_interface.h"
 #include "plugins/plugin_resize.h"

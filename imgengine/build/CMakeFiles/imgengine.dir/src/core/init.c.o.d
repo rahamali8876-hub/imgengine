@@ -1,9 +1,7 @@
 CMakeFiles/imgengine.dir/src/core/init.c.o: \
  /workspaces/imgengine/imgengine/src/core/init.c \
  /usr/include/stdc-predef.h \
- /workspaces/imgengine/imgengine/src/core/init.h \
- /workspaces/imgengine/imgengine/./pipeline/hardware_registry.h \
- /workspaces/imgengine/imgengine/./arch/cpu_caps.h \
+ /workspaces/imgengine/imgengine/include/core/context_internal.h \
  /usr/lib/gcc/x86_64-linux-gnu/13/include/stdint.h /usr/include/stdint.h \
  /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
  /usr/include/features.h /usr/include/features-time64.h \
@@ -20,12 +18,10 @@ CMakeFiles/imgengine.dir/src/core/init.c.o: \
  /usr/include/x86_64-linux-gnu/bits/stdint-intn.h \
  /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h \
  /usr/include/x86_64-linux-gnu/bits/stdint-least.h \
- /workspaces/imgengine/imgengine/./plugins/plugin_internal.h \
- /workspaces/imgengine/imgengine/./pipeline/pipeline.h \
- /workspaces/imgengine/imgengine/src/core/context.h \
- /workspaces/imgengine/imgengine/./memory/slab.h \
  /usr/lib/gcc/x86_64-linux-gnu/13/include/stddef.h \
- /usr/include/turbojpeg.h \
- /workspaces/imgengine/imgengine/src/core/image.h \
- /workspaces/imgengine/imgengine/src/hot/batch.h \
- /workspaces/imgengine/imgengine/./observability/metrics.h
+ /workspaces/imgengine/imgengine/./api/v1/img_core.h \
+ /workspaces/imgengine/imgengine/./arch/cpu_caps.h \
+ /workspaces/imgengine/imgengine/./memory/slab.h \
+ /workspaces/imgengine/imgengine/./memory/arena.h \
+ /workspaces/imgengine/imgengine/./pipeline/jump_table.h \
+ /workspaces/imgengine/imgengine/./api/v1/img_types.h

@@ -20,12 +20,6 @@ CMakeFiles/imgengine.dir/src/cold/validation.c.o: \
  /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h \
  /usr/include/x86_64-linux-gnu/bits/stdint-least.h \
  /workspaces/imgengine/imgengine/./api/v1/img_error.h \
- /workspaces/imgengine/imgengine/./src/core/image.h \
- /workspaces/imgengine/imgengine/./pipeline/pipeline.h \
- /workspaces/imgengine/imgengine/src/core/context.h \
- /workspaces/imgengine/imgengine/./memory/slab.h \
+ /workspaces/imgengine/imgengine/./api/v1/img_types.h \
  /usr/lib/gcc/x86_64-linux-gnu/13/include/stddef.h \
- /workspaces/imgengine/imgengine/./arch/cpu_caps.h \
- /usr/include/turbojpeg.h \
- /workspaces/imgengine/imgengine/src/core/image.h \
- /workspaces/imgengine/imgengine/src/hot/batch.h
+ /workspaces/imgengine/imgengine/./pipeline/pipeline.h

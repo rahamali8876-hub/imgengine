@@ -7,3 +7,7 @@
 
     rm -rf *
     cmake .. && make -j
+
+
+### find out the keyboard
+    grep -r "struct img_ctx" .

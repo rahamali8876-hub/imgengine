@@ -1,3 +1,5 @@
+// io/decoder/decoder_entry.h
+
 #ifndef IMGENGINE_IO_DECODER_ENTRY_H
 #define IMGENGINE_IO_DECODER_ENTRY_H
 

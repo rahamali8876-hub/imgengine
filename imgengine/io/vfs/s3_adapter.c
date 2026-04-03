@@ -1,3 +1,5 @@
+// io/vfs/io_vsf.h
+
 #include "io/io_vfs.h"
 
 // Pseudo implementation (to be wired with libcurl / aws-sdk)

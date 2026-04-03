@@ -1,28 +1,61 @@
-/* pipeline/jump_table.h */
+// /* pipeline/jump_table.h */
 
-#ifndef IMGENGINE_PIPELINE_JUMP_TABLE_H
-#define IMGENGINE_PIPELINE_JUMP_TABLE_H
+// // #include <stdint.h>
 
-#include "pipeline/pipeline.h"
+// // #include "pipeline/batch.h"
 
-#define CACHE_LINE 64
+// #ifndef IMGENGINE_JUMP_TABLE_H
+// #define IMGENGINE_JUMP_TABLE_H
 
-typedef struct
-{
-    img_op_fn ops[MAX_OPCODES];
-    img_batch_op_fn batch_ops[MAX_OPCODES];
-} img_jump_table_t __attribute__((aligned(CACHE_LINE)));
+// #include "core/context_internal.h"
+// #include "api/v1/img_types.h"
 
-// 🔥 GLOBAL (fallback)
-extern img_jump_table_t g_jump_table_global;
+// // Function pointer types
+// typedef void (*img_op_fn)(img_ctx_t *, img_buffer_t *, void *);
+// typedef void (*img_batch_op_fn)(img_ctx_t *, void *, void *); // keep simple for now
 
-// 🔥 THREAD-LOCAL (L1 HOT)
-extern __thread img_jump_table_t *g_jump_table_local;
+// #define IMG_MAX_OPS 256
 
-void img_pipeline_register_op(uint32_t op_code,
-                              img_op_fn single_fn,
-                              img_batch_op_fn batch_fn);
+// // Global tables
+// extern img_op_fn g_jump_table[IMG_MAX_OPS];
+// extern img_batch_op_fn g_batch_jump_table[IMG_MAX_OPS];
 
-void img_pipeline_bind_thread(void);
+// // Registration
+// void img_register_op(uint32_t opcode, img_op_fn fn, img_batch_op_fn batch_fn);
+
+// // 🔥 NEW: CPU-aware binding
+// void img_jump_table_init(cpu_caps_t caps);
+
+// #endif
+
+#ifndef IMGENGINE_JUMP_TABLE_H
+#define IMGENGINE_JUMP_TABLE_H
+
+#include <stdint.h>
+#include "core/context_internal.h"
+#include "api/v1/img_types.h"
+#include "arch/cpu_caps.h"
+
+// ================= FUNCTION TYPES =================
+
+typedef void (*img_op_fn)(img_ctx_t *, img_buffer_t *, void *);
+typedef void (*img_batch_op_fn)(img_ctx_t *, void *, void *);
+
+// ================= CONSTANTS =================
+
+#define IMG_MAX_OPS 256
+
+// ================= GLOBAL TABLES =================
+
+extern img_op_fn g_jump_table[IMG_MAX_OPS];
+extern img_batch_op_fn g_batch_jump_table[IMG_MAX_OPS];
+
+// ================= API =================
+
+// Register operation
+void img_register_op(uint32_t opcode, img_op_fn fn, img_batch_op_fn batch_fn);
+
+// CPU-aware init (MAIN ENTRY)
+void img_jump_table_init(cpu_caps_t caps);
 
 #endif

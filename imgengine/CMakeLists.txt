@@ -85,6 +85,7 @@ include_directories(
     observability
 )
 
+
 # ------------------------------------------------------------
 # 5. EXTERNAL DEPENDENCIES
 # ------------------------------------------------------------
@@ -111,6 +112,10 @@ file(GLOB_RECURSE CORE_SOURCES
 
 file(GLOB_RECURSE HOT_SOURCES
     "src/*.c"
+)
+
+file(GLOB API_SOURCES
+    "src/api/*.c"
 )
 
 file(GLOB_RECURSE COLD_SOURCES
@@ -151,6 +156,8 @@ file(GLOB_RECURSE ARCH_SOURCES
 
 # Combine all
 set(ENGINE_SOURCES
+    ${ENGINE_SOURCES}
+    ${API_SOURCES}
     ${CORE_SOURCES}
     ${HOT_SOURCES}
     ${COLD_SOURCES}

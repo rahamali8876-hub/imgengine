@@ -1,3 +1,5 @@
+// io/io_vsf.h
+
 #ifndef IMGENGINE_IO_VFS_H
 #define IMGENGINE_IO_VFS_H
 

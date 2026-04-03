@@ -1,3 +1,5 @@
+// plugins/plugin_grayscale.c
+
 #include "plugins/plugin_internal.h"
 #include <stdint.h>
 

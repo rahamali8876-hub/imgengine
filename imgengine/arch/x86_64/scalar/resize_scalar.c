@@ -1,3 +1,7 @@
+
+
+// arch/x86_64/scalar/resize_scalar.c
+
 #include "plugins/plugin_resize.h"
 #include "plugins/plugin_internal.h"
 #include <string.h>
