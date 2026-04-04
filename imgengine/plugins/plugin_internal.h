@@ -8,13 +8,6 @@
 #include "api/v1/img_types.h"    // 🔥 brings img_buffer_t
 #include "core/opcodes.h"        // 🔥 ADD THIS
 
-// Unified OpCodes
-// #define OP_RESIZE 0x01
-// #define OP_CROP 0x02
-// #define OP_GRAYSCALE 0x03
-// #define OP_RESIZE_H 0x10
-// #define OP_RESIZE_V 0x11
-
 // Plugin descriptor
 typedef struct
 {

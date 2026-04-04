@@ -3,6 +3,7 @@
 #include "io/encoder/encoder_entry.h"
 #include <turbojpeg.h>
 #include <stdlib.h>
+// #include "api/v1/img_types.h"
 
 int img_encode_from_buffer(img_ctx_t *ctx,
                            img_buffer_t *buf,
@@ -12,8 +13,8 @@ int img_encode_from_buffer(img_ctx_t *ctx,
     if (!ctx || !buf || !out_data || !out_size)
         return -1;
 
-    // tjhandle tj = tjInitCompress();
-    tjhandle tj = ctx->tj_encoder;
+    tjhandle tj = tjInitCompress();
+    // tjhandle tj = ctx->tj_encoder;
 
     if (!tj)
         return -1;
@@ -40,8 +41,8 @@ int img_encode_from_buffer(img_ctx_t *ctx,
                     quality,
                     TJFLAG_FASTDCT) != 0)
     {
-        // tjDestroy(tj);
-        return -1;
+        tjDestroy(tj);
+        // return -1;
     }
 
     // 🔥 TRANSFER OWNERSHIP (important)

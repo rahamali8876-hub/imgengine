@@ -36,7 +36,7 @@
 typedef struct
 {
     img_buffer_t buffer;
-    img_pipeline_t *pipeline;
+    img_pipeline_desc_t *pipeline;
 
     int status;
 

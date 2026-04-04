@@ -1,5 +1,5 @@
-/* api/v1/img_pipeline.c */
-#include "img_pipeline.h"
+/* core/img_pipeline.c */
+#include "api/v1/img_pipeline.h"
 
 void img_pipeline_init(img_pipeline_desc_t *pipe)
 {

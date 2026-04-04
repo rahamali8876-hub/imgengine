@@ -1,5 +1,12 @@
-🔥 ImgEngine Runtime — Full Worker System (L7 Design)
+🔥 ImgEngine Runtime — Full Worker System (L7/L8 Design)
 🧠 Core Philosophy
+
+RFC: imgengine v1.0 (FINAL)
+
+    Title: High-Performance, Kernel-Grade Image Processing Engine
+    Author: Principal Engineer (L7)
+    Status: Final Draft
+    Date: 2026-03-30
 
 You are building:
 

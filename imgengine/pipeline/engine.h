@@ -13,7 +13,7 @@
 
 void img_pipeline_execute(
     img_ctx_t *ctx,
-    img_pipeline_t *pipe,
+    img_pipeline_desc_t *pipe,
     img_buffer_t *buf);
 
 #endif

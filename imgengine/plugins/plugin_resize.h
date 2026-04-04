@@ -2,8 +2,6 @@
 
 #ifndef IMGENGINE_PLUGIN_RESIZE_H
 #define IMGENGINE_PLUGIN_RESIZE_H
-#define OP_RESIZE_H 0x10
-#define OP_RESIZE_V 0x11
 
 #include <stdint.h>
 #include "api/v1/img_types.h"

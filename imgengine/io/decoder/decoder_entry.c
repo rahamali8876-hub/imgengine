@@ -3,6 +3,7 @@
 #include "io/decoder/decoder_entry.h"
 #include <turbojpeg.h>
 #include <string.h>
+#include "api/v1/img_buffer_utils.h"
 
 int img_decode_to_buffer(img_ctx_t *ctx,
                          uint8_t *input,

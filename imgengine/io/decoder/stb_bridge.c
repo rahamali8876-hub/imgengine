@@ -7,6 +7,7 @@
 #include "core/context_internal.h"
 #include "api/v1/img_error.h"
 #include <string.h>
+#include "api/v1/img_buffer_utils.h"
 
 img_result_t img_decode_stb(
     img_ctx_t *ctx,
@@ -22,7 +23,7 @@ img_result_t img_decode_stb(
     if (!decoded)
         return IMG_ERR_FORMAT;
 
-    uint8_t *mem = img_slab_alloc(ctx->pool);
+    uint8_t *mem = img_slab_alloc(ctx->local_pool);
     if (!mem)
         return IMG_ERR_NOMEM;
 

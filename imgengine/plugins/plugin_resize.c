@@ -1,9 +1,11 @@
-// // plugins/_resize.c
+// plugins/_resize.c
+
 #include "plugins/plugin_internal.h"
 #include "plugins/plugin_resize.h"
 #include "memory/slab.h"
 #include "pipeline/jump_table.h"
 #include <stdlib.h>
+#include "api/v1/img_buffer_utils.h"
 
 static void precompute_indices(resize_params_t *p)
 {

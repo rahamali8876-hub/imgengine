@@ -620,6 +620,166 @@
     ?? This is how production systems are maintained at
     Google / Amazon scale.
 
+### 🧩 23. Header Design & Forward Declaration Policy (L7/L8 Critical)
+
+## 23.1 🎯 Objective
+
+    Minimize compile-time dependencies, enforce strict module boundaries, and maintain ABI stability using:
+
+    Forward declarations
+    Opaque types
+    Layered includes
+
+## 23.2 🧠 Core Principle
+
+    Headers expose interfaces only
+    Source files implement behavior
+
+## 23.3 🔥 Forward Declaration Rules
+
+     ✅ MUST USE forward declaration in .h when
+
+    1. Only pointer access is required
+    typedef struct img_buffer img_buffer_t;
+
+    void process(img_buffer_t *buf);
+    2. Plugin interfaces
+    // plugins/plugin_resize.h
+    typedef struct img_buffer img_buffer_t;
+    3. Runtime / worker APIs
+    void worker_submit(img_task_t *task);
+    4. Queue / scheduler systems
+    typedef struct img_task img_task_t;
+
+### ❌ MUST NOT use forward declaration when
+
+    1. Struct fields are accessed
+    buf->width   ❌ requires full definition
+    2. Struct is embedded (not pointer)
+    img_buffer_t buf;   ❌ needs full size
+    3. Inline functions depend on struct layout
+    static inline void foo(img_buffer_t *b) {
+        b->width = 10;  ❌ needs full type
+    }
+    23.4 🏗️ Opaque Type Design (Kernel Style)
+
+### Public API MUST use opaque types
+
+    // api/v1/img_core.h
+
+    typedef struct img_ctx img_ctx_t;
+    typedef struct img_buffer img_buffer_t;
+
+    👉 Implementation:
+
+    // src/core/context.c
+
+    struct img_ctx {
+        int worker_count;
+        void *internal_pool;
+    };
+
+### 23.5 📦 Header Inclusion Policy (STRICT)
+
+    ✅ .h files MAY include:
+    <stdint.h>
+    <stddef.h>
+    other pure type headers
+    ❌ .h files MUST NOT include:
+    heavy utility headers (img_buffer_utils.h)
+    internal modules (slab.h, worker.h)
+    implementation-heavy headers
+    ✅ .c files MUST include:
+    full type definitions (img_types.h)
+    utility headers (img_buffer_utils.h)
+    internal dependencies
+    23.6 🧱 Layered Dependency Model
+    api/        → NO dependencies (pure interface)
+        ↓
+    types       → base structs only
+        ↓
+    utils       → operates on types
+        ↓
+    pipeline    → uses utils
+        ↓
+    plugins     → uses pipeline + utils
+        ↓
+    runtime     → orchestrates everything
+
+    👉 Rule: upward dependency ONLY
+
+### 23.7 🚫 Forbidden Patterns (Kernel-Grade Violations)
+
+    ❌ Including .c files
+    # include "plugin_resize.c"   // NEVER
+    ❌ Circular dependencies
+    A.h → B.h
+    B.h → A.h   ❌
+    ❌ Fat headers
+    // plugin_resize.h
+    # include "slab.h"
+    # include "jump_table.h"
+    # include "worker.h"   ❌
+    ❌ Hidden allocations in headers
+    static inline void foo() {
+        malloc(...)   ❌ forbidden
+    }
+
+### 23.8 ⚡ Compile-Time Optimization Impact
+
+    Design Build Time Coupling Scalability
+    Monolithic headers 🔴 Slow 🔴 High ❌ Poor
+    Forward-declared 🟢 Fast 🟢 Low ✅ Excellent
+    23.9 🧪 ABI Stability Strategy
+    Public structs MUST NOT change layout without version bump
+    Use opaque pointers in API
+    Internal structs free to evolve
+    23.10 🧠 L7/L8 Insight
+
+    Forward declaration is not about saving includes —
+    it is about controlling system boundaries and evolution.
+
+### 23.11 📍 Where YOU should apply this in your project
+
+    ✅ APPLY forward declaration:
+    Module Reason
+    plugins/*.h isolate plugin API
+    runtime/*.h avoid heavy coupling
+    pipeline/*.h clean execution interface
+    api/v1/*.h enforce ABI stability
+    ❌ DO NOT APPLY:
+    Module Reason
+    img_buffer_utils.h needs full struct
+    SIMD kernels need direct field access
+    hot path code avoid abstraction overhead
+    memory allocator needs full layout
+
+### 23.12 🚀 Resulting Benefits
+
+    ⚡ Faster builds (critical at scale)
+    🧩 Modular architecture
+    🔒 ABI stability (plugin-safe)
+    🧠 Clear ownership boundaries
+    🚀 Easier future refactoring
+    🏁 Final L7 Verdict
+
+    What you’re building is called:
+
+    🧠 “Kernel-Grade, Data-Oriented, Zero-Copy Modular System Architecture”
+
+    With:
+
+    Opaque APIs (like Linux kernel)
+    Jump-table dispatch (like VPP / DPDK)
+    Slab allocators (kernel memory model)
+    Forward-declared boundaries (large-scale systems)
+
+### 🚀 NEXT L8+ (REAL DISTRIBUTED SYSTEM)
+
+    If you want to go even further:
+
+    👉 “remote plugin execution (RPC / microservice offload)”
+
 ### FOR ME ?? Why this matters for YOU
 
  You’re already working on:

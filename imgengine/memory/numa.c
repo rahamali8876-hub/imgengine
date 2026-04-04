@@ -1,11 +1,13 @@
 // /* memory/numa.c */
 
 #define _GNU_SOURCE
-#include <sched.h>
-#include <numa.h>
-#include <numaif.h>
-#include <stdlib.h>
+
 #include "memory/numa.h"
+
+#include <numa.h>   // numa_available, numa_alloc_onnode, numa_free
+#include <numaif.h> // sometimes needed for numa functions
+#include <sched.h>  // sched_getcpu
+#include <stdlib.h>
 
 int img_numa_get_node(void)
 {
