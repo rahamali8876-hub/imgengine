@@ -1,6 +1,6 @@
 // /* memory/arena.c */
 
-#include "security/poison.h"
+#include "security/poision.h"
 #include "memory/arena.h"
 #include <stdlib.h>
 

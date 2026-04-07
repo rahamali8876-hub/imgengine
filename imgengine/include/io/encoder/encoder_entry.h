@@ -5,7 +5,11 @@
 
 #include <stddef.h>
 #include <stdint.h>
-#include "core/context_internal.h"
+
+
+typedef struct img_ctx img_ctx_t;
+typedef struct img_buffer img_buffer_t;
+typedef struct img_buffer img_buffer_t;
 
 /**
  * Encode img_buffer into output bytes

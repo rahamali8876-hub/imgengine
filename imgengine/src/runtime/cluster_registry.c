@@ -1,5 +1,7 @@
-#include "runtime/cluster_registry.h"
+// runtime/cluster_register.c
 
+#include "runtime/cluster_registry.h"
+#include <stddef.h>
 #define MAX_NODES 32
 
 static img_node_t nodes[MAX_NODES];

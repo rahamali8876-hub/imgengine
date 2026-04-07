@@ -3,8 +3,6 @@
 #ifndef IMGENGINE_PIPELINE_ENGINE_H
 #define IMGENGINE_PIPELINE_ENGINE_H
 
-// #include "core/context_internal.h"
-
 // Forward declarations (opaque)
 typedef struct img_ctx img_ctx_t;
 typedef struct img_buffer img_buffer_t;

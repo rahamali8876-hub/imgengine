@@ -10,6 +10,7 @@
 #include <stdarg.h>
 #include <pthread.h>
 #include <string.h>
+#include <stdlib.h>
 
 /*
  * ================= CONFIG =================

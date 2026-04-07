@@ -8,10 +8,7 @@
 #include "arch/cpu_caps.h"
 #include "pipeline/batch.h"
 
-// ================= FUNCTION TYPES =================
-
-typedef void (*img_op_fn)(img_ctx_t *, img_buffer_t *, void *);
-typedef void (*img_batch_op_fn)(img_ctx_t *, void *, void *);
+#include "api/v1/img_plugin_api.h"
 
 // ================= CONSTANTS =================
 

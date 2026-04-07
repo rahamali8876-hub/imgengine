@@ -17,7 +17,7 @@ void img_slab_destroy(img_slab_pool_t *pool);
 // ================= HOT PATH =================
 
 // 🔥 returns NULL if no block
-void *img_slab_alloc(img_slab_pool_t *pool);
+uint8_t  *img_slab_alloc(img_slab_pool_t *pool);
 
 // 🔥 MUST be returned to same pool
 void img_slab_free(img_slab_pool_t *pool, void *ptr);

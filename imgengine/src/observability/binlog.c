@@ -2,18 +2,18 @@
 
 #include "observability/binlog.h"
 #include <stdlib.h>
-#include <time.h>
 #include <sched.h>
+#include "core/time.h"
 
 // ================================
 // FAST TIMESTAMP
 // ================================
-static inline uint64_t now_ns()
-{
-    struct timespec ts;
-    clock_gettime(CLOCK_MONOTONIC, &ts);
-    return (uint64_t)ts.tv_sec * 1000000000ULL + ts.tv_nsec;
-}
+// static inline uint64_t now_ns()
+// {
+//     struct timespec ts;
+//     clock_gettime(CLOCK_MONOTONIC, &ts);
+//     return (uint64_t)ts.tv_sec * 1000000000ULL + ts.tv_nsec;
+// }
 
 static inline uint32_t get_cpu()
 {
@@ -75,7 +75,8 @@ int img_binlog_write(
 
     img_log_entry_t *e = &log->entries[tail];
 
-    e->timestamp = now_ns();
+    // e->timestamp = now_ns();
+    e->timestamp = img_now_ns();
     e->event_id = event;
     e->cpu = get_cpu();
     e->arg0 = arg0;

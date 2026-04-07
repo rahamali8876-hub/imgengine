@@ -1,8 +1,6 @@
 // plugins/plugin_grayscale.c
 
-#include "plugins/plugin_internal.h"
-// #include "api/v1/img_types.h"
-// #include "pipeline/pipeline_types.h"
+#include "arch/arch_interface.h"
 #include "core/buffer.h"
 
 void plugin_grayscale_single(img_ctx_t *ctx, img_buffer_t *buf, void *params)

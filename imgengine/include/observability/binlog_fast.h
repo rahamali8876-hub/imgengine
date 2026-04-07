@@ -4,11 +4,14 @@
 #define IMGENGINE_BINLOG_FAST_H
 
 #include "observability/binlog.h"
+#include "observability/events.h"
 
 // global instance
 extern img_binlog_t g_binlog;
 
-// 🔥 HOT PATH MACROS (NO FUNCTION CALL OVERHEAD)
+/*
+ * 🔥 GENERIC LOG
+ */
 #define IMG_LOG(event, a0, a1, a2)        \
     do                                    \
     {                                     \
@@ -19,8 +22,13 @@ extern img_binlog_t g_binlog;
                          (uint64_t)(a2)); \
     } while (0)
 
-// ultra-fast variant (no cast)
-#define IMG_LOG_FAST(e, a0, a1, a2) \
-    img_binlog_write(&g_binlog, e, a0, a1, a2)
+/*
+ * 🔥 SPECIALIZED (ZERO COST MACROS)
+ */
+#define IMG_LOG_LATENCY(cycles, count, extra) \
+    IMG_LOG(IMG_EVENT_LATENCY, cycles, count, extra)
+
+#define IMG_LOG_ERROR(code) \
+    IMG_LOG(IMG_EVENT_ERROR, code, 0, 0)
 
 #endif

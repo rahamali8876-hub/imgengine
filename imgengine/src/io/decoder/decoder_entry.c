@@ -12,6 +12,8 @@
 #include "security/bounds_check.h"
 #include "security/input_validator.h"
 
+#include "arch/arch_interface.h"
+
 // ============================================================
 // 🔥 INTERNAL SAFE MULTIPLY (overflow guard)
 // ============================================================

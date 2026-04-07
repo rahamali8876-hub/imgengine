@@ -2,11 +2,12 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 
-// #include "api/v1/img_types.h"
 #include "core/context_internal.h"
 #include "api/v1/img_error.h"
-#include <string.h>
 #include "api/v1/img_buffer_utils.h"
+#include "memory/slab.h"
+
+#include <string.h>
 
 img_result_t img_decode_stb(
     img_ctx_t *ctx,
@@ -17,12 +18,12 @@ img_result_t img_decode_stb(
     int w, h, ch;
 
     uint8_t *decoded =
-        stbi_load_from_memory(data, size, &w, &h, &ch, 3);
+        stbi_load_from_memory(data, (int)size, &w, &h, &ch, 3);
 
     if (!decoded)
         return IMG_ERR_FORMAT;
 
-    size_t required = w * h * 3;
+    size_t required = (size_t)w * h * 3;
     size_t block = img_slab_block_size(ctx->local_pool);
 
     if (required > block)
@@ -40,7 +41,12 @@ img_result_t img_decode_stb(
 
     memcpy(mem, decoded, required);
 
-    *out = img_buffer_create(mem, w, h, 3);
+    // 🔥 CORRECT: construct buffer (not allocator misuse)
+    out->data = mem;
+    out->width = (uint32_t)w;
+    out->height = (uint32_t)h;
+    out->channels = 3;
+    out->stride = (uint32_t)(w * 3);
 
     stbi_image_free(decoded);
     return IMG_SUCCESS;

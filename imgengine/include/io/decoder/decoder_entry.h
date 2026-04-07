@@ -5,17 +5,14 @@
 
 #include <stddef.h>
 #include <stdint.h>
-#include "core/context_internal.h"
 
 typedef struct img_ctx img_ctx_t;
 typedef struct img_buffer img_buffer_t;
 
-/**
- * Decode input bytes into img_buffer (ZERO-COPY into slab)
- */
-int img_decode_to_buffer(img_ctx_t *ctx,
-                         uint8_t *input,
-                         size_t size,
-                         img_buffer_t *out);
+int img_decode_to_buffer(
+    img_ctx_t *ctx,
+    const uint8_t *input, // ✅ FIXED
+    size_t size,
+    img_buffer_t *out);
 
 #endif

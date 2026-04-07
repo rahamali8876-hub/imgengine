@@ -4,7 +4,11 @@
 #include "pipeline/pipeline_fused.h"
 #include "observability/profiler.h"
 #include "observability/logger.h"
- #include "core/buffer.h"
+#include "core/buffer.h"
+#include <stddef.h>
+
+#include "observability/binlog_fast.h"
+#include "observability/tracepoints.h"
 
 void img_batch_execute(
     img_ctx_t *ctx,
@@ -40,14 +44,16 @@ void img_batch_execute(
         fn(ctx, &buffers[i]);
     }
 
-    uint64_t end = img_profiler_now();
-
     /*
      * 🔥 ZERO-OVERHEAD LOG (OUTSIDE HOT LOOP)
      */
-    IMG_LOG_LATENCY(
-        end - start,
-        count,
-        0 /* reserved */
-    );
+
+    uint64_t end = img_profiler_now();
+
+    uint64_t cycles = end - start;
+
+    IMG_LOG_LATENCY(cycles, count, 0);
+
+    // 🔥 perf-style tracepoint
+    IMG_TRACE("batch_exec", cycles, count, 0);
 }

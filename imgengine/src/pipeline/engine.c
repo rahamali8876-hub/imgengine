@@ -3,7 +3,6 @@
 #include "pipeline/engine.h"
 #include "pipeline/jump_table.h"
 #include "pipeline/pipeline_types.h"
-// #include "runtime/exec_router.h"
 
 void img_pipeline_execute(
     img_ctx_t *ctx,
