@@ -1,10 +1,13 @@
-// pipeline/pipeline_signature.h 
-
+// pipeline/pipeline_signature.h
 
 #ifndef IMGENGINE_PIPELINE_SIGNATURE_H
 #define IMGENGINE_PIPELINE_SIGNATURE_H
 
 #include <stdint.h>
+#include "core/opcodes.h"
+
+/* Forward Declarations (Opaque Handles) */
+typedef struct img_pipeline_desc img_pipeline_desc_t;
 
 /*
  * 🔥 BITMASK SIGNATURE (MAX 32 OPS)

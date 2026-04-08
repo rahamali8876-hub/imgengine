@@ -4,27 +4,19 @@
 #define IMGENGINE_JUMP_TABLE_H
 
 #include <stdint.h>
-#include "core/context_internal.h"
-#include "arch/cpu_caps.h"
 #include "pipeline/kernel_adapter.h"
+#include "arch/cpu_caps.h"
 
-/*
- * 🔥 LIMITS
- */
 #define IMG_MAX_OPS 256
 
 /*
- * 🔥 INTERNAL KERNEL TABLE (HOT PATH)
+ * 🔥 HOT PATH TABLES (KERNEL ABI ONLY)
  */
 extern img_kernel_fn g_jump_table[IMG_MAX_OPS];
+extern img_batch_kernel_fn g_batch_jump_table[IMG_MAX_OPS];
 
 /*
- * 🔥 OPTIONAL BATCH TABLE
- */
-extern img_batch_op_fn g_batch_jump_table[IMG_MAX_OPS];
-
-/*
- * 🔥 REGISTER (PLUGIN → KERNEL ADAPT)
+ * 🔥 REGISTER (AUTO ADAPT)
  */
 void img_register_op(
     uint32_t opcode,
@@ -32,7 +24,7 @@ void img_register_op(
     img_batch_op_fn batch_fn);
 
 /*
- * 🔥 INIT (CPU DISPATCH)
+ * 🔥 INIT
  */
 void img_jump_table_init(cpu_caps_t caps);
 
@@ -47,20 +39,31 @@ void img_jump_table_init(cpu_caps_t caps);
 // #include "pipeline/kernel_adapter.h"
 
 // /*
-//  * 🔥 MAX OPS
+//  * 🔥 LIMITS
 //  */
 // #define IMG_MAX_OPS 256
 
 // /*
-//  * 🔥 INTERNAL TABLE (KERNEL ABI ONLY)
+//  * 🔥 INTERNAL KERNEL TABLE (HOT PATH)
 //  */
 // extern img_kernel_fn g_jump_table[IMG_MAX_OPS];
 
 // /*
-//  * 🔥 REGISTER (AUTO ADAPT)
+//  * 🔥 OPTIONAL BATCH TABLE
 //  */
-// void img_register_op(uint32_t opcode, img_op_fn fn);
+// extern img_batch_op_fn g_batch_jump_table[IMG_MAX_OPS];
 
+// /*
+//  * 🔥 REGISTER (PLUGIN → KERNEL ADAPT)
+//  */
+// void img_register_op(
+//     uint32_t opcode,
+//     img_op_fn single_fn,
+//     img_batch_op_fn batch_fn);
+
+// /*
+//  * 🔥 INIT (CPU DISPATCH)
+//  */
 // void img_jump_table_init(cpu_caps_t caps);
 
 // #endif

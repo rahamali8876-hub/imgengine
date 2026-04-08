@@ -17,11 +17,6 @@
 #define IMG_CAP_BATCH (1u << 1)
 #define IMG_CAP_ZERO_COPY (1u << 3)
 
-// #define IMG_CAP_SINGLE (1 << 0)
-// #define IMG_CAP_BATCH (1 << 1)
-// #define IMG_CAP_SIMD (1 << 2)
-// #define IMG_CAP_ZERO_COPY (1 << 3)
-
 /*
  * 🔥 FUNCTION TYPES
  */

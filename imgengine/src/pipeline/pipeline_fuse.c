@@ -6,6 +6,7 @@
 #include "core/buffer.h"
 #include "pipeline/fused_params.h"
 #include "pipeline/pipeline_signature.h"
+#include "runtime/task.h"
 
 #if defined(__AVX2__)
 #include <immintrin.h>
@@ -207,11 +208,11 @@ int img_pipeline_fuse(
         switch (in->ops[i].op_code)
         {
         case OP_GRAYSCALE:
-            params->has_gray = 1;
+            params->has_grayscale = 1;
             sig |= SIG_OP_GRAYSCALE;
             break;
 
-        case OP_BRIGHTNESS:
+        case SIG_OP_BRIGHTNESS:
             params->has_brightness = 1;
             params->brightness =
                 *(uint16_t *)in->ops[i].params;

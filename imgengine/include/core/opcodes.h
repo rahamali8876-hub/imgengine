@@ -12,6 +12,7 @@
 #define OP_RESIZE 0x01
 #define OP_CROP 0x02
 #define OP_GRAYSCALE 0x03
+#define OP_BRIGHTNESS 0x04
 
 /*
  * 🔥 INTERNAL (SEPARABLE / HOT PATH)

@@ -6,10 +6,6 @@
 #include <stdint.h>
 
 /* Forward Declarations (Opaque Handles) */
-// typedef struct img_op_desc img_op_desc_t;
-// typedef struct img_pipeline_desc img_pipeline_desc_t;
-// typedef struct img_pipeline_runtime img_pipeline_runtime_t;
-
 typedef struct img_op_desc img_op_desc_t;
 typedef struct img_pipeline_desc img_pipeline_desc_t;
 

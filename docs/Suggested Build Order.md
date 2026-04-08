@@ -1,7 +1,7 @@
 ### install packeges
-
-    sudo apt-get install -y libturbojpeg0-dev libnuma-dev
-    sudo apt install liburing-dev
+    sudo apt update && sudo apt upgrade
+    sudo apt install -y libturbojpeg0-dev libnuma-dev
+    sudo apt install -y liburing-dev
     
     `` from the official nothings/stb repository using curl
          curl -o stb_image.h https://raw.githubusercontent.com/nothings/stb/master/stb_image.h
@@ -13,6 +13,7 @@
     systems architect 🚀
 
 
+   mkdir build && cd build
     rm -rf *
     cmake .. && make -j
 

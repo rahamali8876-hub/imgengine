@@ -4,6 +4,8 @@
 #include "core/opcodes.h"
 #include "arch/arch_interface.h"
 
+#include <stddef.h>
+
 static void grayscale_exec(img_ctx_t *ctx, img_buffer_t *buf)
 {
     (void)ctx;

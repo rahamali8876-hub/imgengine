@@ -2,6 +2,8 @@
 
 #include "security/input_validator.h"
 
+#include <stddef.h>
+
 #define MAX_PIXELS (16384ULL * 16384ULL)
 #define MAX_RATIO 400ULL // tighter than before
 

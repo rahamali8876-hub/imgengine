@@ -17,7 +17,7 @@ void img_pipeline_execute(
     {
         uint32_t op_code = ops[i].op_code;
 
-        img_op_fn fn = g_jump_table[op_code];
+        img_kernel_fn fn = g_jump_table[op_code];
 
         if (fn)
         {
