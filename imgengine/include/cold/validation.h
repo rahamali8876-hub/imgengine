@@ -1,3 +1,21 @@
+// ./include/cold/validation.h
+
+
+
+
+
+
+
+// ./include/cold/validation.h
+
+// ./include/cold/validation.h
+
+// ./include/cold/validation.h
+
+// ./include/cold/validation.h
+
+// ./include/cold/validation.h
+
 /* src/cold/validation.h */
 
 #ifndef IMGENGINE_COLD_VALIDATION_H

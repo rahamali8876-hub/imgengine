@@ -1,3 +1,21 @@
+// ./src/plugins/plugin_registry.c
+
+
+
+
+
+
+
+// ./src/plugins/plugin_registry.c
+
+// ./src/plugins/plugin_registry.c
+
+// ./src/plugins/plugin_registry.c
+
+// ./src/plugins/plugin_registry.c
+
+// ./src/plugins/plugin_registry.c
+
 // // plugins/plugin_registry.c
 
 #include "api/v1/img_plugin_api.h"

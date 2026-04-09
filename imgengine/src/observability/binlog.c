@@ -1,3 +1,21 @@
+// ./src/observability/binlog.c
+
+
+
+
+
+
+
+// ./src/observability/binlog.c
+
+// ./src/observability/binlog.c
+
+// ./src/observability/binlog.c
+
+// ./src/observability/binlog.c
+
+// ./src/observability/binlog.c
+
 // src/observability/binlog.c
 
 #include "observability/binlog.h"

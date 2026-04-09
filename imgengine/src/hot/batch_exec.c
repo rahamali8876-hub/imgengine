@@ -1,3 +1,21 @@
+// ./src/hot/batch_exec.c
+
+
+
+
+
+
+
+// ./src/hot/batch_exec.c
+
+// ./src/hot/batch_exec.c
+
+// ./src/hot/batch_exec.c
+
+// ./src/hot/batch_exec.c
+
+// ./src/hot/batch_exec.c
+
 // src/hot/batch_exec.c
 
 #include "pipeline/pipeline_types.h"

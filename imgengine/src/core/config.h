@@ -1,3 +1,21 @@
+// ./src/core/config.h
+
+
+
+
+
+
+
+// ./src/core/config.h
+
+// ./src/core/config.h
+
+// ./src/core/config.h
+
+// ./src/core/config.h
+
+// ./src/core/config.h
+
 /* src/core/config.h */
 #ifndef IMGENGINE_CORE_CONFIG_H
 #define IMGENGINE_CORE_CONFIG_H

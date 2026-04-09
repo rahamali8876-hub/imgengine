@@ -1,4 +1,4 @@
-// src/arch/x86_64/cpu_detect.c
+// ./src/arch/x86_64/cpu_detect.c
 
 #include "arch/cpu_caps.h"
 #include <stddef.h>

@@ -1,3 +1,21 @@
+// ./include/plugins/plugin_resize.h
+
+
+
+
+
+
+
+// ./include/plugins/plugin_resize.h
+
+// ./include/plugins/plugin_resize.h
+
+// ./include/plugins/plugin_resize.h
+
+// ./include/plugins/plugin_resize.h
+
+// ./include/plugins/plugin_resize.h
+
 /* plugins/plugin_resize.h */
 
 #ifndef IMGENGINE_PLUGIN_RESIZE_H

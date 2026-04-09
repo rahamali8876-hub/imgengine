@@ -1,4 +1,4 @@
-/* cmd/bench/lat_bench.c */
+// ./src/cmd/bench/lat_bench.c
 
 #include <x86intrin.h>
 #include <stdio.h>

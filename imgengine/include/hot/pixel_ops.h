@@ -1,3 +1,21 @@
+// ./include/hot/pixel_ops.h
+
+
+
+
+
+
+
+// ./include/hot/pixel_ops.h
+
+// ./include/hot/pixel_ops.h
+
+// ./include/hot/pixel_ops.h
+
+// ./include/hot/pixel_ops.h
+
+// ./include/hot/pixel_ops.h
+
 // src/hot/pixel_ops.h
 
 #ifndef IMGENGINE_PIXEL_OPS_H

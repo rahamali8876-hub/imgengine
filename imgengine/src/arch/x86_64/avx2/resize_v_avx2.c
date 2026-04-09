@@ -1,4 +1,4 @@
-// arch/x86_64/avx2/resize_v_avx2.c
+// ./src/arch/x86_64/avx2/resize_v_avx2.c
 
 #include <immintrin.h>
 #include "plugins/plugin_resize.h"

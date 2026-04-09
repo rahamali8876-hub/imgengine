@@ -1,3 +1,21 @@
+// ./include/core/arch_interface.h
+
+
+
+
+
+
+
+// ./include/core/arch_interface.h
+
+// ./include/core/arch_interface.h
+
+// ./include/core/arch_interface.h
+
+// ./include/core/arch_interface.h
+
+// ./include/core/arch_interface.h
+
 /* include/core/arch_interface.h */
 
 #ifndef IMGENGINE_ARCH_INTERFACE_H

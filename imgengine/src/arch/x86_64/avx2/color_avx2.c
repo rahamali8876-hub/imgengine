@@ -1,4 +1,4 @@
-/* arch/x86_64/avx2/color_avx2.c */
+// ./src/arch/x86_64/avx2/color_avx2.c
 
 #include <immintrin.h>
 #include "arch/arch_interface.h"

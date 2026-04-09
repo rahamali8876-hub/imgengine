@@ -1,3 +1,21 @@
+// ./include/pipeline/hardware_registry.h
+
+
+
+
+
+
+
+// ./include/pipeline/hardware_registry.h
+
+// ./include/pipeline/hardware_registry.h
+
+// ./include/pipeline/hardware_registry.h
+
+// ./include/pipeline/hardware_registry.h
+
+// ./include/pipeline/hardware_registry.h
+
 // pipeline/hardware_registry.h
 
 #ifndef IMGENGINE_PIPELINE_HW_REGISTRY_H

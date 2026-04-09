@@ -1,3 +1,21 @@
+// ./src/cold/error.c
+
+
+
+
+
+
+
+// ./src/cold/error.c
+
+// ./src/cold/error.c
+
+// ./src/cold/error.c
+
+// ./src/cold/error.c
+
+// ./src/cold/error.c
+
 
 // src/cold/error.c
 #include "cold/error.h"

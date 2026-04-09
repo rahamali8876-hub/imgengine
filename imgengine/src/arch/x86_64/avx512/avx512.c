@@ -1,4 +1,4 @@
-// arch/x86_64/avx52/avx52.c
+// ./src/arch/x86_64/avx512/avx512.c
 
 #include <immintrin.h>
 #include "arch/arch_interface.h"

@@ -1,3 +1,21 @@
+// ./src/pipeline/fused_registry.c
+
+
+
+
+
+
+
+// ./src/pipeline/fused_registry.c
+
+// ./src/pipeline/fused_registry.c
+
+// ./src/pipeline/fused_registry.c
+
+// ./src/pipeline/fused_registry.c
+
+// ./src/pipeline/fused_registry.c
+
 // src/pipeline/fused_registry.c
 
 #include "pipeline/batch_exec.h"

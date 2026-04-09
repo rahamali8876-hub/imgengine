@@ -1,4 +1,4 @@
-// arch/x86_64/avx2/fused_resize_color_norm_avx2.c
+// ./src/arch/x86_64/avx2/fused_resize_color_norm_avx2.c
 
 #include <immintrin.h>
 #include "arch/arch_interface.h"

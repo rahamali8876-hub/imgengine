@@ -1,3 +1,21 @@
+// ./include/plugins/plugin_internal_removed.h
+
+
+
+
+
+
+
+// ./include/plugins/plugin_internal_removed.h
+
+// ./include/plugins/plugin_internal_removed.h
+
+// ./include/plugins/plugin_internal_removed.h
+
+// ./include/plugins/plugin_internal_removed.h
+
+// ./include/plugins/plugin_internal_removed.h
+
 // plugins/plugin_inhernal.h
 
 #ifndef IMGENGINE_PLUGINS_INTERNAL_H

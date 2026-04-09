@@ -1,7 +1,9 @@
 ### install packeges
+
     sudo apt update && sudo apt upgrade
     sudo apt install -y libturbojpeg0-dev libnuma-dev
     sudo apt install -y liburing-dev
+    sudo apt install -y build-essential
     
     `` from the official nothings/stb repository using curl
          curl -o stb_image.h https://raw.githubusercontent.com/nothings/stb/master/stb_image.h
@@ -12,7 +14,6 @@
     performance engineer ✅
     systems architect 🚀
 
-
    mkdir build && cd build
     rm -rf *
     cmake .. && make -j
@@ -20,6 +21,10 @@
 ### find out the keyboard
 
     grep -r "struct img_ctx" .  img_pipeline_desc_t;
+
+### Reset to clean commit
+
+   git reset --hard f5e48956708f6674122fee0aeaa3f5b5a6ff6dad
 
 ### Save and see output simultaneously (The tee command)
 

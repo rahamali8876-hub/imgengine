@@ -1,3 +1,21 @@
+// ./include/core/context_internal.h
+
+
+
+
+
+
+
+// ./include/core/context_internal.h
+
+// ./include/core/context_internal.h
+
+// ./include/core/context_internal.h
+
+// ./include/core/context_internal.h
+
+// ./include/core/context_internal.h
+
 /* include/core/context_internal.h */
 
 #ifndef IMGENGINE_CONTEXT_INTERNAL_H

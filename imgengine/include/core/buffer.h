@@ -1,3 +1,21 @@
+// ./include/core/buffer.h
+
+
+
+
+
+
+
+// ./include/core/buffer.h
+
+// ./include/core/buffer.h
+
+// ./include/core/buffer.h
+
+// ./include/core/buffer.h
+
+// ./include/core/buffer.h
+
 // include/core/buffer.h
 
 #ifndef IMGENGINE_BUFFER_H

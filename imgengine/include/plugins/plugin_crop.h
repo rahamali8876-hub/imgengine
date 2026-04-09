@@ -1,3 +1,21 @@
+// ./include/plugins/plugin_crop.h
+
+
+
+
+
+
+
+// ./include/plugins/plugin_crop.h
+
+// ./include/plugins/plugin_crop.h
+
+// ./include/plugins/plugin_crop.h
+
+// ./include/plugins/plugin_crop.h
+
+// ./include/plugins/plugin_crop.h
+
 /* plugins/plugin_crop.h */
 
 #ifndef IMGENGINE_PLUGIN_CROP_H

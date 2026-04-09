@@ -1,3 +1,21 @@
+// ./include/core/opcodes.h
+
+
+
+
+
+
+
+// ./include/core/opcodes.h
+
+// ./include/core/opcodes.h
+
+// ./include/core/opcodes.h
+
+// ./include/core/opcodes.h
+
+// ./include/core/opcodes.h
+
 /* include/core/opcodes.h */
 
 #ifndef IMGENGINE_OPCODES_H

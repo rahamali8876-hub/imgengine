@@ -1,4 +1,4 @@
-// arch/x86_64/scalar/resize_scalar.c
+// ./src/arch/x86_64/scalar/resize_scalar.c
 
 #include "arch/arch_interface.h"
 #include "core/buffer.h"

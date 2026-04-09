@@ -1,3 +1,21 @@
+// ./include/cold/error.h
+
+
+
+
+
+
+
+// ./include/cold/error.h
+
+// ./include/cold/error.h
+
+// ./include/cold/error.h
+
+// ./include/cold/error.h
+
+// ./include/cold/error.h
+
 /* src/cold/error.h */
 
 #ifndef IMGENGINE_COLD_ERROR_H

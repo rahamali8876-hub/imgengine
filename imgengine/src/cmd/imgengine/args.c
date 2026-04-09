@@ -1,4 +1,4 @@
-/* src/cmd/imgengine/args.c */
+// ./src/cmd/imgengine/args.c
 
 #include "cmd/imgengine/args.h"
 
