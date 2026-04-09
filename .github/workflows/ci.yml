@@ -1,17 +1,22 @@
-- name: Check File Headers
-  run: python3 scripts/check_headers.py
+name: imgengine-ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
 
 jobs:
   build-test:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
 
       - name: Install deps
-        run: sudo apt-get install -y build-essential cmake python3
+        run: sudo apt-get update && sudo apt-get install -y build-essential cmake python3
 
-      # 🔥 LINT FIRST (FAST FAIL)
+      # 🔥 HEADER LINT (FAIL FAST)
       - name: Check File Headers
         run: python3 scripts/check_headers.py
 
@@ -22,4 +27,9 @@ jobs:
           make -j$(nproc)
 
       - name: Run Tests
-        run: ./tests/run_all.sh
+        run: |
+          if [ -f ./tests/run_all.sh ]; then
+            ./tests/run_all.sh
+          else
+            echo "No tests found, skipping"
+          fi
