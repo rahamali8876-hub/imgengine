@@ -1,18 +1,29 @@
-
-// ./src/pipeline/batch_exec.c
+// src/pipeline/batch_exec.c
 
 #include "pipeline/batch_exec.h"
 #include "pipeline/pipeline_fused.h"
+#include "pipeline/pipeline_signature.h"
+#include "pipeline/fused_params.h"
 #include "observability/profiler.h"
 #include "observability/logger.h"
+#include "observability/binlog_fast.h"
+#include "observability/tracepoints.h"
 #include "core/buffer.h"
 #include <stddef.h>
 
-#include "observability/binlog_fast.h"
-#include "observability/tracepoints.h"
-
-#include "api/v1/img_buffer_utils.h"
-
+/*
+ * img_batch_execute()
+ *
+ * Hot path entry point for batch processing.
+ *
+ * pipeline: pointer to img_pipeline_fused_t (pre-compiled, cold path)
+ *
+ * CONTRACT:
+ *   - pipeline must be compiled before this call (img_pipeline_fuse)
+ *   - batch->buffers[i] must be non-NULL for i < batch->count
+ *   - No allocation inside this function
+ *   - No locks inside this function
+ */
 void img_batch_execute(
     img_ctx_t *ctx,
     img_batch_t *batch,
@@ -21,40 +32,51 @@ void img_batch_execute(
     if (__builtin_expect(!batch || batch->count == 0, 0))
         return;
 
-    /*
-     * 🔥 Resolve fused kernel ONCE
-     */
-    img_fused_kernel_fn fn = img_get_fused_kernel();
+    img_pipeline_fused_t *pipe = (img_pipeline_fused_t *)pipeline;
 
-    if (__builtin_expect(fn == NULL, 0))
+    if (__builtin_expect(!pipe, 0))
         return;
 
     /*
-     * 🔥 PROFILING START
+     * PROFILING START
+     * RDTSC-based: zero syscall overhead
      */
-    uint64_t start = img_profiler_now();
-
-    img_buffer_t **buffers;
+    const uint64_t start = img_profiler_now();
 
     /*
-     * 🔥 SINGLE CALL → FULL BATCH
-     * (NO per-image loop — kernel handles it)
+     * HOT PATH: batch-level fused kernel (preferred)
+     * Single call → entire batch → minimum function call overhead
      */
-    fn(ctx, batch, pipeline);
+    if (__builtin_expect(pipe->fn_batch != NULL, 1))
+    {
+        pipe->fn_batch(ctx, batch, ctx->fused_params);
+    }
+    else
+    {
+        /*
+         * FALLBACK: sequential single-image
+         * Used when no fused batch kernel exists for this sig.
+         */
+        for (uint32_t i = 0; i < batch->count; i++)
+        {
+            if (__builtin_expect(batch->buffers[i] != NULL, 1))
+                pipe->fn(ctx, batch->buffers[i]);
+        }
+    }
 
     /*
-     * 🔥 PROFILING END
+     * PROFILING END
      */
-    uint64_t end = img_profiler_now();
-    uint64_t cycles = end - start;
+    const uint64_t end = img_profiler_now();
+    const uint64_t cycles = end - start;
 
     /*
-     * 🔥 ZERO-OVERHEAD LOGGING
+     * ZERO-OVERHEAD LOGGING (lock-free ring buffer)
      */
     IMG_LOG_LATENCY(cycles, batch->count, 0);
 
     /*
-     * 🔥 TRACEPOINT (perf/eBPF ready)
+     * TRACEPOINT (perf/eBPF ready)
      */
     IMG_TRACE("batch_exec", cycles, batch->count, 0);
 }

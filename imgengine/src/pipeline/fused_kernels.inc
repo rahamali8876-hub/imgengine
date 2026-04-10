@@ -1,6 +1,4 @@
-/*
- pipeline/fused_kernels.inc
- */
+# pipeline/fused_kernels.inc
 
  /*
  * 🔥 MACRO-BASED CODEGEN

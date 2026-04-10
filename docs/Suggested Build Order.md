@@ -4,6 +4,8 @@
     sudo apt install -y libturbojpeg0-dev libnuma-dev
     sudo apt install -y liburing-dev
     sudo apt install -y build-essential
+
+    sudo apt install -y graphviz     ( for graph generation )
     
     `` from the official nothings/stb repository using curl
          curl -o stb_image.h https://raw.githubusercontent.com/nothings/stb/master/stb_image.h
