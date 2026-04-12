@@ -187,33 +187,24 @@ img_api_run_job()                          [src/api/api.c]
 // USAGE EXAMPLES (all working after this integration)
 // ================================================================
 
-/*
+/* 
 
-# Passport photos (standard 4.5×3.5 cm)
 
-./imgengine_cli --input photo.jpg --output passport.jpg
+# Passport — fits perfectly
 
-# Studio print sheet
+./imgengine_cli --input ../photo.jpg --output passport.jpg \
+    --cols 2 --rows 3 --gap 20 --padding 40
 
-./imgengine_cli --input photo.jpg --output studio.jpg \
-    --cols 6 --rows 2 --gap 15 --width 3.5 --height 3.0 \
-    --padding 20
+# Studio — auto-scales 6 photos to fit with gaps
 
-# Print-ready for lab (bleed + crop marks)
+./imgengine_cli --input ../photo.jpg --output studio.jpg \
+    --cols 6 --rows 2 --gap 15 --padding 40
 
-./imgengine_cli --input photo.jpg --output printready.jpg \
-    --cols 6 --rows 2 \
+# Print-ready with bleed (use fewer cols to leave room)
+
+./imgengine_cli --input ../photo.jpg --output printready.jpg \
+    --cols 4 --rows 3 --gap 15 --padding 40 \
     --bleed 10 --crop-mark 25 --crop-offset 8
-
-# PDF export
-
-./imgengine_cli --input photo.jpg --output sheet.pdf \
-    --cols 4 --rows 3 --dpi 300
-
-# Quiet mode (for scripts)
-
-./imgengine_cli --input photo.jpg --output out.jpg --quiet
-*/
 
 ## REMOTE (RPC / distributed execution)
 

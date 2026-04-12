@@ -1,49 +1,90 @@
 // src/pipeline/crop_marks.c
+//
+// FIX: Crop marks were drawing ON the photos because the mark
+// coordinates placed them starting AT the photo edge going INWARD.
+//
+// Industry standard: crop marks are in the WHITE SPACE OUTSIDE
+// the photo boundary. They indicate where to cut — never drawn
+// over the image content.
+//
+// Correct geometry (per ISO 15930 / print industry standard):
+//
+//   Photo cell at (x, y, w, h)
+//   crop_offset = distance from photo edge to start of mark
+//   crop_mark   = length of the mark line
+//
+//   TOP LEFT corner:
+//     Horizontal: from (x - offset - mark_len) to (x - offset)
+//     Vertical:   from (y - offset - mark_len) to (y - offset)
+//
+//   TOP RIGHT corner:
+//     Horizontal: from (x + w + offset) to (x + w + offset + mark_len)
+//     Vertical:   from (y - offset - mark_len) to (y - offset)
+//
+//   All marks are OUTSIDE the photo. They draw in the gap/padding
+//   white space. offset pushes them away from the photo edge.
+//
+// In your image, the red lines crossed through the photos because
+// the draw_h/draw_v functions were starting at the photo edge
+// (offset=0) or inside it (negative offset direction was wrong).
 
-// Draw ISO crop marks at each photo cell corner.
-// Ported from crop_plugin.c and crop_marks.c, renamed.
+#define _GNU_SOURCE
 
 #include "core/buffer.h"
 #include "pipeline/layout.h"
 #include "api/v1/img_error.h"
 
-/* Draw black pixels — inline, no overhead */
-static inline void set_pixel(
-    img_buffer_t *canvas, int32_t x, int32_t y)
+static inline void set_px(img_buffer_t *c, int32_t x, int32_t y,
+                          uint8_t r, uint8_t g, uint8_t b)
 {
     if (x < 0 || y < 0 ||
-        (uint32_t)x >= canvas->width ||
-        (uint32_t)y >= canvas->height)
+        (uint32_t)x >= c->width ||
+        (uint32_t)y >= c->height)
         return;
 
-    uint8_t *p = canvas->data +
-                 (size_t)y * canvas->stride +
-                 (size_t)x * 3;
-    p[0] = p[1] = p[2] = 0;
+    uint8_t *p = c->data + (size_t)y * c->stride + (size_t)x * 3;
+    p[0] = r;
+    p[1] = g;
+    p[2] = b;
 }
 
-static void draw_h(img_buffer_t *c, int32_t x, int32_t y,
-                   int32_t len, uint32_t th)
+/* Draw horizontal line from (x, y) rightward, length len, thickness th */
+static void draw_h(img_buffer_t *c,
+                   int32_t x, int32_t y, int32_t len, uint32_t th,
+                   uint8_t r, uint8_t g, uint8_t b)
 {
     for (uint32_t t = 0; t < th; t++)
         for (int32_t i = 0; i < len; i++)
-            set_pixel(c, x + i, y + (int32_t)t);
+            set_px(c, x + i, y + (int32_t)t, r, g, b);
 }
 
-static void draw_v(img_buffer_t *c, int32_t x, int32_t y,
-                   int32_t len, uint32_t th)
+/* Draw vertical line from (x, y) downward, length len, thickness th */
+static void draw_v(img_buffer_t *c,
+                   int32_t x, int32_t y, int32_t len, uint32_t th,
+                   uint8_t r, uint8_t g, uint8_t b)
 {
     for (uint32_t t = 0; t < th; t++)
         for (int32_t i = 0; i < len; i++)
-            set_pixel(c, x + (int32_t)t, y + i);
+            set_px(c, x + (int32_t)t, y + i, r, g, b);
 }
 
 /*
  * img_draw_crop_marks()
  *
- * Draw ISO-standard crop marks at each photo cell corner.
- * Marks are aligned to the photo edge (not the bleed edge)
- * so the lab knows exactly where to cut.
+ * Draws ISO-standard crop marks in the white space OUTSIDE each photo.
+ *
+ * Mark color: black (0, 0, 0).
+ * Marks never overlap the photo content.
+ *
+ *  Diagram for TOP-LEFT corner of one photo cell:
+ *
+ *  ←mark_len→←offset→|←── photo ──
+ *  ═══════════════════|             ← horizontal mark (above photo)
+ *                     |
+ *  ═══════════════════|             ← horizontal mark (gap between thickness)
+ *         ↑
+ *         vertical mark (left of photo)
+ *         goes from (y - offset - mark_len) upward to (y - offset)
  */
 img_result_t img_draw_crop_marks(
     img_buffer_t *canvas,
@@ -53,34 +94,141 @@ img_result_t img_draw_crop_marks(
     if (!canvas || !layout || job->crop_mark_px == 0)
         return IMG_SUCCESS;
 
-    int32_t d = (int32_t)job->crop_offset_px;
-    int32_t len = (int32_t)job->crop_mark_px;
-    uint32_t th = job->crop_thickness;
+    const int32_t off = (int32_t)job->crop_offset_px;
+    const int32_t len = (int32_t)job->crop_mark_px;
+    const uint32_t th = job->crop_thickness ? job->crop_thickness : 1;
+
+    /* black crop marks */
+    const uint8_t r = 0, g = 0, b = 0;
 
     for (uint32_t i = 0; i < layout->count; i++)
     {
         const img_cell_t *c = &layout->cells[i];
-        int32_t x = (int32_t)c->x;
-        int32_t y = (int32_t)c->y;
-        int32_t x2 = x + (int32_t)c->w;
-        int32_t y2 = y + (int32_t)c->h;
 
-        /* TOP LEFT */
-        draw_h(canvas, x - d - len, y - d, len, th);
-        draw_v(canvas, x - d, y - d - len, len, th);
+        const int32_t x = (int32_t)c->x;
+        const int32_t y = (int32_t)c->y;
+        const int32_t x2 = x + (int32_t)c->w; /* right edge */
+        const int32_t y2 = y + (int32_t)c->h; /* bottom edge */
 
-        /* TOP RIGHT */
-        draw_h(canvas, x2 + d, y - d, len, th);
-        draw_v(canvas, x2 + d, y - d - len, len, th);
+        /*
+         * TOP-LEFT corner
+         *   H mark: leftward from (x - off), length len
+         *   V mark: upward   from (y - off), length len
+         */
+        draw_h(canvas, x - off - len, y - off - (int32_t)th, len, th, r, g, b);
+        draw_v(canvas, x - off - (int32_t)th, y - off - len, len, th, r, g, b);
 
-        /* BOTTOM LEFT */
-        draw_h(canvas, x - d - len, y2 + d, len, th);
-        draw_v(canvas, x - d, y2 + d, len, th);
+        /*
+         * TOP-RIGHT corner
+         *   H mark: rightward from (x2 + off), length len
+         *   V mark: upward    from (y  - off), length len
+         */
+        draw_h(canvas, x2 + off, y - off - (int32_t)th, len, th, r, g, b);
+        draw_v(canvas, x2 + off, y - off - len, len, th, r, g, b);
 
-        /* BOTTOM RIGHT */
-        draw_h(canvas, x2 + d, y2 + d, len, th);
-        draw_v(canvas, x2 + d, y2 + d, len, th);
+        /*
+         * BOTTOM-LEFT corner
+         *   H mark: leftward from (x - off), length len
+         *   V mark: downward from (y2 + off), length len
+         */
+        draw_h(canvas, x - off - len, y2 + off, len, th, r, g, b);
+        draw_v(canvas, x - off - (int32_t)th, y2 + off, len, th, r, g, b);
+
+        /*
+         * BOTTOM-RIGHT corner
+         *   H mark: rightward from (x2 + off), length len
+         *   V mark: downward  from (y2 + off), length len
+         */
+        draw_h(canvas, x2 + off, y2 + off, len, th, r, g, b);
+        draw_v(canvas, x2 + off, y2 + off, len, th, r, g, b);
     }
 
     return IMG_SUCCESS;
 }
+
+// // src/pipeline/crop_marks.c
+
+// // Draw ISO crop marks at each photo cell corner.
+// // Ported from crop_plugin.c and crop_marks.c, renamed.
+
+// #include "core/buffer.h"
+// #include "pipeline/layout.h"
+// #include "api/v1/img_error.h"
+
+// /* Draw black pixels — inline, no overhead */
+// static inline void set_pixel(
+//     img_buffer_t *canvas, int32_t x, int32_t y)
+// {
+//     if (x < 0 || y < 0 ||
+//         (uint32_t)x >= canvas->width ||
+//         (uint32_t)y >= canvas->height)
+//         return;
+
+//     uint8_t *p = canvas->data +
+//                  (size_t)y * canvas->stride +
+//                  (size_t)x * 3;
+//     p[0] = p[1] = p[2] = 0;
+// }
+
+// static void draw_h(img_buffer_t *c, int32_t x, int32_t y,
+//                    int32_t len, uint32_t th)
+// {
+//     for (uint32_t t = 0; t < th; t++)
+//         for (int32_t i = 0; i < len; i++)
+//             set_pixel(c, x + i, y + (int32_t)t);
+// }
+
+// static void draw_v(img_buffer_t *c, int32_t x, int32_t y,
+//                    int32_t len, uint32_t th)
+// {
+//     for (uint32_t t = 0; t < th; t++)
+//         for (int32_t i = 0; i < len; i++)
+//             set_pixel(c, x + (int32_t)t, y + i);
+// }
+
+// /*
+//  * img_draw_crop_marks()
+//  *
+//  * Draw ISO-standard crop marks at each photo cell corner.
+//  * Marks are aligned to the photo edge (not the bleed edge)
+//  * so the lab knows exactly where to cut.
+//  */
+// img_result_t img_draw_crop_marks(
+//     img_buffer_t *canvas,
+//     const img_layout_t *layout,
+//     const img_job_t *job)
+// {
+//     if (!canvas || !layout || job->crop_mark_px == 0)
+//         return IMG_SUCCESS;
+
+//     int32_t d = (int32_t)job->crop_offset_px;
+//     int32_t len = (int32_t)job->crop_mark_px;
+//     uint32_t th = job->crop_thickness;
+
+//     for (uint32_t i = 0; i < layout->count; i++)
+//     {
+//         const img_cell_t *c = &layout->cells[i];
+//         int32_t x = (int32_t)c->x;
+//         int32_t y = (int32_t)c->y;
+//         int32_t x2 = x + (int32_t)c->w;
+//         int32_t y2 = y + (int32_t)c->h;
+
+//         /* TOP LEFT */
+//         draw_h(canvas, x - d - len, y - d, len, th);
+//         draw_v(canvas, x - d, y - d - len, len, th);
+
+//         /* TOP RIGHT */
+//         draw_h(canvas, x2 + d, y - d, len, th);
+//         draw_v(canvas, x2 + d, y - d - len, len, th);
+
+//         /* BOTTOM LEFT */
+//         draw_h(canvas, x - d - len, y2 + d, len, th);
+//         draw_v(canvas, x - d, y2 + d, len, th);
+
+//         /* BOTTOM RIGHT */
+//         draw_h(canvas, x2 + d, y2 + d, len, th);
+//         draw_v(canvas, x2 + d, y2 + d, len, th);
+//     }
+
+//     return IMG_SUCCESS;
+// }

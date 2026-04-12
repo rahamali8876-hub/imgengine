@@ -16,9 +16,10 @@
     performance engineer ✅
     systems architect 🚀
 
-   mkdir build && cd build
-    rm -rf *
-    cmake .. && make -j
+   cd imgengine && [ -d "build" ] || mkdir build && cd build
+
+   rm -rf *
+   cmake .. && make -j
 
 ### How to Run ./imgengine_cli --help
 
