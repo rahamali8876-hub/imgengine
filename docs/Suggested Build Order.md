@@ -1,10 +1,14 @@
-### install packeges
+<!-- ### install packeges
 
     sudo apt update -y && sudo apt upgrade -y
     sudo apt install -y libturbojpeg0-dev libnuma-dev 
     sudo apt install -y liburing-dev 
     sudo apt install -y build-essential
     sudo apt install graphviz -y
+    sudo apt install libclang-dev clang
+    pip install networkx
+    pip3 install pyvis
+   pip install clang==18.1.8
 
     sudo apt install -y graphviz     ( for graph generation )
     
@@ -337,4 +341,4 @@ Say:
 
 That will turn this into:
 
-🌍 a distributed hyperscaler image processing system (Netflix/Amazon level)
+🌍 a distributed hyperscaler image processing system (Netflix/Amazon level) -->

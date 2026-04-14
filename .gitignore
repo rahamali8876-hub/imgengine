@@ -11,6 +11,7 @@ obj/
 *.lo
 *.out
 *.app
+*lib
 
 # Images 
 dependency_graph.dot
