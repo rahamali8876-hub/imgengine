@@ -2,9 +2,8 @@
 
 #include <immintrin.h>
 #include "arch/arch_interface.h"
-#include "pipeline/batch.h"
+#include "core/batch.h"
 #include "core/buffer.h"
-#include "pipeline/pipeline_types.h"
 
 void img_fused_resize_color_norm_avx2(
     img_ctx_t *ctx,

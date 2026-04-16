@@ -3,6 +3,8 @@
     sudo apt update -y && sudo apt upgrade -y
     sudo apt install -y libturbojpeg0-dev libnuma-dev 
     sudo apt install -y liburing-dev 
+    sudo apt update -y; sudo apt upgrade -y; sudo apt install -y libturbojpeg0-dev libnuma-dev liburing-dev
+
     
     sudo apt install -y build-essential
     sudo apt install graphviz -y
@@ -34,7 +36,7 @@
 # Passport — fits perfectly
 
 ./imgengine_cli --input ../photo.jpg --output passport.jpg \
-    --cols 2 --rows 3 --gap 20 --padding 40
+    --cols 6 --rows 3 --gap 20 --padding 20
 
 # Studio — auto-scales 6 photos to fit with gaps
 

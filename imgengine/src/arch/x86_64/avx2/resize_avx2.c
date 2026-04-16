@@ -1,11 +1,10 @@
 // ./src/arch/x86_64/avx2/resize_avx2.c
 
 #include <immintrin.h>
-#include "plugins/plugin_resize.h"
+#include "arch/resize_params.h"
 #include "arch/arch_interface.h"
 
 #include "core/buffer.h"
-#include "pipeline/pipeline_types.h"
 
 void img_arch_avx2_resize(img_ctx_t *ctx, img_buffer_t *dst, void *params)
 {

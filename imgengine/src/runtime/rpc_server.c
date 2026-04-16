@@ -1,11 +1,15 @@
 // ./src/runtime/rpc_server.c
 
-// ./src/runtime/rpc_server.c
-
-
 #include "runtime/rpc_protocol.h"
 #include "pipeline/jump_table.h"
-#include "api/v1/img_buffer_utils.h"
+
+// #include "api/v1/img_buffer_utils.h"
+// Remove: #include "api/v1/img_buffer_utils.h"
+// The rpc_server only needs img_buffer_t — use core/buffer.h directly.
+// Replace img_buffer_from_slab() with inline slab_alloc + field assignment.
+
+#include "core/buffer.h"
+
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>

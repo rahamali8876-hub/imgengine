@@ -17,16 +17,4 @@ typedef struct img_pipeline_runtime
     uint32_t count;
 } img_pipeline_runtime_t;
 
-// 🔥 STRICT PIPELINE CONTRACT
-// typedef struct
-// {
-//     img_op_desc_t *ops; // Pointer: Size is always 8 bytes (on x86_64)
-//     uint32_t count;
-// } img_pipeline_runtime_t;
-
-// // Build function
-// int img_pipeline_build(
-//     const img_pipeline_desc_t *desc,
-//     img_pipeline_runtime_t *runtime);
-
 #endif

@@ -1,6 +1,6 @@
 // ./src/plugins/plugin_resize.c
 
-#include "api/v1/img_plugin_api.h"
+#include "pipeline/plugin_abi.h"
 #include "core/buffer.h"
 #include <stddef.h>
 

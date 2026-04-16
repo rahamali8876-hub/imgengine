@@ -88,20 +88,36 @@ def is_system_fn(name):
 # Update scripts/l10plusplus.py LAYERS list to this order:
 #  ================================================================
 
+# LAYERS = [
+#     "types",  # 0: img_result_t, img_buffer_t, opcodes — no deps
+#     "memory",  # 1: slab, arena, numa — depends on types only
+#     "arch",  # 2: SIMD kernels, cpu_caps — depends on types only
+#     "security",  # 3: validation, sandbox — depends on types only
+#     "pipeline",  # 4: jump table, fused kernels — depends on arch, memory
+#     "runtime",  # 5: workers, queues — depends on pipeline
+#     "plugins",  # 6: plugin ABI — depends on pipeline
+#     "observability",  # 7: metrics, logging — depends on types
+#     "io",  # 8: decode, encode — depends on memory, security
+#     "api",  # 9: public surface — depends on everything below
+#     "cmd",  # 10: CLI — depends on api only
+#     "startup",  # 11: engine init — depends on all layers
+# ]
+
 LAYERS = [
-    "types",  # 0: img_result_t, img_buffer_t, opcodes — no deps
-    "memory",  # 1: slab, arena, numa — depends on types only
-    "arch",  # 2: SIMD kernels, cpu_caps — depends on types only
-    "security",  # 3: validation, sandbox — depends on types only
-    "pipeline",  # 4: jump table, fused kernels — depends on arch, memory
-    "runtime",  # 5: workers, queues — depends on pipeline
-    "plugins",  # 6: plugin ABI — depends on pipeline
-    "observability",  # 7: metrics, logging — depends on types
-    "io",  # 8: decode, encode — depends on memory, security
-    "api",  # 9: public surface — depends on everything below
-    "cmd",  # 10: CLI — depends on api only
-    "startup",  # 11: engine init — depends on all layers
+    "core",           # 0 — types, buffer, opcodes, batch
+    "memory",         # 1 — slab, arena, numa
+    "arch",           # 2 — SIMD kernels, cpu_caps, resize_params
+    "security",       # 3 — validation, sandbox
+    "observability",  # 4 — metrics, logging, tracing (moved up)
+    "pipeline",       # 5 — jump table, fused kernels, dispatch, job
+    "runtime",        # 6 — workers, queues, scheduler
+    "plugins",        # 7 — plugin ABI (pipeline/plugin_abi.h)
+    "io",             # 8 — decode, encode, vfs
+    "api",            # 9 — public surface (re-exports from lower layers)
+    "cmd",            # 10 — CLI
+    "startup",        # 11 — engine init, wires everything
 ]
+
 # LAYERS = [
 #     "core",
 #     "memory",

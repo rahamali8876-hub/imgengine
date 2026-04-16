@@ -138,6 +138,7 @@ set(SOURCES_PIPELINE
     src/pipeline/pipeline_build.c
     src/pipeline/pipeline_fuse.c
     src/pipeline/border.c
+    src/pipeline/dispatch.c
 )
 
 set(SOURCES_MEMORY

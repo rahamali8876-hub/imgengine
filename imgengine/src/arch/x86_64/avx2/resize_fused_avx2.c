@@ -2,10 +2,9 @@
 
 #include <immintrin.h>
 #include "arch/arch_interface.h"
-#include "pipeline/batch.h"
-#include "plugins/plugin_resize.h"
+#include "core/batch.h"
+#include "arch/resize_params.h"
 
-#include "pipeline/pipeline_types.h"
 #include "core/buffer.h"
 
 void img_batch_resize_fused_avx2(
