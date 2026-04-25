@@ -253,6 +253,24 @@ set(SOURCES_PIPELINE
     src/pipeline/pipeline_executor.c
 )
 
+# Option: enable/disable DSL -> C codegen
+option(IMGENGINE_ENABLE_DSL_CODEGEN "Enable DSL -> C codegen for pipelines" ON)
+
+if(IMGENGINE_ENABLE_DSL_CODEGEN)
+    # Auto-generate pipelines from DSL (creates src/pipeline/generated.c)
+    # corebases present in /include/pipeline/job_presets.h and job_templates.h 
+    add_custom_command(
+        OUTPUT ${CMAKE_SOURCE_DIR}/src/pipeline/generated.c
+        COMMENT "Generate pipeline source from DSL"
+    )
+    list(APPEND SOURCES_PIPELINE ${CMAKE_SOURCE_DIR}/src/pipeline/generated.c)
+else()
+    # If codegen disabled but generated.c exists in tree, include it so builds don't break
+    if(EXISTS ${CMAKE_SOURCE_DIR}/src/pipeline/generated.c)
+        list(APPEND SOURCES_PIPELINE ${CMAKE_SOURCE_DIR}/src/pipeline/generated.c)
+    endif()
+endif()
+
 set(SOURCES_MEMORY
     src/memory/arena_alloc.c
     src/memory/arena_alloc_aligned.c
