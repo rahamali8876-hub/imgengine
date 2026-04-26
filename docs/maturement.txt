@@ -48,3 +48,10 @@ Kernel fast path (decode + compiled pipeline)
   min:  40.823 ms (40823151 ns)
   max:  480.089 ms (480089451 ns)
   thr:  10 ops/sec
+
+
+
+  
+cd imgengine && [ -d "build" ] || mkdir build && cd build rm -rf * cmake .. && make -j asbhumi-ai ➜ /workspaces/imgengine/imgengine/build (with_claude_from_main) $ ./imgengine_cli --input ../photo.jpg --output passport.jpg
+--cols 6 --rows 3 --gap 20 --padding 20 job failed: IMG_ERR_SECURITY (3) i am following docs/v2.0 RFC.md and making lld.md and hld.md with disign patterns design_patterns.md which is not completed yet complete design_patterns.md based on my include/ and src/ inside codebases this is a c and assembly project i can dind all about with reading those files mentioned above
+
