@@ -2,8 +2,10 @@ name: imgengine-ci
 
 on:
   push:
-    branches: [main]
+    branches: ["**"]  # This ensures 'with_claude_from_main' triggers it
   pull_request:
+    branches: ["**"]
+
 
 jobs:
   build-test:
