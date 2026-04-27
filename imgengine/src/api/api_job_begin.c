@@ -49,25 +49,16 @@ img_result_t img_api_begin_job(img_engine_t *engine, const char *input_path, con
     img_buffer_t photo = {0};
 
     img_result_t r = img_api_init_ctx(engine, ctx);
-    if (r != IMG_SUCCESS) {
-        if (getenv("IMGENGINE_DEBUG"))
-            fprintf(stderr, "[DBG] img_api_init_ctx -> %d\n", r);
+    if (r != IMG_SUCCESS)
         return r;
-    }
 
     r = img_api_load_input(input_path, &file_data, &file_size);
-    if (r != IMG_SUCCESS) {
-        if (getenv("IMGENGINE_DEBUG"))
-            fprintf(stderr, "[DBG] img_api_load_input -> %d (file_size=%zu)\n", r, file_size);
+    if (r != IMG_SUCCESS)
         return r;
-    }
 
     r = img_api_decode_input(ctx, &file_data, file_size, &photo);
-    if (r != IMG_SUCCESS) {
-        if (getenv("IMGENGINE_DEBUG"))
-            fprintf(stderr, "[DBG] img_api_decode_input -> %d\n", r);
+    if (r != IMG_SUCCESS)
         return r;
-    }
 
     r = img_api_begin_job_with_photo(engine, job, &photo, ctx, canvas, layout, arena);
 

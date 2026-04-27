@@ -532,6 +532,13 @@ if(IMGENGINE_SANITIZE)
     target_link_libraries(verify_generated_registration PRIVATE -fsanitize=address,undefined)
 endif()
 
+# ── Regression test: progressive JPEG ────────────────────────
+add_custom_target(regression_progressive
+    COMMAND ${CMAKE_COMMAND} -E env BUILD_DIR=${CMAKE_BINARY_DIR} bash ${CMAKE_SOURCE_DIR}/tests/regression/progressive_regression.sh ${CMAKE_BINARY_DIR} ${CMAKE_BINARY_DIR}/regression_tmp
+    DEPENDS imgengine_cli
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+)
+
 # ── Build summary ──────────────────────────────────────────
 message(STATUS "")
 message(STATUS "======================================")

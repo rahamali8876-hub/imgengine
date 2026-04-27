@@ -41,13 +41,10 @@ img_result_t img_decode_stream_core(img_slab_pool_t *pool, img_stream_t *stream,
         return IMG_ERR_FORMAT;
     }
 
-    if (getenv("IMGENGINE_DEBUG"))
-        fprintf(stderr, "[DBG] stream: w=%d h=%d file_size=%zu\n", w, h, stream->size);
+    (void)w; (void)h; (void)stream; /* debug prints removed; use observability logger if needed */
 
     img_result_t sec = img_security_validate_request(w, h, stream->size);
     if (sec != IMG_SUCCESS) {
-        if (getenv("IMGENGINE_DEBUG"))
-            fprintf(stderr, "[DBG] stream: img_security_validate_request -> %d\n", sec);
         tjDestroy(tj);
         return sec;
     }

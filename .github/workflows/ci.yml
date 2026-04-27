@@ -16,7 +16,7 @@ jobs:
       - name: Install deps
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential cmake python3
+          sudo apt-get install -y build-essential cmake python3 clang-format imagemagick libturbojpeg-dev curl
 
       # 🔥 STRICT HEADER CHECK (ONLY ENGINE)
       - name: Check Headers (ENGINE ONLY)
@@ -28,6 +28,18 @@ jobs:
           mkdir -p build && cd build
           cmake ..
           make -j$(nproc)
+
+      - name: Run format-check
+        run: |
+          cd imgengine
+          mkdir -p build && cd build
+          cmake --build . --target format-check || (echo "format-check failed" && exit 1)
+
+      - name: Run progressive-JPEG regression
+        run: |
+          cd imgengine
+          mkdir -p build && cd build
+          cmake --build . --target regression_progressive || (echo "regression_progressive failed" && exit 1)
 
       - name: Run Tests
         run: |
