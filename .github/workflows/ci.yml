@@ -31,7 +31,9 @@ jobs:
             imagemagick \
             libturbojpeg-dev \
             libnuma-dev \
+            liburing-dev \
             curl
+
 
 
       - name: Annotate and Check Headers
