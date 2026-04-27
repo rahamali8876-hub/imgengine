@@ -1,12 +1,8 @@
 // ./src/pipeline/canvas_geometry.c
 #include "pipeline/canvas_internal.h"
 
-void img_canvas_compute_geometry(
-    img_canvas_t *canvas,
-    const img_job_t *job,
-    uint32_t pw,
-    uint32_t ph)
-{
+void img_canvas_compute_geometry(img_canvas_t *canvas, const img_job_t *job, uint32_t pw,
+                                 uint32_t ph) {
     uint32_t photo_w = img_cm_to_px(job->photo_w_cm, job->dpi);
     uint32_t photo_h = img_cm_to_px(job->photo_h_cm, job->dpi);
 
@@ -20,8 +16,7 @@ void img_canvas_compute_geometry(
     uint32_t max_pw = avail_w / job->cols;
     uint32_t max_ph = avail_h / job->rows;
 
-    if (photo_w > max_pw || photo_h > max_ph)
-    {
+    if (photo_w > max_pw || photo_h > max_ph) {
         float sx = (max_pw > 0) ? (float)max_pw / (float)photo_w : 1.0f;
         float sy = (max_ph > 0) ? (float)max_ph / (float)photo_h : 1.0f;
         float s = (sx < sy) ? sx : sy;

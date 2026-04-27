@@ -7,8 +7,7 @@
 
 #include <stddef.h>
 
-void img_ctx_bind_engine(const img_engine_t *engine, img_ctx_t *ctx)
-{
+void img_ctx_bind_engine(const img_engine_t *engine, img_ctx_t *ctx) {
     if (!engine || !ctx)
         return;
 

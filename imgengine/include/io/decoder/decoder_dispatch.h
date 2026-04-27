@@ -17,11 +17,8 @@ typedef enum {
 } img_decode_strategy_t;
 
 /* Dispatch entry used as the default decode function in the vtable. */
-img_result_t img_decode_dispatch(
-    img_ctx_t *ctx,
-    const uint8_t *input,
-    size_t size,
-    img_buffer_t *out);
+img_result_t img_decode_dispatch(img_ctx_t *ctx, const uint8_t *input, size_t size,
+                                 img_buffer_t *out);
 
 /* Set runtime strategy (callable after engine init). */
 void img_io_set_decode_strategy(img_decode_strategy_t s);

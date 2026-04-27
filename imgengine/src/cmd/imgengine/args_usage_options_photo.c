@@ -3,12 +3,10 @@
 
 #include <stdio.h>
 
-void img_cli_print_photo_options(void)
-{
-    fprintf(stdout,
-            "PHOTO SETTINGS:\n"
-            "  --width <cm>           Photo width  in cm (default: 4.5)\n"
-            "  --height <cm>          Photo height in cm (default: 3.5)\n"
-            "  --dpi <int>            Print DPI (default: 300)\n"
-            "  --border <px>          Border thickness (default: 2)\n\n");
+void img_cli_print_photo_options(void) {
+    fprintf(stdout, "PHOTO SETTINGS:\n"
+                    "  --width <cm>           Photo width  in cm (default: 4.5)\n"
+                    "  --height <cm>          Photo height in cm (default: 3.5)\n"
+                    "  --dpi <int>            Print DPI (default: 300)\n"
+                    "  --border <px>          Border thickness (default: 2)\n\n");
 }

@@ -3,8 +3,7 @@
 
 #include <unistd.h>
 
-void img_rpc_client_close(int sock)
-{
+void img_rpc_client_close(int sock) {
     if (sock >= 0)
         close(sock);
 }

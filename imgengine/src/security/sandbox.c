@@ -27,8 +27,7 @@
 
 #ifdef IMG_SANDBOX_ENABLED
 
-bool img_security_enter_sandbox(void)
-{
+bool img_security_enter_sandbox(void) {
     struct sock_fprog prog = {0};
     if (!img_sandbox_build_filter(&prog))
         return false;
@@ -49,9 +48,6 @@ bool img_security_enter_sandbox(void)
  * initialization — after threads, slabs, io_uring, and file handles
  * are all set up. The filter locks down the decoder only.
  */
-bool img_security_enter_sandbox(void)
-{
-    return true; /* no-op in dev mode */
-}
+bool img_security_enter_sandbox(void) { return true; /* no-op in dev mode */ }
 
 #endif /* IMG_SANDBOX_ENABLED */

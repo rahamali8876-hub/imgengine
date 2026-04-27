@@ -9,9 +9,10 @@
 #ifndef IMGENGINE_GENERATED_PIPELINES
 #define IMGENGINE_GENERATED_PIPELINES
 
-void pipeline_photo_6x6(img_ctx_t *ctx, img_buffer_t *buf, void *params)
-{
-    (void)ctx; (void)buf; (void)params;
+void pipeline_photo_6x6(img_ctx_t *ctx, img_buffer_t *buf, void *params) {
+    (void)ctx;
+    (void)buf;
+    (void)params;
     /* auto-generated pipeline: photo_6x6 */
     /* Pipeline body (DSL):
 resize(4096,4096)
@@ -21,9 +22,10 @@ resize(4096,4096)
     */
 }
 
-void pipeline_photo_6x3(img_ctx_t *ctx, img_buffer_t *buf, void *params)
-{
-    (void)ctx; (void)buf; (void)params;
+void pipeline_photo_6x3(img_ctx_t *ctx, img_buffer_t *buf, void *params) {
+    (void)ctx;
+    (void)buf;
+    (void)params;
     /* auto-generated pipeline: photo_6x3 */
     /* Pipeline body (DSL):
 resize(4096,4096)
@@ -33,9 +35,10 @@ resize(4096,4096)
     */
 }
 
-void pipeline_photo_6x1(img_ctx_t *ctx, img_buffer_t *buf, void *params)
-{
-    (void)ctx; (void)buf; (void)params;
+void pipeline_photo_6x1(img_ctx_t *ctx, img_buffer_t *buf, void *params) {
+    (void)ctx;
+    (void)buf;
+    (void)params;
     /* auto-generated pipeline: photo_6x1 */
     /* Pipeline body (DSL):
 resize(4096,4096)
@@ -45,9 +48,10 @@ resize(4096,4096)
     */
 }
 
-void pipeline_passport_45x35(img_ctx_t *ctx, img_buffer_t *buf, void *params)
-{
-    (void)ctx; (void)buf; (void)params;
+void pipeline_passport_45x35(img_ctx_t *ctx, img_buffer_t *buf, void *params) {
+    (void)ctx;
+    (void)buf;
+    (void)params;
     /* auto-generated pipeline: passport_45x35 */
     /* Pipeline body (DSL):
 resize(4096,4096)
@@ -57,9 +61,10 @@ resize(4096,4096)
     */
 }
 
-void pipeline_printready_6x6(img_ctx_t *ctx, img_buffer_t *buf, void *params)
-{
-    (void)ctx; (void)buf; (void)params;
+void pipeline_printready_6x6(img_ctx_t *ctx, img_buffer_t *buf, void *params) {
+    (void)ctx;
+    (void)buf;
+    (void)params;
     /* auto-generated pipeline: printready_6x6 */
     /* Pipeline body (DSL):
 resize(4096,4096)
@@ -73,8 +78,7 @@ resize(4096,4096)
  * Explicit registration function.
  * Call from deterministic startup (img_api_init / engine init).
  */
-void register_generated_pipelines(void)
-{
+void register_generated_pipelines(void) {
     img_register_op((OP_CUSTOM_BASE + 0), (img_op_fn)pipeline_photo_6x6, NULL);
     img_register_op((OP_CUSTOM_BASE + 1), (img_op_fn)pipeline_photo_6x3, NULL);
     img_register_op((OP_CUSTOM_BASE + 2), (img_op_fn)pipeline_photo_6x1, NULL);

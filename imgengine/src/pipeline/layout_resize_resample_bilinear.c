@@ -12,28 +12,17 @@
 #include "core/opcodes.h"
 #include "memory/arena.h"
 
-static void img_layout_resize_precompute_axes(
-    uint32_t count,
-    uint32_t scale,
-    uint32_t *index_out,
-    uint16_t *weight_out)
-{
-    for (uint32_t i = 0; i < count; i++)
-    {
+static void img_layout_resize_precompute_axes(uint32_t count, uint32_t scale, uint32_t *index_out,
+                                              uint16_t *weight_out) {
+    for (uint32_t i = 0; i < count; i++) {
         uint64_t fp = (uint64_t)i * (uint64_t)scale;
         index_out[i] = (uint32_t)(fp >> 16);
         weight_out[i] = (uint16_t)(fp & 0xffffu);
     }
 }
 
-void img_layout_resize_resample_bilinear(
-    img_ctx_t *ctx,
-    const img_buffer_t *src,
-    uint8_t *mem,
-    uint32_t new_w,
-    uint32_t new_h,
-    uint32_t stride)
-{
+void img_layout_resize_resample_bilinear(img_ctx_t *ctx, const img_buffer_t *src, uint8_t *mem,
+                                         uint32_t new_w, uint32_t new_h, uint32_t stride) {
     /*
      * HOT PATH: dispatch to registered SIMD kernel.
      *
@@ -58,16 +47,13 @@ void img_layout_resize_resample_bilinear(
      */
     img_kernel_fn resize_fn = g_jump_table[OP_RESIZE];
 
-    if (__builtin_expect(resize_fn != NULL, 1))
-    {
+    if (__builtin_expect(resize_fn != NULL, 1)) {
         const uint32_t src_w = src->width;
         const uint32_t src_h = src->height;
-        const uint32_t scale_x = (new_w > 1 && src_w > 1)
-                                     ? (uint32_t)(((uint64_t)(src_w - 1) << 16) / (new_w - 1))
-                                     : 0;
-        const uint32_t scale_y = (new_h > 1 && src_h > 1)
-                                     ? (uint32_t)(((uint64_t)(src_h - 1) << 16) / (new_h - 1))
-                                     : 0;
+        const uint32_t scale_x =
+            (new_w > 1 && src_w > 1) ? (uint32_t)(((uint64_t)(src_w - 1) << 16) / (new_w - 1)) : 0;
+        const uint32_t scale_y =
+            (new_h > 1 && src_h > 1) ? (uint32_t)(((uint64_t)(src_h - 1) << 16) / (new_h - 1)) : 0;
 
         img_buffer_t dst_buf = {
             .data = mem,
@@ -83,25 +69,17 @@ void img_layout_resize_resample_bilinear(
         uint16_t *x_weight = NULL;
         uint16_t *y_weight = NULL;
 
-        if (arena)
-        {
-            x_index = img_arena_alloc_aligned(
-                arena, (size_t)new_w * sizeof(uint32_t), 64);
-            y_index = img_arena_alloc_aligned(
-                arena, (size_t)new_h * sizeof(uint32_t), 64);
-            x_weight = img_arena_alloc_aligned(
-                arena, (size_t)new_w * sizeof(uint16_t), 64);
-            y_weight = img_arena_alloc_aligned(
-                arena, (size_t)new_h * sizeof(uint16_t), 64);
+        if (arena) {
+            x_index = img_arena_alloc_aligned(arena, (size_t)new_w * sizeof(uint32_t), 64);
+            y_index = img_arena_alloc_aligned(arena, (size_t)new_h * sizeof(uint32_t), 64);
+            x_weight = img_arena_alloc_aligned(arena, (size_t)new_w * sizeof(uint16_t), 64);
+            y_weight = img_arena_alloc_aligned(arena, (size_t)new_h * sizeof(uint16_t), 64);
         }
 
-        if (x_index && y_index && x_weight && y_weight)
-        {
+        if (x_index && y_index && x_weight && y_weight) {
             img_layout_resize_precompute_axes(new_w, scale_x, x_index, x_weight);
             img_layout_resize_precompute_axes(new_h, scale_y, y_index, y_weight);
-        }
-        else
-        {
+        } else {
             x_index = NULL;
             y_index = NULL;
             x_weight = NULL;
@@ -137,15 +115,12 @@ void img_layout_resize_resample_bilinear(
     const uint32_t src_w = src->width;
     const uint32_t src_h = src->height;
 
-    const uint32_t x_ratio = (new_w > 1)
-                                 ? (uint32_t)(((uint64_t)(src_w - 1) << 16) / (new_w - 1))
-                                 : 0;
-    const uint32_t y_ratio = (new_h > 1)
-                                 ? (uint32_t)(((uint64_t)(src_h - 1) << 16) / (new_h - 1))
-                                 : 0;
+    const uint32_t x_ratio =
+        (new_w > 1) ? (uint32_t)(((uint64_t)(src_w - 1) << 16) / (new_w - 1)) : 0;
+    const uint32_t y_ratio =
+        (new_h > 1) ? (uint32_t)(((uint64_t)(src_h - 1) << 16) / (new_h - 1)) : 0;
 
-    for (uint32_t dy = 0; dy < new_h; dy++)
-    {
+    for (uint32_t dy = 0; dy < new_h; dy++) {
         uint32_t y_fp = dy * y_ratio;
         uint32_t y0 = y_fp >> 16;
         uint32_t y1 = (y0 + 1 < src_h) ? y0 + 1 : y0;
@@ -155,8 +130,7 @@ void img_layout_resize_resample_bilinear(
         const uint8_t *row1 = src->data + (size_t)y1 * src->stride;
         uint8_t *dst_row = mem + (size_t)dy * stride;
 
-        for (uint32_t dx = 0; dx < new_w; dx++)
-        {
+        for (uint32_t dx = 0; dx < new_w; dx++) {
             uint32_t x_fp = dx * x_ratio;
             uint32_t x0 = x_fp >> 16;
             uint32_t x1 = (x0 + 1 < src_w) ? x0 + 1 : x0;
@@ -168,8 +142,7 @@ void img_layout_resize_resample_bilinear(
             const uint8_t *p11 = row1 + (size_t)x1 * ch;
             uint8_t *out = dst_row + (size_t)dx * ch;
 
-            for (uint32_t c = 0; c < ch; c++)
-            {
+            for (uint32_t c = 0; c < ch; c++) {
                 uint64_t top = (uint64_t)p00[c] * wx0 + (uint64_t)p10[c] * fx;
                 uint64_t bottom = (uint64_t)p01[c] * wx0 + (uint64_t)p11[c] * fx;
                 uint64_t value = top * wy0 + bottom * fy;

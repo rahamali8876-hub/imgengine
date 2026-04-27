@@ -3,8 +3,7 @@
 
 #include <stdlib.h>
 
-void img_mpmc_destroy(img_mpmc_queue_t *q)
-{
+void img_mpmc_destroy(img_mpmc_queue_t *q) {
     if (!q)
         return;
 

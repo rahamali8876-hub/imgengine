@@ -24,8 +24,7 @@
 /* forward: these match what api/v1/img_pipeline.h declares */
 typedef struct img_pipeline img_pipeline_t;
 
-img_pipeline_t *img_pipeline_create(void)
-{
+img_pipeline_t *img_pipeline_create(void) {
     img_pipeline_desc_t *pipe =
         img_numa_alloc_onnode(sizeof(img_pipeline_desc_t), img_numa_get_node());
     if (!pipe)
@@ -34,16 +33,11 @@ img_pipeline_t *img_pipeline_create(void)
     return (img_pipeline_t *)pipe;
 }
 
-void img_pipeline_destroy(img_pipeline_t *pipe)
-{
+void img_pipeline_destroy(img_pipeline_t *pipe) {
     img_numa_release(pipe, sizeof(img_pipeline_desc_t));
 }
 
-int img_pipeline_add_op(
-    img_pipeline_t *p,
-    uint32_t op_code,
-    void *params)
-{
+int img_pipeline_add_op(img_pipeline_t *p, uint32_t op_code, void *params) {
     img_pipeline_desc_t *pipe = (img_pipeline_desc_t *)p;
     if (!pipe || pipe->count >= IMG_MAX_PIPELINE_OPS)
         return -1;

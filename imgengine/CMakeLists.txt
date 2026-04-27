@@ -544,3 +544,8 @@ message(STATUS " Sandbox      : ${IMGENGINE_SANDBOX}")
 message(STATUS " Bench        : ${IMGENGINE_BENCH}")
 message(STATUS "======================================")
 message(STATUS "")
+
+# Optional: include clang-format integration (adds `format` and `format-check` targets)
+if(EXISTS "${CMAKE_SOURCE_DIR}/cmake/clang-format.cmake")
+    include(${CMAKE_SOURCE_DIR}/cmake/clang-format.cmake)
+endif()

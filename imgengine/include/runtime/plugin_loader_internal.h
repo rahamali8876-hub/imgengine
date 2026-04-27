@@ -5,8 +5,7 @@
 #include "pipeline/plugin_abi.h"
 
 int img_plugin_descriptor_load(const img_plugin_descriptor_t *desc);
-int img_plugin_descriptor_load_range(
-    const img_plugin_descriptor_t *const *begin,
-    const img_plugin_descriptor_t *const *end);
+int img_plugin_descriptor_load_range(const img_plugin_descriptor_t *const *begin,
+                                     const img_plugin_descriptor_t *const *end);
 
 #endif /* IMGENGINE_RUNTIME_PLUGIN_LOADER_INTERNAL_H */

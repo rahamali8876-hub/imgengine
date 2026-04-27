@@ -7,19 +7,17 @@
 #include <stddef.h>
 #include <sys/syscall.h>
 
-#define ALLOW(syscall_nr)                                  \
-    BPF_JUMP(BPF_JMP | BPF_JEQ | BPF_K, syscall_nr, 0, 1), \
+#define ALLOW(syscall_nr)                                                                          \
+    BPF_JUMP(BPF_JMP | BPF_JEQ | BPF_K, syscall_nr, 0, 1),                                         \
         BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_ALLOW)
 
 /*
  * Keep the policy in a separate unit so the public entrypoint stays small.
  * The analyzer treats this as the policy owner, not the syscall installer.
  */
-bool img_sandbox_build_filter(struct sock_fprog *prog)
-{
+bool img_sandbox_build_filter(struct sock_fprog *prog) {
     static struct sock_filter filter[] = {
-        BPF_STMT(BPF_LD | BPF_W | BPF_ABS,
-                 offsetof(struct seccomp_data, nr)),
+        BPF_STMT(BPF_LD | BPF_W | BPF_ABS, offsetof(struct seccomp_data, nr)),
         ALLOW(SYS_read),
         ALLOW(SYS_write),
         ALLOW(SYS_readv),

@@ -3,7 +3,4 @@
 
 #include "startup/engine_init_internal.h"
 
-void img_engine_init_caps(img_engine_t *engine)
-{
-    engine->caps = img_cpu_detect_caps();
-}
+void img_engine_init_caps(img_engine_t *engine) { engine->caps = img_cpu_detect_caps(); }

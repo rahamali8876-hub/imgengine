@@ -4,8 +4,7 @@
 #include "api/api_internal.h"
 #include "runtime/task.h"
 
-int img_submit_task(img_task_t *task)
-{
+int img_submit_task(img_task_t *task) {
     if (!task)
         return 0;
 

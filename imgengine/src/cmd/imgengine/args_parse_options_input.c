@@ -2,20 +2,16 @@
 
 #include <string.h>
 
-int img_cli_parse_options_input(int opt, const char *optarg, img_cli_options_t *opts)
-{
-    switch (opt)
-    {
+int img_cli_parse_options_input(int opt, const char *optarg, img_cli_options_t *opts) {
+    switch (opt) {
     case 15:
         if (!optarg)
             return -1;
-        if (strcmp(optarg, "encoded") == 0)
-        {
+        if (strcmp(optarg, "encoded") == 0) {
             opts->input_format = IMG_CLI_INPUT_FORMAT_ENCODED;
             return 0;
         }
-        if (strcmp(optarg, "raw-rgb24") == 0)
-        {
+        if (strcmp(optarg, "raw-rgb24") == 0) {
             opts->input_format = IMG_CLI_INPUT_FORMAT_RAW_RGB24;
             return 0;
         }

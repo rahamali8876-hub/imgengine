@@ -10,12 +10,8 @@
  * 🔥 Create buffer INSIDE slab (header + data contiguous)
  */
 
-static inline img_buffer_t img_buffer_from_slab(
-    img_slab_pool_t *pool,
-    uint32_t w,
-    uint32_t h,
-    uint32_t ch)
-{
+static inline img_buffer_t img_buffer_from_slab(img_slab_pool_t *pool, uint32_t w, uint32_t h,
+                                                uint32_t ch) {
     img_buffer_t buf = {0};
 
     if (!pool || w == 0 || h == 0 || ch == 0)

@@ -7,8 +7,7 @@
 #define SERVER_PORT 9090
 #define SERVER_IP "127.0.0.1"
 
-int img_rpc_client_connect(int sock)
-{
+int img_rpc_client_connect(int sock) {
     struct sockaddr_in server;
     server.sin_family = AF_INET;
     server.sin_port = htons(SERVER_PORT);

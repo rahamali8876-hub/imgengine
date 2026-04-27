@@ -5,12 +5,9 @@
 #include <string.h>
 #include <stdlib.h>
 
-img_result_t img_runtime_hot_bench_init(
-    img_engine_t *engine,
-    const img_buffer_t *decoded,
-    img_job_template_t preset_template,
-    img_hot_bench_state_t *state)
-{
+img_result_t img_runtime_hot_bench_init(img_engine_t *engine, const img_buffer_t *decoded,
+                                        img_job_template_t preset_template,
+                                        img_hot_bench_state_t *state) {
     if (!engine || !decoded || !decoded->data || !state)
         return IMG_ERR_SECURITY;
 
@@ -19,16 +16,14 @@ img_result_t img_runtime_hot_bench_init(
     state->decoded = *decoded;
     state->owns_decoded = 0;
 
-    if (state->decoded.width == 0 || state->decoded.height == 0)
-    {
+    if (state->decoded.width == 0 || state->decoded.height == 0) {
         img_runtime_hot_bench_destroy(engine, state);
         return IMG_ERR_FORMAT;
     }
 
     img_ctx_bind_engine(engine, &state->ctx);
     state->arena = img_arena_create(1 * 1024 * 1024);
-    if (!state->arena)
-    {
+    if (!state->arena) {
         img_runtime_hot_bench_destroy(engine, state);
         return IMG_ERR_NOMEM;
     }
@@ -48,9 +43,7 @@ img_result_t img_runtime_hot_bench_init(
     else
         state->render_cache.allow_final_cache = 0;
     state->ctx.op_params = &state->render_cache;
-    if (img_runtime_resolve_template_job(
-            engine, preset_template, &state->job) != IMG_SUCCESS)
-    {
+    if (img_runtime_resolve_template_job(engine, preset_template, &state->job) != IMG_SUCCESS) {
         img_job_defaults(&state->job);
         state->job.cols = 6;
         state->job.rows = 3;
@@ -61,26 +54,16 @@ img_result_t img_runtime_hot_bench_init(
     return IMG_SUCCESS;
 }
 
-img_result_t img_runtime_hot_bench_step(
-    img_hot_bench_state_t *state)
-{
+img_result_t img_runtime_hot_bench_step(img_hot_bench_state_t *state) {
     if (!state || !state->engine || !state->decoded.data)
         return IMG_ERR_SECURITY;
 
-    return img_runtime_prepare_render_stage(
-        state->engine,
-        &state->ctx,
-        &state->canvas,
-        &state->layout,
-        &state->job,
-        &state->decoded,
-        &state->arena);
+    return img_runtime_prepare_render_stage(state->engine, &state->ctx, &state->canvas,
+                                            &state->layout, &state->job, &state->decoded,
+                                            &state->arena);
 }
 
-void img_runtime_hot_bench_destroy(
-    img_engine_t *engine,
-    img_hot_bench_state_t *state)
-{
+void img_runtime_hot_bench_destroy(img_engine_t *engine, img_hot_bench_state_t *state) {
     if (!state)
         return;
 

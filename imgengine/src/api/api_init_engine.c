@@ -5,8 +5,7 @@
 #include "startup/engine_init_internal.h"
 #include "pipeline/generated.h"
 
-int img_api_init_prepare_engine(uint32_t workers)
-{
+int img_api_init_prepare_engine(uint32_t workers) {
     if (workers == 0 || workers > 64)
         return -1;
 
@@ -18,19 +17,15 @@ int img_api_init_prepare_engine(uint32_t workers)
 
     g_engine.caps = img_cpu_detect_caps();
 
-    g_engine.global_pool = img_slab_create(
-        512 * 1024 * 1024,
-        32 * 1024 * 1024);
+    g_engine.global_pool = img_slab_create(512 * 1024 * 1024, 32 * 1024 * 1024);
 
-    if (!g_engine.global_pool)
-    {
+    if (!g_engine.global_pool) {
         img_api_init_reset_engine();
         return -1;
     }
 
     g_engine.user_data = img_template_registry_create();
-    if (!g_engine.user_data)
-    {
+    if (!g_engine.user_data) {
         img_api_init_reset_engine();
         return -1;
     }

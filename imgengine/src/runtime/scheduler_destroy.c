@@ -5,18 +5,15 @@
 
 #include <stdlib.h>
 
-void img_scheduler_destroy(img_scheduler_t *sched)
-{
+void img_scheduler_destroy(img_scheduler_t *sched) {
     if (!sched)
         return;
 
-    for (uint32_t i = 0; i < sched->worker_count; i++)
-    {
+    for (uint32_t i = 0; i < sched->worker_count; i++) {
         img_worker_stop(&sched->workers[i]);
         img_worker_join(&sched->workers[i]);
         img_render_cache_discard(&sched->workers[i].render_cache);
-        if (sched->workers[i].queue)
-        {
+        if (sched->workers[i].queue) {
             img_queue_destroy(sched->workers[i].queue);
             sched->workers[i].queue = NULL;
         }

@@ -19,8 +19,7 @@
 struct img_scheduler;
 struct img_ctx;
 
-typedef struct img_worker
-{
+typedef struct img_worker {
     uint32_t id;
     pthread_t thread;
 
@@ -38,8 +37,7 @@ typedef struct img_worker
  * The worker thread starts immediately — it reads both before any
  * other code can set them after the fact.
  */
-int img_worker_init(img_worker_t *w, uint32_t id,
-                    struct img_scheduler *scheduler,
+int img_worker_init(img_worker_t *w, uint32_t id, struct img_scheduler *scheduler,
                     struct img_ctx *ctx);
 
 void img_worker_stop(img_worker_t *w);

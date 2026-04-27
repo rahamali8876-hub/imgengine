@@ -4,8 +4,7 @@
 
 #include <stdlib.h>
 
-void img_queue_destroy(img_queue_t *q)
-{
+void img_queue_destroy(img_queue_t *q) {
     if (!q)
         return;
 

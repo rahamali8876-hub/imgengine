@@ -5,8 +5,7 @@
 
 #include <stdlib.h>
 
-void img_slab_destroy(img_slab_pool_t *pool)
-{
+void img_slab_destroy(img_slab_pool_t *pool) {
     if (!pool)
         return;
 

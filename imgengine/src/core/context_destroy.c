@@ -5,8 +5,7 @@
 
 #include <stdlib.h>
 
-void img_ctx_destroy(img_ctx_t *ctx)
-{
+void img_ctx_destroy(img_ctx_t *ctx) {
     if (!ctx)
         return;
 

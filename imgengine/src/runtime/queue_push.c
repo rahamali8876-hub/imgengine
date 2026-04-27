@@ -2,8 +2,7 @@
 #include "runtime/queue_internal.h"
 #include "runtime/queue_spsc.h"
 
-bool img_queue_push(img_queue_t *q, void *data)
-{
+bool img_queue_push(img_queue_t *q, void *data) {
     uint32_t t = q->tail;
     uint32_t next = (t + 1) & q->mask;
 

@@ -6,8 +6,7 @@
 
 #include <stdlib.h>
 
-void img_engine_init_sandbox(void)
-{
+void img_engine_init_sandbox(void) {
     if (!img_security_enter_sandbox())
         abort();
 }

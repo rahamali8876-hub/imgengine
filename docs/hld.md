@@ -1,126 +1,210 @@
-# High-Level Design (HLD) — imgengine
+# High-Level Design (HLD) — imgengine (Production-ready)
 
-## Purpose
+This HLD captures the v2.0 RFC's intent and translates it into a concrete, reviewable architecture suitable for a kernel-grade, deterministic execution engine. It is meant to be the authoritative reference for system-level decisions, runtime constraints, and production policies.
 
-This document summarizes the high-level architecture of imgengine based on the code in `src/` and the public/internal headers in `include/`. It is intended to describe components, responsibilities, runtime flow, and extension points so engineers can quickly understand system boundaries.
+## 0. System Definition (one line)
 
-## Overview
+`A Kernel-Grade, Deterministic, Data-Oriented, SIMD-Fused, Zero-Allocation Execution Engine with Auto-Generated Pipelines`
 
-imgengine is a modular, kernel-grade image processing engine implemented in C and built with CMake. The repository separates stable/public APIs (`include/api/v1` and `src/api`) from internal implementation (`include/*` and `src/*`). The system is designed for high throughput and low latency with explicit hot/cold code separation, architecture-specific kernels, and a plugin ABI.
+## 1. Goals & Targets
 
-## Key Components
+- Latency: < 2 ms (4K image) for render-only paths
+- Throughput: 100K+ ops/sec (scale-out and per-socket targets)
+- Hot-path: zero heap allocation, branchless SIMD fusion where possible
+- Deterministic execution and reproducible latency profiles
 
-- **API:** `include/api/v1` and `src/api` — stable user-facing ABI for creating and submitting image jobs, managing buffers, handling errors, and reading results.
-- **Core:** `include/core`, `src/core` — central data structures, context and lifecycle management, buffer lifecycle, result types.
-- **Pipeline:** `include/pipeline`, `src/pipeline` — pipeline builder, DAG orchestration, jump-table based execution, and kernel fusion infrastructure.
-- **IO:** `include/io`, `src/io` — decoders/encoders, streaming decoders, and VFS adapters (posix, memory, s3, http). Also includes `third_party/stb` bridge.
-- **Memory:** `include/memory`, `src/memory` — slab and arena allocators, hugepage support, NUMA-aware allocation and aligned allocators.
-- **Runtime:** `include/runtime`, `src/runtime` — worker threads, queues (SPSC/MPMC), scheduler, RPC stubs for distributed/cluster use, affinity and backpressure.
-- **Plugins:** `include/plugins`, `src/plugins`, `src/runtime/plugin_loader.c` — plugin ABI, registration and static plugin implementations (resize, crop, grayscale, pdf, bleed).
-- **Arch layer:** `include/arch`, `src/arch/*` — arch-specific implementations (x86_64 AVX2/AVX512, scalar, aarch64/neon). Jump-table selects appropriate kernel at runtime.
-- **Observability:** `include/observability`, `src/observability` — logging, binlog, metrics, tracing, and profiler.
-- **Security:** `include/security`, `src/security` — input validation, bounds checks, sandboxing seccomp integration.
-- **Cmd / Startup:** `src/cmd/imgengine` and `src/startup` — CLI entrypoint (`main.c`), job_builder, engine initialization and subsystems bootstrap.
+### Non-Goals
 
-## Data Flow (high-level)
+- GPU-first execution
+- Desktop GUI tooling or general-purpose interactive editing
 
-1. Input (file/HTTP/S3/memory) is fetched by VFS adapters in `src/io/vfs`.
-2. Decoder(s) in `src/io/decoder` convert raw bytes to internal slab buffers.
-3. API constructs a `job` and submits it (`src/api/*`).
-4. Scheduler enqueues jobs into worker queues (`src/runtime/*`).
-5. Worker executes pipeline via the jump-table / fused kernels path (`src/hot`, `src/pipeline/*`).
-6. Processed data is handed to encoder / output path (`src/io/encoder/*`).
-7. Observability hooks/logging emit metrics and traces; job finalization returns results via API.
+## 2. Architecture Overview
 
-## Build & Configuration Notes
+High level layers (strict downward dependencies):
 
-- Build system: CMake (see `CMakeLists.txt`). Primary options discovered in the codebase include `IMGENGINE_LTO`, `IMGENGINE_SANITIZE`, `IMGENGINE_SANDBOX`, and `IMGENGINE_BENCH`.
-- Architecture detection toggles path under `src/arch/*` (AVX2/AVX512/Scalar/AArch64), and the build tree includes explicit lists of sources by component.
-- Optional dependency: libjpeg-turbo (auto-fetched when not found on system)
+- Control Plane: `cmd` → `api` → `runtime`
+- Execution Plane: `pipeline` → `arch` → `memory` → `core`
 
-## Runtime Considerations
+Execution is modelled as a strict DAG from job submission to SIMD fused kernel execution and output.
 
-- NUMA and hugepage aware allocators used to minimize cross-socket contention and TLB pressure.
-- Worker threads are pinned and scheduled with backpressure to avoid overload.
-- Hot code (SIMD kernels, fused kernels) lives in `src/hot` and `src/arch/*` and must be kept branchless and inlinable where possible.
-- Cold code handles validation, errors, and debugging; it intentionally trades latency for clarity.
+See repository layout for canonical locations: [CMakeLists-Instructions.md](CMakeLists-Instructions.md) and the `src/` layout.
 
-## Extension Points
+## 3. Execution Flow (Strict DAG)
 
-- Plugins: `include/pipeline/plugin_abi.h` and `src/runtime/plugin_loader.c` define plugin interface and loading logic.
-- Pipeline DSL/codegen: The CMake option `IMGENGINE_ENABLE_DSL_CODEGEN` generates `src/pipeline/generated.c` from presets and templates in `include/pipeline`.
-- Adding kernels: implement new arch kernels under `src/arch/<arch>/` and register them via `hardware_registry`.
+```
+USER
+ ↓
+cmd
+ ↓
+api          ← validation + IO boundary
+ ↓
+runtime      ← scheduler (brain)
+ ↓
+pipeline     ← PURE execution
+ ↓
+arch         ← SIMD fused kernels
+ ↓
+memory       ← slab / arena
+ ↓
+core         ← POD types only
+```
 
-## Observability & Testing
+Key rules: API is the only IO boundary, runtime performs scheduling, pipeline must be pure (no side-effects), and arch kernels implement validated leaf operations only.
 
-- Metrics, tracing and binlog support are available in `src/observability` and headers in `include/observability`.
-- Bench tooling is under `src/cmd/bench` and the build toggles `IMGENGINE_BENCH`.
+## 4. Hard Rules (Production Policies)
 
-## Security Model
+- Downward dependencies only.
+- No `malloc`/`free` in hot path; slab/arena allocation only at startup or API boundaries.
+- No IO or syscalls in hot path.
+- No locks in hot path; prefer lock-free SPSC/MPMC primitives.
+- Pipeline operators are pure or otherwise have clearly documented ownership semantics.
+- Runtime manages prepared registries and prepared decode state; pipeline execution must not perform control-plane work.
 
-- Input validation and bounds checks are centralized in `src/cold/validation.c` and `include/security` headers.
-- Optional seccomp sandbox (controlled by `IMGENGINE_SANDBOX`) is configured at startup in `src/startup`.
+Enforcement: CI gates will fail builds when these policies are violated (see CI/CD section).
 
-## Open Questions / Next Steps
+## 5. Control vs Execution Plane
 
-- Verify and document the stable public API surface under `include/api/v1` (versioning policy, semantic stability guarantees).
-- Produce a function-level LLD (this repository's `lld.md`) mapping important public functions to implementing files and call graphs.
-- Add sequence diagrams for common flows (CLI job -> decode -> pipeline -> encode).
+- Control Plane: `src/cmd`, `src/api`, `src/runtime` — parsing, validation, IO, template resolution, and scheduling.
+- Execution Plane: `src/pipeline`, `src/arch`, `src/hot` — pure SIMD fused kernels, jump-table dispatch, and memory-local execution.
+
+Control plane can allocate, perform logging, and make blocking calls. Execution plane must be deterministic and allocation-free.
+
+## 6. Prepared Registry & Decode Path
+
+The runtime owns a prepared template registry and prepared decoder objects. These are created at startup or during a controlled prepare phase and stored as runtime-owned objects referenced by jobs.
+
+Prepared registry responsibilities:
+
+- Template key → prepared job entry mapping (constant-time lookup)
+- Job defaults and presets are centralized; runtime resolves presets first and then applies overrides
+- Prepared decode state (thread-local slab + arena) to avoid repeated heavy initialization
+
+Pseudo flow:
+
+```
+CLI/API Request
+	↓
+TemplateKey
+	↓
+Runtime Template Registry
+	↓
+Prepared Job Entry
+	↓
+Prepared Decode State
+	↓
+Pipeline / Arch Dispatch
+```
+
+Files: [src/pipeline/jump_table_register.c](src/pipeline/jump_table_register.c#L1), [src/pipeline/fused_registry.c](src/pipeline/fused_registry.c#L1)
+
+## 7. Raw Frame Ingress (decode bypass)
+
+Raw RGB24 frames can be submitted explicitly via a raw ingress contract. Rules:
+
+- Raw ingress is explicit (never autodetected).
+- Width/height/stride must be validated before entering render-stage.
+- Decoder is skipped; pipeline receives validated, owner-annotated buffers.
+- Raw ingress still must obey ownership and slab return semantics.
+
+Use cases: upstream producers (camera, pre-decode pipelines) requiring strict low-latency render-only paths.
+
+## 8. Pipeline Registration & Codegen Policy
+
+- Pipeline registration is explicit and C-first; hand-written `src/pipeline/*.c` registration is preferred.
+- Codegen may be used but must emit reviewed C committed to the repo or gated behind an opt-in CMake flag.
+- The runtime must never parse DSL files at startup; DSL is a build-time convenience only.
+
+Guidance and files of interest: [include/pipeline/job_presets.h](include/pipeline/job_presets.h), [include/pipeline/job_templates.h](include/pipeline/job_templates.h), [src/pipeline/jump_table_register.c](src/pipeline/jump_table_register.c#L1)
+
+## 9. SIMD Strategy & Execution
+
+- Use SoA memory layout for image channels to maximize SIMD throughput.
+- AVX2 and AVX-512 fused kernels are the production execution path for resize, color, and fused operations.
+- Assembly limited to validated leaf kernels (rep movsb, rep stosb) and must not contain policy or allocation.
+
+Kernel ABI and placement examples: [src/arch/x86_64/avx2/resize_avx2.c](src/arch/x86_64/avx2/resize_avx2.c#L1), [src/arch/x86_64/avx512/avx512.c](src/arch/x86_64/avx512/avx512.c#L1)
+
+## 10. Memory Model & Locality
+
+```
+GLOBAL NUMA POOL
+ ↓
+thread-local slab
+ ↓
+thread-local arena
+ ↓
+decoded / prepared buffers
+```
+
+- NUMA-aware allocations and thread affinity to avoid cross-socket traffic.
+- Slab allocator for hot buffers and O(1) allocation semantics.
+- 64-byte alignment and prefetch hints to avoid false sharing and improve cache-line access.
+
+See: [src/memory/slab_create.c](src/memory/slab_create.c#L1), [src/memory/numa.c](src/memory/numa.c#L1)
+
+## 11. Runtime & Scheduling
+
+- Worker-per-core model with pinned threads and SPSC queues per worker.
+- Global MPMC submit path for API submissions; workers use `img_scheduler_steal` for load balancing.
+- Backpressure and batching to honor latency and throughput budgets.
+
+See: [src/runtime/scheduler.c](src/runtime/scheduler.c#L1), [src/runtime/queue_spsc.c](src/runtime/queue_spsc.c#L1)
+
+## 12. Latency Budget & Performance Targets
+
+| Stage    | Time   |
+| -------- | ------ |
+| Decode   | 0.5 ms |
+| Dispatch | 0.2 ms |
+| SIMD     | 0.8 ms |
+| Output   | 0.3 ms |
+
+Total target: < 2 ms (render-only paths)
+
+## 13. Failure Strategy
+
+- Corrupt input: fail-fast and return a clear error code.
+- SIMD unsupported: fallback to scalar implementation.
+- Memory full: reject job with resource error.
+- Plugin failure: log and skip plugin stage if safe, otherwise fail job.
+
+## 14. CI/CD & Enforcement
+
+Gated checks (CI must fail the build if any of the following occur):
+
+- `malloc` in pipeline hot-path (detected via static analysis or build-time instrumentation).
+- Latency regression > 2ms on critical microbenchmarks.
+- Throughput drop > 5% for core kernels.
+- Undefined behavior detected by sanitizers (UBSan/ASan) in PR builds.
+
+Add microbench thresholds and an `exported-symbols` ABI check to prevent accidental changes to public API.
+
+## 15. Observability & Debugging
+
+- Lightweight, sampled hooks for metrics/tracing; heavy tracing and logging only on cold-path or sampling windows.
+- Binlog format for post-mortem analysis and deterministic replay.
+
+## 16. Security
+
+- Input validation is mandatory before ownership transfer; bounds checking must be enforced in cold-path.
+- Sandbox integration (seccomp) is opt-in but recommended for untrusted inputs.
+
+## 17. Implementation Roadmap (short-term)
+
+- Finalize template registry APIs and strong ownership semantics (`img_template_entry_t`).
+- Make `img_jump_table_init` and hardware registration deterministic and part of `img_api_init`.
+- Add render-only benchmarks and CI thresholds.
+
+## 18. Production Checklist (PR review)
+
+- Build `IMGENGINE_SANITIZE` and run unit tests.
+- Verify no heap allocations in hot path.
+- Add microbench for changed kernels and include regression checks.
+- Ensure generated C (if used) is checked into the repo or gated by opt-in CMake flag.
 
 ---
 
-Files referenced during this analysis: `include/`, `src/`, and `CMakeLists.txt` (see repo for details).
-
-For a deeper low-level mapping, see `docs/lld.md`.
-
-## Hard Rules (Non‑Negotiable)
-
-- **Downward dependencies only:** higher-level modules must not be referenced by lower-level modules. Keep public API -> core -> arch direction strictly enforced.
-- **Hot-path constraints:** no `malloc`/`free`, no blocking I/O, no locks or blocking syscalls, and avoid data-dependent branching in hot kernels. Hot code must be deterministic and side-effect free where feasible.
-- **Pipeline purity:** pipeline operators should be pure (no global state mutation) or otherwise have well-defined ownership/contract semantics documented in headers.
-- **Zero-copy contracts:** use slab/arena ownership semantics (`img_slab_alloc` / `img_slab_recycle`) — clearly document ownership transfer on API boundaries.
-- **Init order guarantees:** ensure `img_jump_table_init` runs before architecture/hardware registration and any `img_register_op` plugin calls (done during deterministic startup / `img_api_init`).
-- **Fail-fast in hot path:** detect and surface errors to cold-path handlers rather than attempting expensive recovery inside kernels.
-- **Stable ABI:** public headers under `include/api/v1` are versioned; require symbol/version checks during plugin registration.
-
-## Kernel-grade Design Patterns (recommended)
-
-Below are concise, actionable patterns that map well to the existing codebase and the constraints of kernel-grade, performance-sensitive systems.
-
-- **Strategy:** runtime selection of algorithmic variants (used by jump-table selection of `img_arch_*` kernels). Use a light-weight strategy table (function pointers) rather than virtual dispatch.
-- **Factory / Registration:** register platform-specific kernels at startup (`hardware_registry` / `img_register_op`) so callers request an opcode and receive the best available implementation.
-- **Command / Pipeline (Chain-of-Responsibility):** represent pipeline ops as compact command structures (`op_code`, params, buffer refs). This makes queuing, serialization, replay, and batching efficient.
-- **Adapter / Bridge:** adapt third‑party decoders/encoders via small vtables (`img_io_vtable`) to isolate external API changes from core runtime.
-- **Facade:** present a minimal, stable façade for API clients while hiding complex startup/engine lifecycle and tuning knobs.
-- **Observer / Event Hooks (low-overhead):** expose sampling hooks for metrics/traces; keep fast-path hooks conditional and inexpensive.
-- **State Machine:** model job lifecycle explicitly (`created` → `prepared` → `scheduled` → `running` → `completed`) to enforce invariants and idempotence.
-- **Data-Oriented Design (DOD):** favor contiguous memory, struct-of-arrays, and layout optimizations to maximize SIMD utilization and prefetch efficiency.
-- **Lock-free messaging + work-stealing:** use per-worker SPSC queues for the hot path, an MPMC fallback for async submission, and a work-stealing deque (or light-weight steal API) for load balancing.
-- **Scoped/RAII-like cleanup (C idiom):** use explicit `recycle`/`free` semantics and `cleanup` macros where convenient; avoid implicit frees in hot path.
-- **Versioned Plugin ABI & Compatibility Checks:** embed numeric version checks into plugin registration to prevent runtime mismatches.
-
-## Implementation Guidance — mapping patterns to repository primitives
-
-- Hot dispatch: keep `g_jump_table[op]()` direct and inlinable — this is the hot lookup (see `src/pipeline/jump_table_register.c`).
-- Kernel registration: implement platform-specific factories in `src/pipeline/hardware_registry.c` and generated registrations under `src/pipeline/generated.c`.
-- IO adaptors: implement `img_io_vtable` for decoder/encoder adapters and pass vtables during initialization for testability.
-- Memory management: use `img_slab_alloc` / `img_slab_recycle` for transient buffers; prefer pooling to avoid allocator churn in the hot path.
-- Scheduler: per-worker SPSC + global MPMC submit + work-steal (`img_scheduler_steal`) for resiliency and low latency.
-- Observability: use lightweight sampling and per-job trace ids; avoid heavy logging in hot loops (`img_log_write` should be cold-path only or rate-limited).
-
-## Review / CI Checklist (kernel-grade PR review)
-
-- Build with `IMGENGINE_SANITIZE` and run unit tests.
-- Run lint/format and static analyzers (UBSan/ASan) as gating checks.
-- Verify no heap allocations occur in hot path using instrumentation or targeted sanitizers.
-- Add microbenchmarks for any changed kernel and include regression thresholds in CI.
-- Add ABI checks (compare `nm` exports to canonical CSV/JSON) when touching `include/api/v1` or registration code.
-
-## Next steps
-
-- Expand `docs/design_patterns.md` with small code sketches mapping each pattern to repo examples and test harnesses.
-- Optionally produce a compact checklist template for reviewers to enforce the Hard Rules on PRs.
-
+This HLD is intentionally prescriptive — the rules and policies here are the contract that implementation and reviewers must follow to reach deterministic, kernel-grade behavior.
 ## Problem → Pattern Map
 
 Below are common problems you will encounter while working toward the RFC targets, the design pattern to think of first, why it helps, and quick repo examples to inspect.

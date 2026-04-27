@@ -3,8 +3,7 @@
 
 #include <stdio.h>
 
-void img_cli_print_print_options(void)
-{
+void img_cli_print_print_options(void) {
     fprintf(stdout,
             "PRINT FEATURES:\n"
             "  --preset <name>        Template catalog:\n"

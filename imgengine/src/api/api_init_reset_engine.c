@@ -3,17 +3,13 @@
 #include "memory/slab.h"
 #include "runtime/template_registry.h"
 
-void img_api_init_reset_engine(void)
-{
-    if (g_engine.user_data)
-    {
-        img_template_registry_destroy(
-            (img_template_registry_t *)g_engine.user_data);
+void img_api_init_reset_engine(void) {
+    if (g_engine.user_data) {
+        img_template_registry_destroy((img_template_registry_t *)g_engine.user_data);
         g_engine.user_data = NULL;
     }
 
-    if (g_engine.global_pool)
-    {
+    if (g_engine.global_pool) {
         img_slab_destroy(g_engine.global_pool);
         g_engine.global_pool = NULL;
     }

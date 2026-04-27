@@ -1,18 +1,10 @@
 // ./src/pipeline/canvas_alloc_buffer.c
 #include "pipeline/canvas_internal.h"
 
-img_result_t img_canvas_alloc_buffer(
-    img_canvas_t *canvas,
-    img_slab_pool_t *pool,
-    uint32_t pw,
-    uint32_t ph)
-{
-    if (canvas->buf.data &&
-        canvas->buf.width == pw &&
-        canvas->buf.height == ph &&
-        canvas->buf.channels == 3 &&
-        canvas->buf.stride == pw * 3)
-    {
+img_result_t img_canvas_alloc_buffer(img_canvas_t *canvas, img_slab_pool_t *pool, uint32_t pw,
+                                     uint32_t ph) {
+    if (canvas->buf.data && canvas->buf.width == pw && canvas->buf.height == ph &&
+        canvas->buf.channels == 3 && canvas->buf.stride == pw * 3) {
         return IMG_SUCCESS;
     }
 

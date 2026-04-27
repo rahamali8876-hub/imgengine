@@ -2,8 +2,7 @@
 
 #include <stdio.h>
 
-void img_cli_print_input_options(void)
-{
+void img_cli_print_input_options(void) {
     fprintf(stdout,
             "INPUT:\n"
             "  --input <path>              Source image or raw frame path\n"

@@ -2,8 +2,7 @@
 #include "memory/align.h"
 #include "memory/arena.h"
 
-void *img_arena_alloc_aligned(img_arena_t *arena, size_t size, size_t align)
-{
+void *img_arena_alloc_aligned(img_arena_t *arena, size_t size, size_t align) {
     if (!arena || align == 0)
         return NULL;
 

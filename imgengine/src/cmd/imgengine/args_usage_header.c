@@ -3,11 +3,9 @@
 
 #include <stdio.h>
 
-void img_cli_print_header(const char *bin)
-{
+void img_cli_print_header(const char *bin) {
     (void)bin;
-    fprintf(stdout,
-            "\nIMGENGINE CLI\n"
-            "Professional Photo Layout & Print Pipeline\n"
-            "------------------------------------------------------------\n\n");
+    fprintf(stdout, "\nIMGENGINE CLI\n"
+                    "Professional Photo Layout & Print Pipeline\n"
+                    "------------------------------------------------------------\n\n");
 }

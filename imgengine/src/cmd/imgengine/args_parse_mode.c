@@ -4,19 +4,16 @@
 #include <stdio.h>
 #include <string.h>
 
-int img_cli_parse_mode(const char *text, img_scale_mode_t *mode)
-{
+int img_cli_parse_mode(const char *text, img_scale_mode_t *mode) {
     if (!text || !mode)
         return -1;
 
-    if (strcmp(text, "fit") == 0)
-    {
+    if (strcmp(text, "fit") == 0) {
         *mode = IMG_FIT;
         return 0;
     }
 
-    if (strcmp(text, "fill") == 0)
-    {
+    if (strcmp(text, "fill") == 0) {
         *mode = IMG_FILL;
         return 0;
     }

@@ -7,11 +7,7 @@
 #include "pipeline/dispatch.h" /* replaces runtime/exec_router.h */
 #include "pipeline/pipeline_types.h"
 
-void img_pipeline_execute(
-    img_ctx_t *ctx,
-    img_pipeline_desc_t *pipe,
-    img_buffer_t *buf)
-{
+void img_pipeline_execute(img_ctx_t *ctx, img_pipeline_desc_t *pipe, img_buffer_t *buf) {
     const uint32_t count = pipe->count;
     img_op_desc_t *ops = pipe->ops;
 

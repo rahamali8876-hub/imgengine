@@ -1,7 +1,5 @@
 // ./include/core/context_internal.h
 
-
-
 #ifndef IMGENGINE_CONTEXT_INTERNAL_H
 #define IMGENGINE_CONTEXT_INTERNAL_H
 
@@ -42,8 +40,7 @@ typedef struct img_engine img_engine_t;
  * ================= CONTEXT =================
  */
 
-typedef struct __attribute__((aligned(64))) img_ctx
-{
+typedef struct __attribute__((aligned(64))) img_ctx {
     uint32_t thread_id;
 
     img_slab_pool_t *local_pool;

@@ -8,17 +8,9 @@
 
 #include "pipeline/layout_resize_internal.h"
 
-img_result_t img_layout_prepare_fit(
-    img_ctx_t *ctx,
-    const img_buffer_t *src,
-    img_buffer_t *dst,
-    uint32_t cell_w,
-    uint32_t cell_h,
-    img_slab_pool_t *pool,
-    uint8_t bg_r,
-    uint8_t bg_g,
-    uint8_t bg_b)
-{
+img_result_t img_layout_prepare_fit(img_ctx_t *ctx, const img_buffer_t *src, img_buffer_t *dst,
+                                    uint32_t cell_w, uint32_t cell_h, img_slab_pool_t *pool,
+                                    uint8_t bg_r, uint8_t bg_g, uint8_t bg_b) {
     if (!ctx || !src || !dst || !pool || !src->data || src->width == 0 || src->height == 0)
         return IMG_ERR_SECURITY;
 
@@ -38,13 +30,11 @@ img_result_t img_layout_prepare_fit(
         fit_h = cell_h;
 
     img_buffer_t tmp = {0};
-    img_result_t r = img_layout_resize_bilinear(
-        ctx, src, &tmp, fit_w, fit_h, pool);
+    img_result_t r = img_layout_resize_bilinear(ctx, src, &tmp, fit_w, fit_h, pool);
     if (r != IMG_SUCCESS)
         return r;
 
-    r = img_layout_prepare_fit_commit(
-        &tmp, dst, pool, cell_w, cell_h, bg_r, bg_g, bg_b);
+    r = img_layout_prepare_fit_commit(&tmp, dst, pool, cell_w, cell_h, bg_r, bg_g, bg_b);
     if (tmp.owner_pool == pool)
         img_slab_recycle(pool, tmp.data);
     return r;

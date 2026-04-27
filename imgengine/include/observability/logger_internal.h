@@ -10,14 +10,12 @@
 #define LOG_RING_SIZE 1024
 #define LOG_MSG_SIZE 256
 
-typedef struct
-{
+typedef struct {
     _Atomic size_t seq;
     char msg[LOG_MSG_SIZE];
 } log_cell_t;
 
-typedef struct
-{
+typedef struct {
     size_t size;
     size_t mask;
 

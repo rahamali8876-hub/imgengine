@@ -3,8 +3,7 @@
 
 #include <stdlib.h>
 
-void img_arena_destroy(img_arena_t *arena)
-{
+void img_arena_destroy(img_arena_t *arena) {
     if (!arena)
         return;
 

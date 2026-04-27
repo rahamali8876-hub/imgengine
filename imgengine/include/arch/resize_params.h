@@ -20,8 +20,7 @@
  */
 struct img_buffer;
 
-typedef struct
-{
+typedef struct {
     struct img_buffer *src; /* source buffer — full type at call sites */
 
     uint32_t target_w;
@@ -30,8 +29,8 @@ typedef struct
     uint32_t scale_x; /* fixed-point 16.16 */
     uint32_t scale_y;
 
-    uint32_t *x_index; /* precomputed column map (arena-allocated) */
-    uint32_t *y_index; /* precomputed row map    (arena-allocated) */
+    uint32_t *x_index;  /* precomputed column map (arena-allocated) */
+    uint32_t *y_index;  /* precomputed row map    (arena-allocated) */
     uint16_t *x_weight; /* low 16 bits of the 16.16 fractional part */
     uint16_t *y_weight;
 

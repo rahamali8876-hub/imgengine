@@ -1,3 +1,54 @@
+# Exported Symbols — Public ABI Reference
+
+This file lists the canonical exported symbols that form the public runtime ABI. CI should compare the live binary exports against this file (or `docs/abi/exported_symbols.json`) to detect accidental ABI drift.
+
+| Symbol | Location |
+|--------|----------|
+| `img_api_init` | [src/api/api_init.c](src/api/api_init.c#L9) |
+| `img_api_shutdown` | [src/api/api_shutdown.c](src/api/api_shutdown.c#L6) |
+| `img_api_run_job_impl` | [src/api/api_job_run.c](src/api/api_job_run.c#L99) |
+| `img_api_run_job_raw_impl` | [src/api/api_job_run_raw.c](src/api/api_job_run_raw.c#L4) |
+| `img_api_run_job_rgb24_impl` | [src/api/api_job_run_rgb24.c](src/api/api_job_run_rgb24.c#L33) |
+| `img_api_run_job_rgb24_raw_impl` | [src/api/api_job_run_rgb24.c](src/api/api_job_run_rgb24.c#L84) |
+| `img_api_process_raw` | [src/api/api_process_raw.c](src/api/api_process_raw.c#L7) |
+| `img_api_process_fast` | [src/api/api_process_fast.c](src/api/api_process_fast.c#L5) |
+| `img_api_release_raw_buffer` | [src/api/api_encoded.c](src/api/api_encoded.c#L8) |
+| `img_encoded_free` | [src/api/api_encoded.c](src/api/api_encoded.c#L13) |
+| `img_pipeline_create` | [src/pipeline/pipeline_executor.c](src/pipeline/pipeline_executor.c#L27) |
+| `img_pipeline_destroy` | [src/pipeline/pipeline_executor.c](src/pipeline/pipeline_executor.c#L37) |
+| `img_pipeline_add_op` | [src/pipeline/pipeline_executor.c](src/pipeline/pipeline_executor.c#L42) |
+| `g_jump_table` | [src/pipeline/jump_table_register.c](src/pipeline/jump_table_register.c#L4) |
+| `g_batch_jump_table` | [src/pipeline/jump_table_register.c](src/pipeline/jump_table_register.c#L5) |
+| `img_register_op` | [src/pipeline/jump_table_register.c](src/pipeline/jump_table_register.c#L7) |
+| `img_jump_table_init` | [src/pipeline/jump_table_init.c](src/pipeline/jump_table_init.c#L5) |
+| `img_scheduler_init` | [src/runtime/scheduler_init.c](src/runtime/scheduler_init.c#L18) |
+| `img_scheduler_destroy` | [src/runtime/scheduler_destroy.c](src/runtime/scheduler_destroy.c#L8) |
+| `img_scheduler_submit` | [src/runtime/scheduler_submit.c](src/runtime/scheduler_submit.c#L8) |
+| `img_runtime_submit_task` | [src/runtime/scheduler_submit.c](src/runtime/scheduler_submit.c#L22) |
+| `img_runtime_wait_task` | [src/runtime/scheduler_submit.c](src/runtime/scheduler_submit.c#L30) |
+| `img_scheduler_steal` | [src/runtime/scheduler.c](src/runtime/scheduler.c#L5) |
+| `img_slab_create` | [src/memory/slab_create.c](src/memory/slab_create.c#L9) |
+| `img_slab_destroy` | [src/memory/slab_destroy.c](src/memory/slab_destroy.c#L8) |
+| `img_slab_alloc` | [src/memory/slab_hot.c](src/memory/slab_hot.c#L6) |
+| `img_slab_free` | [src/memory/slab_hot.c](src/memory/slab_hot.c#L19) |
+| `img_slab_recycle` | [src/memory/slab_hot.c](src/memory/slab_hot.c#L31) |
+| `img_slab_block_size` | [src/memory/slab_block_size.c](src/memory/slab_block_size.c#L5) |
+| `img_arch_avx2_resize` | [src/arch/x86_64/avx2/resize_avx2.c](src/arch/x86_64/avx2/resize_avx2.c#L129) |
+| `resize_avx2` | [src/arch/x86_64/avx2/resize_avx2.c](src/arch/x86_64/avx2/resize_avx2.c#L211) |
+| `img_arch_grayscale_avx2` | [src/arch/x86_64/avx2/color_avx2.c](src/arch/x86_64/avx2/color_avx2.c#L20) |
+| `img_arch_grayscale_scalar` | [src/arch/x86_64/scalar/color_scalar.c](src/arch/x86_64/scalar/color_scalar.c#L6) |
+| `g_io_vtable` | [src/io/io_register.c](src/io/io_register.c#L16) |
+| `img_io_register` | [src/io/io_register.c](src/io/io_register.c#L18) |
+| `img_logger_init` | [src/observability/logger_lifecycle.c](src/observability/logger_lifecycle.c#L7) |
+| `img_logger_shutdown` | [src/observability/logger_lifecycle.c](src/observability/logger_lifecycle.c#L16) |
+| `img_log_write` | [src/observability/logger_write.c](src/observability/logger_write.c#L8) |
+
+---
+
+Notes:
+
+- Keep `docs/abi/exported_symbols.json` synchronized with this markdown table; use a CI task to fail on mismatches.
+- When adding new public API symbols, update both JSON and MD files and document the ABI contract and expected lifetime.
 # Exported Symbols — API / ABI Audit
 
 Scope: public headers under `include/api/v1/` plus selected internal headers that form the stable/visible ABI (pipeline jump table, runtime scheduler, memory slab, arch interface, IO vtable, observability).

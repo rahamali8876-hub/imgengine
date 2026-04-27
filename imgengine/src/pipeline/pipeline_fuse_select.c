@@ -4,8 +4,7 @@
 #include "pipeline/pipeline_fuse_internal.h"
 #include "pipeline/pipeline_fuse_exec_internal.h"
 
-img_single_kernel_fn img_pipeline_fuse_select_single_fn(void)
-{
+img_single_kernel_fn img_pipeline_fuse_select_single_fn(void) {
 #if defined(__AVX2__)
     return fused_exec_avx2;
 #else

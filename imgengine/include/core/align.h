@@ -4,8 +4,7 @@
 
 #include <stddef.h>
 
-static inline size_t img_align_pow2(size_t x)
-{
+static inline size_t img_align_pow2(size_t x) {
     size_t p = 1;
     while (p < x)
         p <<= 1;

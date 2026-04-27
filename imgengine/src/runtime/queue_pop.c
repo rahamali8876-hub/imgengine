@@ -4,8 +4,7 @@
 
 #include <stddef.h>
 
-void *img_queue_pop(img_queue_t *q)
-{
+void *img_queue_pop(img_queue_t *q) {
     uint32_t h = q->head;
 
     if (h == __atomic_load_n(&q->tail, __ATOMIC_ACQUIRE))

@@ -4,11 +4,7 @@
 img_kernel_fn g_jump_table[IMG_MAX_OPS];
 img_batch_kernel_fn g_batch_jump_table[IMG_MAX_OPS];
 
-void img_register_op(
-    uint32_t opcode,
-    img_op_fn single_fn,
-    img_batch_op_fn batch_fn)
-{
+void img_register_op(uint32_t opcode, img_op_fn single_fn, img_batch_op_fn batch_fn) {
     if (opcode >= IMG_MAX_OPS)
         return;
 

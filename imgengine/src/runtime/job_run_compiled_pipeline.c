@@ -5,12 +5,8 @@
 #include "hot/pipeline_exec.h"
 #include "pipeline/pipeline_compiled.h"
 
-img_result_t img_runtime_run_compiled_pipeline(
-    img_engine_t *engine,
-    img_ctx_t *ctx,
-    img_pipeline_desc_t *pipe,
-    img_buffer_t *out_buf)
-{
+img_result_t img_runtime_run_compiled_pipeline(img_engine_t *engine, img_ctx_t *ctx,
+                                               img_pipeline_desc_t *pipe, img_buffer_t *out_buf) {
     if (!engine || !ctx || !pipe || !out_buf)
         return IMG_ERR_SECURITY;
 

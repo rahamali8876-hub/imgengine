@@ -15,28 +15,20 @@
 
 static img_decode_strategy_t g_decode_strategy = IMG_DECODE_STRATEGY_AUTO;
 
-void img_io_set_decode_strategy(img_decode_strategy_t s)
-{
-    g_decode_strategy = s;
-}
+void img_io_set_decode_strategy(img_decode_strategy_t s) { g_decode_strategy = s; }
 
-img_result_t img_decode_dispatch(
-    img_ctx_t *ctx,
-    const uint8_t *input,
-    size_t size,
-    img_buffer_t *out)
-{
+img_result_t img_decode_dispatch(img_ctx_t *ctx, const uint8_t *input, size_t size,
+                                 img_buffer_t *out) {
     if (!ctx || !input || size == 0 || !out)
         return IMG_ERR_INTERNAL;
 
     img_decode_strategy_t mode = g_decode_strategy;
-    if (mode == IMG_DECODE_STRATEGY_AUTO)
-    {
-        mode = (size > IMG_DECODE_AUTO_THRESHOLD) ? IMG_DECODE_STRATEGY_STREAM : IMG_DECODE_STRATEGY_BULK;
+    if (mode == IMG_DECODE_STRATEGY_AUTO) {
+        mode = (size > IMG_DECODE_AUTO_THRESHOLD) ? IMG_DECODE_STRATEGY_STREAM
+                                                  : IMG_DECODE_STRATEGY_BULK;
     }
 
-    if (mode == IMG_DECODE_STRATEGY_BULK)
-    {
+    if (mode == IMG_DECODE_STRATEGY_BULK) {
         return (img_result_t)img_decode_to_buffer(ctx, input, size, out);
     }
 

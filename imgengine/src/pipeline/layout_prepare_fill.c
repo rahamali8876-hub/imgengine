@@ -8,14 +8,8 @@
 
 #include "pipeline/layout_resize_internal.h"
 
-img_result_t img_layout_prepare_fill(
-    img_ctx_t *ctx,
-    const img_buffer_t *src,
-    img_buffer_t *dst,
-    uint32_t cell_w,
-    uint32_t cell_h,
-    img_slab_pool_t *pool)
-{
+img_result_t img_layout_prepare_fill(img_ctx_t *ctx, const img_buffer_t *src, img_buffer_t *dst,
+                                     uint32_t cell_w, uint32_t cell_h, img_slab_pool_t *pool) {
     if (!ctx || !src || !dst || !pool || !src->data || src->width == 0 || src->height == 0)
         return IMG_ERR_SECURITY;
 
@@ -31,8 +25,7 @@ img_result_t img_layout_prepare_fill(
         scaled_h = cell_h;
 
     img_buffer_t tmp = {0};
-    img_result_t r = img_layout_resize_bilinear(
-        ctx, src, &tmp, scaled_w, scaled_h, pool);
+    img_result_t r = img_layout_resize_bilinear(ctx, src, &tmp, scaled_w, scaled_h, pool);
     if (r != IMG_SUCCESS)
         return r;
 

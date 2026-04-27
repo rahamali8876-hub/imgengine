@@ -6,13 +6,9 @@
 #include <stddef.h>
 #include <string.h>
 
-img_result_t img_layout_prepare_fill_commit(
-    const img_buffer_t *tmp,
-    img_buffer_t *dst,
-    img_slab_pool_t *pool,
-    uint32_t cell_w,
-    uint32_t cell_h)
-{
+img_result_t img_layout_prepare_fill_commit(const img_buffer_t *tmp, img_buffer_t *dst,
+                                            img_slab_pool_t *pool, uint32_t cell_w,
+                                            uint32_t cell_h) {
     if (tmp->width < cell_w || tmp->height < cell_h)
         return IMG_ERR_SECURITY;
 
@@ -40,8 +36,7 @@ img_result_t img_layout_prepare_fill_commit(
     dst->channels = 3;
     dst->stride = (uint32_t)row_bytes;
 
-    for (uint32_t dy = 0; dy < cell_h; dy++)
-    {
+    for (uint32_t dy = 0; dy < cell_h; dy++) {
         const uint8_t *src_row = tmp->data + (cy + dy) * tmp->stride + cx * 3;
         uint8_t *dst_row = mem + dy * dst->stride;
         memcpy(dst_row, src_row, cell_w * 3);

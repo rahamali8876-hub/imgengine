@@ -3,8 +3,7 @@
 
 #include "startup/engine_init_internal.h"
 
-void img_engine_init(img_engine_t *engine)
-{
+void img_engine_init(img_engine_t *engine) {
     if (!engine)
         return;
 

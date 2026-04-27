@@ -6,18 +6,15 @@
 
 #include <string.h>
 
-void img_api_shutdown_globals(img_engine_t *engine)
-{
+void img_api_shutdown_globals(img_engine_t *engine) {
     if (!engine)
         return;
 
     img_mpmc_destroy(&g_task_queue);
     memset(&g_task_queue, 0, sizeof(g_task_queue));
 
-    if (engine->user_data)
-    {
-        img_template_registry_destroy(
-            (img_template_registry_t *)engine->user_data);
+    if (engine->user_data) {
+        img_template_registry_destroy((img_template_registry_t *)engine->user_data);
         engine->user_data = NULL;
     }
 

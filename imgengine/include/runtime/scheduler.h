@@ -18,8 +18,7 @@ typedef struct img_worker img_worker_t;
 /*
  * 🔥 REAL STRUCT (NOT ANONYMOUS!)
  */
-typedef struct img_scheduler
-{
+typedef struct img_scheduler {
     uint32_t worker_count;
 
     img_worker_t *workers;

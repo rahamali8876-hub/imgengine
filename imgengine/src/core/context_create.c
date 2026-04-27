@@ -8,8 +8,7 @@
 #define DEFAULT_SLAB_SIZE (64 * 1024 * 1024)
 #define DEFAULT_BLOCK_SIZE (256 * 1024)
 
-img_ctx_t *img_ctx_create(uint32_t thread_id, cpu_caps_t caps)
-{
+img_ctx_t *img_ctx_create(uint32_t thread_id, cpu_caps_t caps) {
     img_ctx_t *ctx = aligned_alloc(64, sizeof(img_ctx_t));
     if (!ctx)
         return NULL;
@@ -17,9 +16,7 @@ img_ctx_t *img_ctx_create(uint32_t thread_id, cpu_caps_t caps)
     ctx->thread_id = thread_id;
     ctx->caps = caps;
 
-    ctx->local_pool = img_slab_create(
-        DEFAULT_SLAB_SIZE,
-        DEFAULT_BLOCK_SIZE);
+    ctx->local_pool = img_slab_create(DEFAULT_SLAB_SIZE, DEFAULT_BLOCK_SIZE);
 
     if (!ctx->local_pool)
         goto fail;

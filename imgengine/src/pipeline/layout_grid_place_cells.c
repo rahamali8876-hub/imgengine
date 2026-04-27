@@ -5,15 +5,10 @@
 
 #include <assert.h>
 
-extern void img_blit_avx2(img_buffer_t *, const img_buffer_t *,
-                          uint32_t, uint32_t);
+extern void img_blit_avx2(img_buffer_t *, const img_buffer_t *, uint32_t, uint32_t);
 
-uint32_t img_layout_grid_place_cells(
-    img_canvas_t *canvas,
-    const img_buffer_t *scaled,
-    const img_job_t *job,
-    img_cell_t *cells)
-{
+uint32_t img_layout_grid_place_cells(img_canvas_t *canvas, const img_buffer_t *scaled,
+                                     const img_job_t *job, img_cell_t *cells) {
     uint32_t pw = canvas->photo_w_px;
     uint32_t ph = canvas->photo_h_px;
     uint32_t step_x = pw + job->gap;
@@ -24,10 +19,8 @@ uint32_t img_layout_grid_place_cells(
     assert(((uintptr_t)cells & 0xF) == 0 && "cells not 16-byte aligned");
 #endif
 
-    for (uint32_t row = 0; row < job->rows; row++)
-    {
-        for (uint32_t col = 0; col < job->cols; col++)
-        {
+    for (uint32_t row = 0; row < job->rows; row++) {
+        for (uint32_t col = 0; col < job->cols; col++) {
             size_t x = (size_t)canvas->start_x + (size_t)col * step_x;
             size_t y = (size_t)canvas->start_y + (size_t)row * step_y;
 

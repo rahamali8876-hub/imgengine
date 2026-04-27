@@ -3,8 +3,7 @@
 
 #include <stdio.h>
 
-void img_cli_print_examples_section(const char *bin)
-{
+void img_cli_print_examples_section(const char *bin) {
     fprintf(stdout,
             "EXAMPLES:\n\n"
             "  Passport sheet:\n"

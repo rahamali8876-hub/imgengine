@@ -3,8 +3,7 @@
 
 #include <sys/socket.h>
 
-int img_rpc_client_send_request(int sock, uint32_t op_code, img_buffer_t *buf)
-{
+int img_rpc_client_send_request(int sock, uint32_t op_code, img_buffer_t *buf) {
     img_rpc_request_t req;
     req.op_code = op_code;
     req.buffer.width = buf->width;

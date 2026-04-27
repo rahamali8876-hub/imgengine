@@ -7,14 +7,12 @@
 #include <stdbool.h>
 #include "pipeline/job.h"
 
-typedef enum
-{
+typedef enum {
     IMG_CLI_INPUT_FORMAT_ENCODED = 0,
     IMG_CLI_INPUT_FORMAT_RAW_RGB24 = 1,
 } img_cli_input_format_t;
 
-typedef struct
-{
+typedef struct {
     const char *input_path;
     const char *output_path;
     img_cli_input_format_t input_format;

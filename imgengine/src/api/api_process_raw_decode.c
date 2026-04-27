@@ -2,12 +2,8 @@
 #include "api/api_process_raw_internal.h"
 #include "api/io_vtable.h"
 
-img_result_t img_api_process_raw_decode(
-    img_ctx_t *ctx,
-    const uint8_t *input,
-    size_t input_size,
-    img_buffer_t *buf)
-{
+img_result_t img_api_process_raw_decode(img_ctx_t *ctx, const uint8_t *input, size_t input_size,
+                                        img_buffer_t *buf) {
     if (!g_io_vtable.decode)
         return IMG_ERR_INTERNAL;
 

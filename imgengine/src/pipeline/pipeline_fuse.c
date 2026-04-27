@@ -10,10 +10,7 @@
 #include "pipeline/pipeline_types.h"
 #include "core/opcodes.h"
 
-int img_pipeline_fuse(
-    const img_pipeline_desc_t *in,
-    img_pipeline_fused_t *out)
-{
+int img_pipeline_fuse(const img_pipeline_desc_t *in, img_pipeline_fused_t *out) {
     if (__builtin_expect(!in || !out, 0))
         return -1;
 
@@ -21,12 +18,10 @@ int img_pipeline_fuse(
 
     img_pipeline_sig_t sig = 0;
 
-    for (uint32_t i = 0; i < in->count; i++)
-    {
+    for (uint32_t i = 0; i < in->count; i++) {
         const uint32_t op = in->ops[i].op_code;
 
-        switch (op)
-        {
+        switch (op) {
         case OP_GRAYSCALE:
             g_fused_params.has_grayscale = 1;
             sig |= SIG_OP_GRAYSCALE;
@@ -34,14 +29,12 @@ int img_pipeline_fuse(
         case OP_BRIGHTNESS:
             g_fused_params.has_brightness = 1;
             if (__builtin_expect(in->ops[i].params != NULL, 1))
-                g_fused_params.brightness_value =
-                    *(const uint16_t *)in->ops[i].params;
+                g_fused_params.brightness_value = *(const uint16_t *)in->ops[i].params;
             sig |= SIG_OP_BRIGHTNESS;
             break;
         case OP_RESIZE:
             g_fused_params.has_resize = 1;
-            if (__builtin_expect(in->ops[i].params != NULL, 1))
-            {
+            if (__builtin_expect(in->ops[i].params != NULL, 1)) {
                 const uint32_t *dims = (const uint32_t *)in->ops[i].params;
                 g_fused_params.new_w = dims[0];
                 g_fused_params.new_h = dims[1];

@@ -5,7 +5,4 @@
 
 #include <string.h>
 
-void img_engine_init_reset(img_engine_t *engine)
-{
-    memset(engine, 0, sizeof(*engine));
-}
+void img_engine_init_reset(img_engine_t *engine) { memset(engine, 0, sizeof(*engine)); }

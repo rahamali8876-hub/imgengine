@@ -3,8 +3,7 @@
 
 #include <sys/mman.h>
 
-img_result_t img_api_release_input(uint8_t *file_data, size_t file_size)
-{
+img_result_t img_api_release_input(uint8_t *file_data, size_t file_size) {
     if (!file_data || file_size == 0)
         return IMG_SUCCESS;
 

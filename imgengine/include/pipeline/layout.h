@@ -16,13 +16,11 @@
 #include "memory/slab.h"
 #include <stdint.h>
 
-typedef struct
-{
+typedef struct {
     uint32_t x, y, w, h;
 } img_cell_t;
 
-typedef struct
-{
+typedef struct {
     img_cell_t *cells;
     uint32_t count;
 } img_layout_t;
@@ -36,14 +34,9 @@ typedef struct
  * ctx: carries caps for AVX2 dispatch in resize.
  *      Obtain from the job's img_ctx_t (set up by api layer).
  */
-img_result_t img_layout_grid(
-    img_ctx_t *ctx, /* ← added */
-    img_canvas_t *canvas,
-    const img_buffer_t *photo,
-    const img_job_t *job,
-    img_layout_t *layout,
-    img_arena_t *arena,
-    img_slab_pool_t *pool);
+img_result_t img_layout_grid(img_ctx_t *ctx, /* ← added */
+                             img_canvas_t *canvas, const img_buffer_t *photo, const img_job_t *job,
+                             img_layout_t *layout, img_arena_t *arena, img_slab_pool_t *pool);
 
 #endif /* IMGENGINE_PIPELINE_LAYOUT_H */
 

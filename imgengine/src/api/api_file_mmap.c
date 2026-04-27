@@ -12,11 +12,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-img_result_t load_file_mmap(
-    const char *path,
-    uint8_t **data,
-    size_t *size)
-{
+img_result_t load_file_mmap(const char *path, uint8_t **data, size_t *size) {
     if (!path || !data || !size)
         return IMG_ERR_SECURITY;
 
@@ -25,8 +21,7 @@ img_result_t load_file_mmap(
         return IMG_ERR_IO;
 
     struct stat st;
-    if (fstat(fd, &st) != 0 || st.st_size <= 0)
-    {
+    if (fstat(fd, &st) != 0 || st.st_size <= 0) {
         close(fd);
         return IMG_ERR_IO;
     }

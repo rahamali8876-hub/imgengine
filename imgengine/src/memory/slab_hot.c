@@ -3,8 +3,7 @@
 #include "memory/slab_internal.h"
 #include "memory/poison.h"
 
-uint8_t *img_slab_alloc(img_slab_pool_t *pool)
-{
+uint8_t *img_slab_alloc(img_slab_pool_t *pool) {
     if (!pool || !pool->free_list)
         return NULL;
 
@@ -16,8 +15,7 @@ uint8_t *img_slab_alloc(img_slab_pool_t *pool)
     return (uint8_t *)block;
 }
 
-void img_slab_free(img_slab_pool_t *pool, void *ptr)
-{
+void img_slab_free(img_slab_pool_t *pool, void *ptr) {
     if (!pool || !ptr)
         return;
 
@@ -28,7 +26,4 @@ void img_slab_free(img_slab_pool_t *pool, void *ptr)
     pool->free_list = block;
 }
 
-void img_slab_recycle(img_slab_pool_t *pool, void *ptr)
-{
-    img_slab_free(pool, ptr);
-}
+void img_slab_recycle(img_slab_pool_t *pool, void *ptr) { img_slab_free(pool, ptr); }

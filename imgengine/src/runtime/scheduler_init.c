@@ -15,8 +15,7 @@
 #include "runtime/worker.h"
 #include <stdlib.h>
 
-int img_scheduler_init(img_scheduler_t *sched, uint32_t workers)
-{
+int img_scheduler_init(img_scheduler_t *sched, uint32_t workers) {
     if (!sched || workers == 0)
         return -1;
 
@@ -25,8 +24,7 @@ int img_scheduler_init(img_scheduler_t *sched, uint32_t workers)
     if (!sched->workers)
         return -1;
 
-    if (img_mpmc_init(&sched->global_queue, 1024) != 0)
-    {
+    if (img_mpmc_init(&sched->global_queue, 1024) != 0) {
         free(sched->workers);
         sched->workers = NULL;
         return -1;
@@ -42,15 +40,13 @@ int img_scheduler_init(img_scheduler_t *sched, uint32_t workers)
      * pthread_create is deferred to a separate start call so
      * ctx can be set safely before any thread runs.
      */
-    for (uint32_t i = 0; i < workers; i++)
-    {
+    for (uint32_t i = 0; i < workers; i++) {
         sched->workers[i].id = i;
         sched->workers[i].scheduler = sched;
         sched->workers[i].ctx = NULL;  /* set by caller before start */
         sched->workers[i].running = 0; /* not running yet */
         sched->workers[i].queue = img_queue_create(10);
-        if (!sched->workers[i].queue)
-        {
+        if (!sched->workers[i].queue) {
             /* cleanup already created queues */
             for (uint32_t j = 0; j < i; j++)
                 img_queue_destroy(sched->workers[j].queue);

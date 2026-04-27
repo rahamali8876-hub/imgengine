@@ -7,16 +7,10 @@
 #include "src/third_party/stb/stb_image.h"
 #include <string.h>
 
-img_result_t img_decode_stb(
-    img_ctx_t *ctx,
-    const uint8_t *data,
-    size_t size,
-    img_buffer_t *out)
-{
+img_result_t img_decode_stb(img_ctx_t *ctx, const uint8_t *data, size_t size, img_buffer_t *out) {
     int w, h, ch;
 
-    uint8_t *decoded =
-        stbi_load_from_memory(data, (int)size, &w, &h, &ch, 3);
+    uint8_t *decoded = stbi_load_from_memory(data, (int)size, &w, &h, &ch, 3);
 
     if (!decoded)
         return IMG_ERR_FORMAT;
@@ -24,15 +18,13 @@ img_result_t img_decode_stb(
     size_t required = (size_t)w * h * 3;
     size_t block = img_slab_block_size(ctx->local_pool);
 
-    if (required > block)
-    {
+    if (required > block) {
         stbi_image_free(decoded);
         return IMG_ERR_NOMEM;
     }
 
     uint8_t *mem = img_slab_alloc(ctx->local_pool);
-    if (!mem)
-    {
+    if (!mem) {
         stbi_image_free(decoded);
         return IMG_ERR_NOMEM;
     }

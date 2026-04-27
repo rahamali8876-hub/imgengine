@@ -3,7 +3,4 @@
 
 #include <sys/socket.h>
 
-int img_rpc_client_open(void)
-{
-    return socket(AF_INET, SOCK_STREAM, 0);
-}
+int img_rpc_client_open(void) { return socket(AF_INET, SOCK_STREAM, 0); }

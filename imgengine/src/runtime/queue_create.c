@@ -4,8 +4,7 @@
 
 #include <stdlib.h>
 
-img_queue_t *img_queue_create(uint32_t power)
-{
+img_queue_t *img_queue_create(uint32_t power) {
     img_queue_t *q = malloc(sizeof(img_queue_t));
     if (!q)
         return NULL;

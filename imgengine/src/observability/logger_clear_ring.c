@@ -5,8 +5,7 @@
 
 #include <stdlib.h>
 
-void img_logger_clear_ring(void)
-{
+void img_logger_clear_ring(void) {
     if (!g_ring.cells)
         return;
 

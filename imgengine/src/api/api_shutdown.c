@@ -3,8 +3,7 @@
 #include "api/api_internal.h"
 #include "api/api_shutdown_internal.h"
 
-void img_api_shutdown(img_engine_t *engine)
-{
+void img_api_shutdown(img_engine_t *engine) {
     if (!engine)
         return;
 

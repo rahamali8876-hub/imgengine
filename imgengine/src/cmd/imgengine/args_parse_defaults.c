@@ -3,8 +3,7 @@
 
 #include <string.h>
 
-void img_cli_set_defaults(img_cli_options_t *opts)
-{
+void img_cli_set_defaults(img_cli_options_t *opts) {
     if (!opts)
         return;
 

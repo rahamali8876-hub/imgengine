@@ -5,8 +5,7 @@
 #include <stdalign.h>
 #include <stdint.h>
 
-struct img_queue
-{
+struct img_queue {
     void **buffer;
     uint32_t capacity;
     uint32_t mask;

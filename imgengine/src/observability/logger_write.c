@@ -5,8 +5,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-void img_log_write(img_log_level_t level, const char *fmt, ...)
-{
+void img_log_write(img_log_level_t level, const char *fmt, ...) {
     if (__builtin_expect(level < LOG_INFO, 1))
         return;
 

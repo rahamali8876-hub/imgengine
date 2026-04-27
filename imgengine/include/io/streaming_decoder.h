@@ -15,9 +15,6 @@ typedef struct img_buffer img_buffer_t;
 typedef struct img_stream img_stream_t;
 
 // 🔥 Decode from stream (NOT full buffer)
-img_result_t img_decode_stream(
-    img_ctx_t *ctx,
-    img_stream_t *stream,
-    img_buffer_t *out);
+img_result_t img_decode_stream(img_ctx_t *ctx, img_stream_t *stream, img_buffer_t *out);
 
 #endif

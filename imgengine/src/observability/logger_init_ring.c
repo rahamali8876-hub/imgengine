@@ -6,8 +6,7 @@
 
 #include <stdlib.h>
 
-int img_logger_init_ring(void)
-{
+int img_logger_init_ring(void) {
     size_t size = img_align_pow2(LOG_RING_SIZE);
 
     g_ring.size = size;

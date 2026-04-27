@@ -3,25 +3,16 @@
 #include "cmd/imgengine/job_builder.h"
 #include "api/api_internal.h"
 
-int img_build_job(
-    const img_engine_t *engine,
-    const img_cli_options_t *opts,
-    img_job_t *job)
-{
+int img_build_job(const img_engine_t *engine, const img_cli_options_t *opts, img_job_t *job) {
     if (!opts || !job)
         return -1;
 
-    if (opts->has_preset)
-    {
-        if (img_api_resolve_template_job(
-                engine, opts->preset_template, job) != IMG_SUCCESS)
-        {
+    if (opts->has_preset) {
+        if (img_api_resolve_template_job(engine, opts->preset_template, job) != IMG_SUCCESS) {
             img_job_defaults(job);
             img_job_apply_template(job, opts->preset_template);
         }
-    }
-    else
-    {
+    } else {
         img_job_defaults(job);
     }
 

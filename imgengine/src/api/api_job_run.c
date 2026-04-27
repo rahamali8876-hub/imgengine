@@ -96,12 +96,8 @@
 
 #include <stdio.h>
 
-img_result_t img_api_run_job_impl(
-    img_engine_t *engine,
-    const char *input_path,
-    const char *output_path,
-    const img_job_t *job)
-{
+img_result_t img_api_run_job_impl(img_engine_t *engine, const char *input_path,
+                                  const char *output_path, const img_job_t *job) {
     if (!engine || !input_path || !output_path || !job)
         return IMG_ERR_SECURITY;
 
@@ -113,26 +109,13 @@ img_result_t img_api_run_job_impl(
     img_layout_t layout = {0};
     img_arena_t *arena = NULL;
 
-    img_result_t r = img_api_begin_job(
-        engine,
-        input_path,
-        job,
-        &ctx,
-        &canvas,
-        &layout,
-        &arena);
-    if (r != IMG_SUCCESS)
-    {
+    img_result_t r = img_api_begin_job(engine, input_path, job, &ctx, &canvas, &layout, &arena);
+    if (r != IMG_SUCCESS) {
         img_api_finish_job_stage(engine, &canvas, arena);
         return r;
     }
 
-    r = img_api_finish_job_output(
-        &ctx,
-        &canvas,
-        &layout,
-        job,
-        output_path);
+    r = img_api_finish_job_output(&ctx, &canvas, &layout, job, output_path);
 
     if (r != IMG_SUCCESS)
         fprintf(stderr, "[JOB] output stage failed: %s\n", img_result_name(r));

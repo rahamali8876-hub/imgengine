@@ -5,10 +5,7 @@
 
 #include <string.h>
 
-img_result_t img_api_prepare_decoder(
-    img_engine_t *engine,
-    img_prepared_decoder_t *state)
-{
+img_result_t img_api_prepare_decoder(img_engine_t *engine, img_prepared_decoder_t *state) {
     if (!engine || !state)
         return IMG_ERR_SECURITY;
 
@@ -18,12 +15,8 @@ img_result_t img_api_prepare_decoder(
     return state->ctx.local_pool ? IMG_SUCCESS : IMG_ERR_NOMEM;
 }
 
-img_result_t img_api_decode_prepared(
-    img_prepared_decoder_t *state,
-    const uint8_t *input,
-    size_t size,
-    img_buffer_t *out_buf)
-{
+img_result_t img_api_decode_prepared(img_prepared_decoder_t *state, const uint8_t *input,
+                                     size_t size, img_buffer_t *out_buf) {
     if (!state || !state->engine || !input || !out_buf)
         return IMG_ERR_SECURITY;
     if (!g_io_vtable.decode)
@@ -33,21 +26,15 @@ img_result_t img_api_decode_prepared(
     return (img_result_t)rc;
 }
 
-void img_api_decoder_destroy(
-    img_prepared_decoder_t *state)
-{
+void img_api_decoder_destroy(img_prepared_decoder_t *state) {
     if (!state)
         return;
 
     memset(state, 0, sizeof(*state));
 }
 
-img_result_t decode_image_secure(
-    img_engine_t *engine,
-    const uint8_t *input,
-    size_t size,
-    img_buffer_t *out_buf)
-{
+img_result_t decode_image_secure(img_engine_t *engine, const uint8_t *input, size_t size,
+                                 img_buffer_t *out_buf) {
     if (!engine || !input || !out_buf)
         return IMG_ERR_SECURITY;
     if (!g_io_vtable.decode)

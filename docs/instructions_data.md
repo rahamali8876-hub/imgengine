@@ -4,6 +4,7 @@
     sudo apt install -y libturbojpeg0-dev libnuma-dev 
     sudo apt install -y liburing-dev 
     sudo apt update -y; sudo apt upgrade -y; sudo apt install -y libturbojpeg0-dev libnuma-dev liburing-dev; 
+    sudo apt-get update && sudo apt-get install -y clang-format;
 
     
     sudo apt install -y build-essential
@@ -28,6 +29,10 @@
 
    rm -rf *
    cmake .. && make -j
+
+### Formatting check
+    cmake --build . --target format        # runs clang-format -i (requires clang-format)
+    cmake --build . --target format-check  # runs the Python verifier (requires python3 + clang-format)
 
 ### How to Run ./imgengine_cli --help
 

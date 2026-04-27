@@ -19,15 +19,10 @@
 
 #include <string.h>
 
-img_result_t img_runtime_prepare_render_stage(
-    img_engine_t *engine,
-    img_ctx_t *ctx,
-    img_canvas_t *canvas,
-    img_layout_t *layout,
-    const img_job_t *job,
-    const img_buffer_t *photo,
-    img_arena_t **arena)
-{
+img_result_t img_runtime_prepare_render_stage(img_engine_t *engine, img_ctx_t *ctx,
+                                              img_canvas_t *canvas, img_layout_t *layout,
+                                              const img_job_t *job, const img_buffer_t *photo,
+                                              img_arena_t **arena) {
     if (!engine || !ctx || !canvas || !layout || !job || !photo || !arena)
         return IMG_ERR_SECURITY;
 
@@ -44,29 +39,20 @@ img_result_t img_runtime_prepare_render_stage(
     uint32_t render_sig =
         img_render_cache_signature(photo, job, probe.photo_w_px, probe.photo_h_px);
 
-    if (cache && cache->allow_final_cache &&
-        cache->final_valid &&
-        cache->photo == photo &&
-        cache->cell_w == probe.photo_w_px &&
-        cache->cell_h == probe.photo_h_px &&
-        cache->job_sig == render_sig &&
-        cache->canvas.buf.data &&
-        cache->layout.cells)
-    {
+    if (cache && cache->allow_final_cache && cache->final_valid && cache->photo == photo &&
+        cache->cell_w == probe.photo_w_px && cache->cell_h == probe.photo_h_px &&
+        cache->job_sig == render_sig && cache->canvas.buf.data && cache->layout.cells) {
         *canvas = cache->canvas;
         *layout = cache->layout;
         canvas->cache_owned = 1;
         return IMG_SUCCESS;
     }
 
-    if (!*arena)
-    {
+    if (!*arena) {
         *arena = img_arena_create(1 * 1024 * 1024);
         if (!*arena)
             return IMG_ERR_NOMEM;
-    }
-    else
-    {
+    } else {
         img_arena_reset(*arena);
     }
 
@@ -74,49 +60,31 @@ img_result_t img_runtime_prepare_render_stage(
     if (r != IMG_SUCCESS)
         return r;
 
-    r = img_layout_grid(
-        ctx,
-        canvas,
-        photo,
-        job,
-        layout,
-        *arena,
-        engine->global_pool);
+    r = img_layout_grid(ctx, canvas, photo, job, layout, *arena, engine->global_pool);
 
-    if (r == IMG_SUCCESS && cache && cache->allow_final_cache)
-    {
+    if (r == IMG_SUCCESS && cache && cache->allow_final_cache) {
         size_t canvas_bytes = (size_t)canvas->buf.stride * canvas->buf.height;
         size_t layout_bytes = (size_t)layout->count * sizeof(img_cell_t);
 
-        if (canvas_bytes > 0 &&
-            canvas_bytes <= img_slab_block_size(engine->global_pool))
-        {
+        if (canvas_bytes > 0 && canvas_bytes <= img_slab_block_size(engine->global_pool)) {
             if (cache->final_valid)
                 img_render_cache_discard(cache);
 
-            if (!cache->layout_arena)
-            {
+            if (!cache->layout_arena) {
                 cache->layout_arena = img_arena_create(1024 * 1024);
-            }
-            else
-            {
+            } else {
                 img_arena_reset(cache->layout_arena);
             }
 
-            if (cache->layout_arena && layout_bytes <= 1024 * 1024)
-            {
+            if (cache->layout_arena && layout_bytes <= 1024 * 1024) {
                 uint8_t *canvas_mem = img_slab_alloc(engine->global_pool);
-                if (canvas_mem)
-                {
+                if (canvas_mem) {
                     memcpy(canvas_mem, canvas->buf.data, canvas_bytes);
 
-                    img_cell_t *cells_copy = img_arena_alloc_aligned(
-                        cache->layout_arena,
-                        layout_bytes,
-                        16);
+                    img_cell_t *cells_copy =
+                        img_arena_alloc_aligned(cache->layout_arena, layout_bytes, 16);
 
-                    if (cells_copy)
-                    {
+                    if (cells_copy) {
                         memcpy(cells_copy, layout->cells, layout_bytes);
 
                         cache->canvas = *canvas;
@@ -133,9 +101,7 @@ img_result_t img_runtime_prepare_render_stage(
                         cache->pool = engine->global_pool;
                         cache->valid = 1;
                         cache->final_valid = 1;
-                    }
-                    else
-                    {
+                    } else {
                         img_slab_recycle(engine->global_pool, canvas_mem);
                     }
                 }

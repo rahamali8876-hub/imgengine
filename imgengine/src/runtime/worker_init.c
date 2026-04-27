@@ -5,12 +5,8 @@
 
 #include <pthread.h>
 
-int img_worker_init(
-    img_worker_t *w,
-    uint32_t id,
-    struct img_scheduler *scheduler,
-    struct img_ctx *ctx)
-{
+int img_worker_init(img_worker_t *w, uint32_t id, struct img_scheduler *scheduler,
+                    struct img_ctx *ctx) {
     if (!w)
         return -1;
 
@@ -25,8 +21,7 @@ int img_worker_init(
 
     img_pin_thread_to_core(id);
 
-    if (pthread_create(&w->thread, NULL, img_worker_loop, w) != 0)
-    {
+    if (pthread_create(&w->thread, NULL, img_worker_loop, w) != 0) {
         img_queue_destroy(w->queue);
         w->queue = NULL;
         w->running = 0;

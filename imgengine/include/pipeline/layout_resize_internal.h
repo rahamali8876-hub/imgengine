@@ -22,13 +22,8 @@
  * ctx: carries caps and local_pool for jump table dispatch.
  *      Must not be NULL.
  */
-img_result_t img_layout_resize_bilinear(
-    img_ctx_t *ctx,
-    const img_buffer_t *src,
-    img_buffer_t *dst,
-    uint32_t new_w,
-    uint32_t new_h,
-    img_slab_pool_t *pool);
+img_result_t img_layout_resize_bilinear(img_ctx_t *ctx, const img_buffer_t *src, img_buffer_t *dst,
+                                        uint32_t new_w, uint32_t new_h, img_slab_pool_t *pool);
 
 /*
  * img_layout_resize_resample_bilinear()
@@ -39,13 +34,8 @@ img_result_t img_layout_resize_bilinear(
  *
  * ctx: used for jump table dispatch. Must not be NULL.
  */
-void img_layout_resize_resample_bilinear(
-    img_ctx_t *ctx,
-    const img_buffer_t *src,
-    uint8_t *mem,
-    uint32_t new_w,
-    uint32_t new_h,
-    uint32_t stride);
+void img_layout_resize_resample_bilinear(img_ctx_t *ctx, const img_buffer_t *src, uint8_t *mem,
+                                         uint32_t new_w, uint32_t new_h, uint32_t stride);
 
 /*
  * img_layout_resize_validate_alloc()
@@ -53,15 +43,10 @@ void img_layout_resize_resample_bilinear(
  * Validates dimensions and allocates output buffer from slab.
  * Pure validation — no ctx needed.
  */
-img_result_t img_layout_resize_validate_alloc(
-    img_ctx_t *ctx,
-    const img_buffer_t *src,
-    img_buffer_t *dst,
-    uint32_t new_w,
-    uint32_t new_h,
-    img_slab_pool_t *pool,
-    uint8_t **mem_out,
-    uint32_t *stride_out);
+img_result_t img_layout_resize_validate_alloc(img_ctx_t *ctx, const img_buffer_t *src,
+                                              img_buffer_t *dst, uint32_t new_w, uint32_t new_h,
+                                              img_slab_pool_t *pool, uint8_t **mem_out,
+                                              uint32_t *stride_out);
 
 /*
  * img_layout_prepare_fill()
@@ -71,41 +56,20 @@ img_result_t img_layout_resize_validate_alloc(
  *
  * All accept ctx so the resize step can use the jump table.
  */
-img_result_t img_layout_prepare_fill(
-    img_ctx_t *ctx,
-    const img_buffer_t *src,
-    img_buffer_t *dst,
-    uint32_t cell_w,
-    uint32_t cell_h,
-    img_slab_pool_t *pool);
+img_result_t img_layout_prepare_fill(img_ctx_t *ctx, const img_buffer_t *src, img_buffer_t *dst,
+                                     uint32_t cell_w, uint32_t cell_h, img_slab_pool_t *pool);
 
-img_result_t img_layout_prepare_fill_commit(
-    const img_buffer_t *tmp,
-    img_buffer_t *dst,
-    img_slab_pool_t *pool,
-    uint32_t cell_w,
-    uint32_t cell_h);
+img_result_t img_layout_prepare_fill_commit(const img_buffer_t *tmp, img_buffer_t *dst,
+                                            img_slab_pool_t *pool, uint32_t cell_w,
+                                            uint32_t cell_h);
 
-img_result_t img_layout_prepare_fit(
-    img_ctx_t *ctx,
-    const img_buffer_t *src,
-    img_buffer_t *dst,
-    uint32_t cell_w,
-    uint32_t cell_h,
-    img_slab_pool_t *pool,
-    uint8_t bg_r,
-    uint8_t bg_g,
-    uint8_t bg_b);
+img_result_t img_layout_prepare_fit(img_ctx_t *ctx, const img_buffer_t *src, img_buffer_t *dst,
+                                    uint32_t cell_w, uint32_t cell_h, img_slab_pool_t *pool,
+                                    uint8_t bg_r, uint8_t bg_g, uint8_t bg_b);
 
-img_result_t img_layout_prepare_fit_commit(
-    const img_buffer_t *tmp,
-    img_buffer_t *dst,
-    img_slab_pool_t *pool,
-    uint32_t cell_w,
-    uint32_t cell_h,
-    uint8_t bg_r,
-    uint8_t bg_g,
-    uint8_t bg_b);
+img_result_t img_layout_prepare_fit_commit(const img_buffer_t *tmp, img_buffer_t *dst,
+                                           img_slab_pool_t *pool, uint32_t cell_w, uint32_t cell_h,
+                                           uint8_t bg_r, uint8_t bg_g, uint8_t bg_b);
 
 #endif /* IMGENGINE_PIPELINE_LAYOUT_RESIZE_INTERNAL_H */
 

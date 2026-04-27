@@ -19,16 +19,14 @@
 #include <time.h>
 #include <unistd.h>
 
-typedef struct
-{
+typedef struct {
     int index;
     bool success;
     double seconds;
     char *stderr_text;
 } bench_result_t;
 
-typedef struct
-{
+typedef struct {
     char binary_path[PATH_MAX];
     char input_file[PATH_MAX];
     char output_dir[PATH_MAX];
@@ -45,31 +43,27 @@ typedef struct
     int command_argc;
 } bench_config_t;
 
-typedef struct
-{
+typedef struct {
     bench_config_t *config;
     bench_result_t *results;
     int next_index;
     pthread_mutex_t index_mutex;
 } bench_context_t;
 
-static int detect_worker_count(void)
-{
+static int detect_worker_count(void) {
     long value = sysconf(_SC_NPROCESSORS_ONLN);
     if (value < 1 || value > INT32_MAX)
         return 1;
     return (int)value;
 }
 
-static double monotonic_seconds(void)
-{
+static double monotonic_seconds(void) {
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
     return (double)ts.tv_sec + ((double)ts.tv_nsec / 1000000000.0);
 }
 
-static void print_usage(const char *prog)
-{
+static void print_usage(const char *prog) {
     printf("Usage: %s [options] [-- extra imgengine_cli args...]\n", prog);
     printf("\n");
     printf("Options:\n");
@@ -84,15 +78,13 @@ static void print_usage(const char *prog)
     printf("Defaults mirror imgengine/scripts/bench_mark.py.\n");
 }
 
-static int parse_int_arg(const char *text, const char *name)
-{
+static int parse_int_arg(const char *text, const char *name) {
     char *end = NULL;
     long value;
 
     errno = 0;
     value = strtol(text, &end, 10);
-    if (errno != 0 || end == text || (end && *end != '\0') || value <= 0 || value > INT32_MAX)
-    {
+    if (errno != 0 || end == text || (end && *end != '\0') || value <= 0 || value > INT32_MAX) {
         fprintf(stderr, "imgengine_cli_bench: invalid %s '%s'\n", name, text ? text : "");
         return -1;
     }
@@ -100,8 +92,7 @@ static int parse_int_arg(const char *text, const char *name)
     return (int)value;
 }
 
-static int ensure_directory_recursive(const char *path)
-{
+static int ensure_directory_recursive(const char *path) {
     char tmp[PATH_MAX];
     size_t len;
 
@@ -117,8 +108,7 @@ static int ensure_directory_recursive(const char *path)
     if (tmp[len - 1] == '/')
         tmp[len - 1] = '\0';
 
-    for (char *p = tmp + 1; *p; ++p)
-    {
+    for (char *p = tmp + 1; *p; ++p) {
         if (*p != '/')
             continue;
 
@@ -134,16 +124,14 @@ static int ensure_directory_recursive(const char *path)
     return 0;
 }
 
-static int build_output_path(char *out, size_t out_size, const char *dir, int index)
-{
+static int build_output_path(char *out, size_t out_size, const char *dir, int index) {
     int written = snprintf(out, out_size, "%s/photo_%d.jpg", dir, index);
     if (written < 0 || (size_t)written >= out_size)
         return -1;
     return 0;
 }
 
-static char *read_text_file(const char *path)
-{
+static char *read_text_file(const char *path) {
     FILE *fp;
     long size;
     size_t read_size;
@@ -153,28 +141,24 @@ static char *read_text_file(const char *path)
     if (!fp)
         return NULL;
 
-    if (fseek(fp, 0, SEEK_END) != 0)
-    {
+    if (fseek(fp, 0, SEEK_END) != 0) {
         fclose(fp);
         return NULL;
     }
 
     size = ftell(fp);
-    if (size < 0)
-    {
+    if (size < 0) {
         fclose(fp);
         return NULL;
     }
 
-    if (fseek(fp, 0, SEEK_SET) != 0)
-    {
+    if (fseek(fp, 0, SEEK_SET) != 0) {
         fclose(fp);
         return NULL;
     }
 
     buffer = calloc((size_t)size + 1u, 1u);
-    if (!buffer)
-    {
+    if (!buffer) {
         fclose(fp);
         return NULL;
     }
@@ -182,8 +166,7 @@ static char *read_text_file(const char *path)
     read_size = fread(buffer, 1, (size_t)size, fp);
     fclose(fp);
 
-    if (read_size != (size_t)size)
-    {
+    if (read_size != (size_t)size) {
         free(buffer);
         return NULL;
     }
@@ -191,8 +174,7 @@ static char *read_text_file(const char *path)
     return buffer;
 }
 
-static char *copy_string_or_fallback(const char *text)
-{
+static char *copy_string_or_fallback(const char *text) {
     const char *fallback = "unknown error";
     size_t len = strlen(text ? text : fallback);
     char *copy = malloc(len + 1u);
@@ -204,8 +186,7 @@ static char *copy_string_or_fallback(const char *text)
     return copy;
 }
 
-static uint8_t *read_binary_file(const char *path, size_t *size_out)
-{
+static uint8_t *read_binary_file(const char *path, size_t *size_out) {
     FILE *fp = fopen(path, "rb");
     long size;
     uint8_t *buffer;
@@ -214,36 +195,31 @@ static uint8_t *read_binary_file(const char *path, size_t *size_out)
     if (!fp)
         return NULL;
 
-    if (fseek(fp, 0, SEEK_END) != 0)
-    {
+    if (fseek(fp, 0, SEEK_END) != 0) {
         fclose(fp);
         return NULL;
     }
 
     size = ftell(fp);
-    if (size <= 0)
-    {
+    if (size <= 0) {
         fclose(fp);
         return NULL;
     }
 
-    if (fseek(fp, 0, SEEK_SET) != 0)
-    {
+    if (fseek(fp, 0, SEEK_SET) != 0) {
         fclose(fp);
         return NULL;
     }
 
     buffer = malloc((size_t)size);
-    if (!buffer)
-    {
+    if (!buffer) {
         fclose(fp);
         return NULL;
     }
 
     read_size = fread(buffer, 1, (size_t)size, fp);
     fclose(fp);
-    if (read_size != (size_t)size)
-    {
+    if (read_size != (size_t)size) {
         free(buffer);
         return NULL;
     }
@@ -252,14 +228,12 @@ static uint8_t *read_binary_file(const char *path, size_t *size_out)
     return buffer;
 }
 
-static int write_binary_file(const char *path, const uint8_t *data, size_t size)
-{
+static int write_binary_file(const char *path, const uint8_t *data, size_t size) {
     FILE *fp = fopen(path, "wb");
     if (!fp)
         return -1;
 
-    if (fwrite(data, 1, size, fp) != size)
-    {
+    if (fwrite(data, 1, size, fp) != size) {
         fclose(fp);
         return -1;
     }
@@ -267,8 +241,7 @@ static int write_binary_file(const char *path, const uint8_t *data, size_t size)
     return fclose(fp) == 0 ? 0 : -1;
 }
 
-static int prepare_raw_rgb24_input(bench_config_t *config)
-{
+static int prepare_raw_rgb24_input(bench_config_t *config) {
     size_t encoded_size = 0;
     uint8_t *encoded = read_binary_file(config->input_file, &encoded_size);
     img_buffer_t decoded = {0};
@@ -277,22 +250,19 @@ static int prepare_raw_rgb24_input(bench_config_t *config)
     int temp_fd = -1;
     char **combined_args = NULL;
 
-    if (!encoded)
-    {
+    if (!encoded) {
         fprintf(stderr, "imgengine_cli_bench: failed to read input for raw preparation\n");
         return -1;
     }
 
     engine = img_api_init(1);
-    if (!engine)
-    {
+    if (!engine) {
         free(encoded);
         fprintf(stderr, "imgengine_cli_bench: failed to init engine for raw preparation\n");
         return -1;
     }
 
-    if (img_api_process_fast_decode(engine, encoded, encoded_size, &decoded) != IMG_SUCCESS)
-    {
+    if (img_api_process_fast_decode(engine, encoded, encoded_size, &decoded) != IMG_SUCCESS) {
         img_api_shutdown(engine);
         free(encoded);
         fprintf(stderr, "imgengine_cli_bench: failed to decode input for raw preparation\n");
@@ -300,8 +270,7 @@ static int prepare_raw_rgb24_input(bench_config_t *config)
     }
 
     temp_fd = mkstemp(temp_template);
-    if (temp_fd < 0)
-    {
+    if (temp_fd < 0) {
         img_api_release_raw_buffer(engine, &decoded);
         img_api_shutdown(engine);
         free(encoded);
@@ -311,8 +280,7 @@ static int prepare_raw_rgb24_input(bench_config_t *config)
     close(temp_fd);
 
     if (write_binary_file(temp_template, decoded.data,
-                          (size_t)decoded.stride * (size_t)decoded.height) != 0)
-    {
+                          (size_t)decoded.stride * (size_t)decoded.height) != 0) {
         unlink(temp_template);
         img_api_release_raw_buffer(engine, &decoded);
         img_api_shutdown(engine);
@@ -327,8 +295,7 @@ static int prepare_raw_rgb24_input(bench_config_t *config)
     snprintf(config->raw_stride_text, sizeof(config->raw_stride_text), "%u", decoded.stride);
 
     combined_args = calloc((size_t)(8 + config->extra_argc), sizeof(char *));
-    if (!combined_args)
-    {
+    if (!combined_args) {
         unlink(config->prepared_input_file);
         img_api_release_raw_buffer(engine, &decoded);
         img_api_shutdown(engine);
@@ -358,8 +325,7 @@ static int prepare_raw_rgb24_input(bench_config_t *config)
     return 0;
 }
 
-static int run_once(const bench_config_t *config, int index, bench_result_t *result)
-{
+static int run_once(const bench_config_t *config, int index, bench_result_t *result) {
     char output_file[PATH_MAX];
     char stderr_template[] = "/tmp/imgengine_cli_bench_stderr_XXXXXX";
     char *stderr_text = NULL;
@@ -372,8 +338,7 @@ static int run_once(const bench_config_t *config, int index, bench_result_t *res
     double start_time;
     double end_time;
 
-    if (build_output_path(output_file, sizeof(output_file), config->output_dir, index) != 0)
-    {
+    if (build_output_path(output_file, sizeof(output_file), config->output_dir, index) != 0) {
         result->index = index;
         result->success = false;
         result->seconds = 0.0;
@@ -382,8 +347,7 @@ static int run_once(const bench_config_t *config, int index, bench_result_t *res
     }
 
     stderr_fd = mkstemp(stderr_template);
-    if (stderr_fd < 0)
-    {
+    if (stderr_fd < 0) {
         result->index = index;
         result->success = false;
         result->seconds = 0.0;
@@ -393,8 +357,7 @@ static int run_once(const bench_config_t *config, int index, bench_result_t *res
 
     arg_count = 1 + 4 + config->command_argc + 1;
     argv = calloc((size_t)arg_count, sizeof(char *));
-    if (!argv)
-    {
+    if (!argv) {
         close(stderr_fd);
         unlink(stderr_template);
         result->index = index;
@@ -417,11 +380,9 @@ static int run_once(const bench_config_t *config, int index, bench_result_t *res
 
     start_time = monotonic_seconds();
     pid = fork();
-    if (pid == 0)
-    {
+    if (pid == 0) {
         int null_fd = open("/dev/null", O_WRONLY);
-        if (null_fd >= 0)
-        {
+        if (null_fd >= 0) {
             dup2(null_fd, STDOUT_FILENO);
             close(null_fd);
         }
@@ -434,8 +395,7 @@ static int run_once(const bench_config_t *config, int index, bench_result_t *res
         _exit(127);
     }
 
-    if (pid < 0)
-    {
+    if (pid < 0) {
         close(stderr_fd);
         unlink(stderr_template);
         free(argv);
@@ -448,8 +408,7 @@ static int run_once(const bench_config_t *config, int index, bench_result_t *res
 
     close(stderr_fd);
 
-    while (waitpid(pid, &status, 0) < 0)
-    {
+    while (waitpid(pid, &status, 0) < 0) {
         if (errno != EINTR)
             break;
     }
@@ -467,12 +426,10 @@ static int run_once(const bench_config_t *config, int index, bench_result_t *res
     return result->success ? 0 : -1;
 }
 
-static void *worker_main(void *opaque)
-{
+static void *worker_main(void *opaque) {
     bench_context_t *ctx = (bench_context_t *)opaque;
 
-    for (;;)
-    {
+    for (;;) {
         int index;
 
         pthread_mutex_lock(&ctx->index_mutex);
@@ -496,23 +453,18 @@ static void *worker_main(void *opaque)
     return NULL;
 }
 
-static void report_results(const bench_result_t *results, int count, double total_seconds)
-{
+static void report_results(const bench_result_t *results, int count, double total_seconds) {
     int success = 0;
     int failed = 0;
     double success_seconds = 0.0;
     double avg_seconds = 0.0;
     double throughput = 0.0;
 
-    for (int i = 0; i < count; ++i)
-    {
-        if (results[i].success)
-        {
+    for (int i = 0; i < count; ++i) {
+        if (results[i].success) {
             success++;
             success_seconds += results[i].seconds;
-        }
-        else
-        {
+        } else {
             failed++;
         }
     }
@@ -535,8 +487,7 @@ static void report_results(const bench_result_t *results, int count, double tota
     printf("==================================================\n");
 }
 
-static int derive_default_base_dir(const char *argv0, char *out, size_t out_size)
-{
+static int derive_default_base_dir(const char *argv0, char *out, size_t out_size) {
     char resolved[PATH_MAX];
     char dir_a[PATH_MAX];
     char dir_b[PATH_MAX];
@@ -558,17 +509,10 @@ static int derive_default_base_dir(const char *argv0, char *out, size_t out_size
     return 0;
 }
 
-static void set_default_extra_args(bench_config_t *config)
-{
+static void set_default_extra_args(bench_config_t *config) {
     static char *defaults[] = {
-        "--cols", "6",
-        "--rows", "3",
-        "--gap", "15",
-        "--padding", "20",
-        "--bleed", "10",
-        "--crop-mark", "25",
-        "--crop-offset", "8",
-        "--crop-thickness", "2",
+        "--cols",  "6",  "--rows",      "3",  "--gap",         "15", "--padding",        "20",
+        "--bleed", "10", "--crop-mark", "25", "--crop-offset", "8",  "--crop-thickness", "2",
     };
 
     config->extra_args = defaults;
@@ -577,24 +521,24 @@ static void set_default_extra_args(bench_config_t *config)
     config->command_argc = config->extra_argc;
 }
 
-static int init_config_defaults(bench_config_t *config, const char *argv0)
-{
+static int init_config_defaults(bench_config_t *config, const char *argv0) {
     char base_dir[PATH_MAX];
 
     memset(config, 0, sizeof(*config));
     config->runs = 1000;
     config->workers = detect_worker_count();
 
-    if (derive_default_base_dir(argv0, base_dir, sizeof(base_dir)) != 0)
-    {
+    if (derive_default_base_dir(argv0, base_dir, sizeof(base_dir)) != 0) {
         fprintf(stderr, "imgengine_cli_bench: failed to derive base directory from '%s'\n", argv0);
         return -1;
     }
 
-    if (snprintf(config->binary_path, sizeof(config->binary_path), "%s/build/imgengine_cli", base_dir) >= (int)sizeof(config->binary_path) ||
-        snprintf(config->input_file, sizeof(config->input_file), "%s/photo.jpg", base_dir) >= (int)sizeof(config->input_file) ||
-        snprintf(config->output_dir, sizeof(config->output_dir), "%s/outputs", base_dir) >= (int)sizeof(config->output_dir))
-    {
+    if (snprintf(config->binary_path, sizeof(config->binary_path), "%s/build/imgengine_cli",
+                 base_dir) >= (int)sizeof(config->binary_path) ||
+        snprintf(config->input_file, sizeof(config->input_file), "%s/photo.jpg", base_dir) >=
+            (int)sizeof(config->input_file) ||
+        snprintf(config->output_dir, sizeof(config->output_dir), "%s/outputs", base_dir) >=
+            (int)sizeof(config->output_dir)) {
         fprintf(stderr, "imgengine_cli_bench: failed to initialize default paths\n");
         return -1;
     }
@@ -603,70 +547,57 @@ static int init_config_defaults(bench_config_t *config, const char *argv0)
     return 0;
 }
 
-static int parse_args(int argc, char **argv, bench_config_t *config)
-{
+static int parse_args(int argc, char **argv, bench_config_t *config) {
     int i = 1;
 
-    while (i < argc)
-    {
-        if (strcmp(argv[i], "--") == 0)
-        {
+    while (i < argc) {
+        if (strcmp(argv[i], "--") == 0) {
             config->extra_args = &argv[i + 1];
             config->extra_argc = argc - (i + 1);
             config->command_args = config->extra_args;
             config->command_argc = config->extra_argc;
             return 0;
         }
-        if (strcmp(argv[i], "--help") == 0)
-        {
+        if (strcmp(argv[i], "--help") == 0) {
             print_usage(argv[0]);
             return 1;
         }
-        if (strcmp(argv[i], "--prepare-raw-rgb24") == 0)
-        {
+        if (strcmp(argv[i], "--prepare-raw-rgb24") == 0) {
             config->prepare_raw_rgb24 = true;
             i += 1;
             continue;
         }
-        if ((strcmp(argv[i], "--binary") == 0 ||
-             strcmp(argv[i], "--input") == 0 ||
-             strcmp(argv[i], "--output-dir") == 0 ||
-             strcmp(argv[i], "--runs") == 0 ||
+        if ((strcmp(argv[i], "--binary") == 0 || strcmp(argv[i], "--input") == 0 ||
+             strcmp(argv[i], "--output-dir") == 0 || strcmp(argv[i], "--runs") == 0 ||
              strcmp(argv[i], "--workers") == 0) &&
-            (i + 1) >= argc)
-        {
+            (i + 1) >= argc) {
             fprintf(stderr, "imgengine_cli_bench: missing value for %s\n", argv[i]);
             return -1;
         }
 
-        if (strcmp(argv[i], "--binary") == 0)
-        {
+        if (strcmp(argv[i], "--binary") == 0) {
             snprintf(config->binary_path, sizeof(config->binary_path), "%s", argv[i + 1]);
             i += 2;
             continue;
         }
-        if (strcmp(argv[i], "--input") == 0)
-        {
+        if (strcmp(argv[i], "--input") == 0) {
             snprintf(config->input_file, sizeof(config->input_file), "%s", argv[i + 1]);
             i += 2;
             continue;
         }
-        if (strcmp(argv[i], "--output-dir") == 0)
-        {
+        if (strcmp(argv[i], "--output-dir") == 0) {
             snprintf(config->output_dir, sizeof(config->output_dir), "%s", argv[i + 1]);
             i += 2;
             continue;
         }
-        if (strcmp(argv[i], "--runs") == 0)
-        {
+        if (strcmp(argv[i], "--runs") == 0) {
             config->runs = parse_int_arg(argv[i + 1], "runs");
             if (config->runs <= 0)
                 return -1;
             i += 2;
             continue;
         }
-        if (strcmp(argv[i], "--workers") == 0)
-        {
+        if (strcmp(argv[i], "--workers") == 0) {
             config->workers = parse_int_arg(argv[i + 1], "workers");
             if (config->workers <= 0)
                 return -1;
@@ -681,8 +612,7 @@ static int parse_args(int argc, char **argv, bench_config_t *config)
     return 0;
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
     bench_config_t config;
     bench_context_t ctx;
     bench_result_t *results = NULL;
@@ -699,22 +629,20 @@ int main(int argc, char **argv)
     if (parse_rc != 0)
         return parse_rc < 0 ? 1 : 0;
 
-    if (config.prepare_raw_rgb24)
-    {
+    if (config.prepare_raw_rgb24) {
         if (prepare_raw_rgb24_input(&config) != 0)
             return 1;
     }
 
-    if (ensure_directory_recursive(config.output_dir) != 0)
-    {
-        fprintf(stderr, "imgengine_cli_bench: failed to create output directory '%s'\n", config.output_dir);
+    if (ensure_directory_recursive(config.output_dir) != 0) {
+        fprintf(stderr, "imgengine_cli_bench: failed to create output directory '%s'\n",
+                config.output_dir);
         return 1;
     }
 
     results = calloc((size_t)config.runs, sizeof(*results));
     threads = calloc((size_t)config.workers, sizeof(*threads));
-    if (!results || !threads)
-    {
+    if (!results || !threads) {
         fprintf(stderr, "imgengine_cli_bench: allocation failed\n");
         free(results);
         free(threads);
@@ -731,20 +659,17 @@ int main(int argc, char **argv)
     printf("binary:     %s\n", config.binary_path);
     printf("input:      %s\n", config.input_file);
     printf("output dir: %s\n\n", config.output_dir);
-    if (config.prepare_raw_rgb24)
-    {
+    if (config.prepare_raw_rgb24) {
         printf("mode:       raw-rgb24 decode-bypass CLI benchmark\n");
-        printf("raw frame:  %sx%s stride=%s\n\n",
-               config.raw_width_text, config.raw_height_text, config.raw_stride_text);
+        printf("raw frame:  %sx%s stride=%s\n\n", config.raw_width_text, config.raw_height_text,
+               config.raw_stride_text);
     }
     fflush(stdout);
 
     total_start = monotonic_seconds();
 
-    for (int i = 0; i < config.workers; ++i)
-    {
-        if (pthread_create(&threads[i], NULL, worker_main, &ctx) != 0)
-        {
+    for (int i = 0; i < config.workers; ++i) {
+        if (pthread_create(&threads[i], NULL, worker_main, &ctx) != 0) {
             fprintf(stderr, "imgengine_cli_bench: failed to create worker thread\n");
             config.workers = i;
             exit_code = 1;

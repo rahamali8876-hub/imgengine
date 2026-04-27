@@ -3,8 +3,7 @@
 #include "runtime/plugin_loader.h"
 #include "runtime/plugin_loader_internal.h"
 
-int img_plugin_load_all(const char *directory)
-{
+int img_plugin_load_all(const char *directory) {
     if (!directory)
         return -1;
 

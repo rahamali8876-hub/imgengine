@@ -6,11 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int img_binlog_init(
-    img_binlog_t *log,
-    uint32_t cpu_count,
-    uint32_t power)
-{
+int img_binlog_init(img_binlog_t *log, uint32_t cpu_count, uint32_t power) {
     if (!log || cpu_count == 0 || cpu_count > IMG_MAX_CPUS)
         return -1;
 
@@ -20,13 +16,10 @@ int img_binlog_init(
 
     uint32_t size = 1u << power;
 
-    for (uint32_t i = 0; i < cpu_count; i++)
-    {
+    for (uint32_t i = 0; i < cpu_count; i++) {
         img_binlog_cpu_t *c = &log->cpu_logs[i];
 
-        c->entries = aligned_alloc(
-            64,
-            sizeof(img_log_entry_t) * size);
+        c->entries = aligned_alloc(64, sizeof(img_log_entry_t) * size);
 
         if (!c->entries)
             return -1;
@@ -40,8 +33,7 @@ int img_binlog_init(
     return 0;
 }
 
-void img_binlog_destroy(img_binlog_t *log)
-{
+void img_binlog_destroy(img_binlog_t *log) {
     if (!log)
         return;
 

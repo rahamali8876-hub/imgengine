@@ -31,14 +31,12 @@
 #define BENCH_SWEEP_ITERATIONS 100
 #define BENCH_SWEEP_WARMUP 20
 
-typedef enum
-{
+typedef enum {
     BENCH_INPUT_FORMAT_ENCODED = 0,
     BENCH_INPUT_FORMAT_RAW_RGB24 = 1,
 } bench_input_format_t;
 
-typedef struct
-{
+typedef struct {
     double avg_ms;
     double p50_ms;
     double p95_ms;
@@ -54,8 +52,7 @@ typedef struct
     uint64_t max_ns;
 } bench_stats_t;
 
-static int compare_u64(const void *lhs, const void *rhs)
-{
+static int compare_u64(const void *lhs, const void *rhs) {
     const uint64_t a = *(const uint64_t *)lhs;
     const uint64_t b = *(const uint64_t *)rhs;
 
@@ -66,15 +63,13 @@ static int compare_u64(const void *lhs, const void *rhs)
     return 0;
 }
 
-static uint64_t monotonic_ns(void)
-{
+static uint64_t monotonic_ns(void) {
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
     return (uint64_t)ts.tv_sec * 1000000000ull + (uint64_t)ts.tv_nsec;
 }
 
-static uint64_t percentile_ns(const uint64_t *sorted, size_t count, double pct)
-{
+static uint64_t percentile_ns(const uint64_t *sorted, size_t count, double pct) {
     if (!sorted || count == 0)
         return 0;
 
@@ -85,14 +80,10 @@ static uint64_t percentile_ns(const uint64_t *sorted, size_t count, double pct)
     return sorted[idx];
 }
 
-static bench_stats_t compute_stats(
-    const uint64_t *samples,
-    size_t count)
-{
+static bench_stats_t compute_stats(const uint64_t *samples, size_t count) {
     bench_stats_t stats = {0};
     uint64_t *sorted = malloc(count * sizeof(*sorted));
-    if (!sorted || !samples || count == 0)
-    {
+    if (!sorted || !samples || count == 0) {
         free(sorted);
         return stats;
     }
@@ -122,12 +113,8 @@ static bench_stats_t compute_stats(
     return stats;
 }
 
-static void print_stats(
-    const char *label,
-    const uint64_t *samples,
-    size_t count,
-    bench_stats_t *stats_out)
-{
+static void print_stats(const char *label, const uint64_t *samples, size_t count,
+                        bench_stats_t *stats_out) {
     bench_stats_t stats = compute_stats(samples, count);
 
     if (stats_out)
@@ -142,18 +129,15 @@ static void print_stats(
     printf("  thr:  %.0f ops/sec\n", stats.throughput);
 }
 
-static void print_benchmark_note(bench_input_format_t input_format)
-{
+static void print_benchmark_note(bench_input_format_t input_format) {
     printf("  note:       prepared benchmark excludes final encode/output\n");
     if (input_format == BENCH_INPUT_FORMAT_RAW_RGB24)
         printf("  note:       raw-rgb24 mode also bypasses decode by contract\n");
     printf("  note:       final render-cache hits are disabled for honest timings\n");
 }
 
-static const char *subsamp_name(int subsamp)
-{
-    switch (subsamp)
-    {
+static const char *subsamp_name(int subsamp) {
+    switch (subsamp) {
     case TJSAMP_420:
         return "4:2:0";
     case TJSAMP_422:
@@ -168,8 +152,7 @@ static const char *subsamp_name(int subsamp)
     }
 }
 
-static const char *cpu_caps_name(cpu_caps_t caps)
-{
+static const char *cpu_caps_name(cpu_caps_t caps) {
     if (img_cpu_has_avx512(caps))
         return "AVX512";
     if (img_cpu_has_avx2(caps))
@@ -179,8 +162,7 @@ static const char *cpu_caps_name(cpu_caps_t caps)
     return "SCALAR";
 }
 
-static const char *resize_dispatch_name(cpu_caps_t caps)
-{
+static const char *resize_dispatch_name(cpu_caps_t caps) {
     if (img_cpu_has_avx512(caps))
         return "AVX2 resize on AVX512 CPU (current fallback)";
     if (img_cpu_has_avx2(caps))
@@ -190,58 +172,36 @@ static const char *resize_dispatch_name(cpu_caps_t caps)
     return "SCALAR";
 }
 
-static void print_simd_profile(const img_engine_t *engine)
-{
+static void print_simd_profile(const img_engine_t *engine) {
     cpu_caps_t caps = engine ? engine->caps : 0;
     printf("  cpu caps:   %s (0x%x)\n", cpu_caps_name(caps), (unsigned int)caps);
     printf("  resize op:  %s\n", resize_dispatch_name(caps));
 }
 
-static void print_score_line(
-    const char *label,
-    bool pass,
-    double measured,
-    double target,
-    const char *unit)
-{
-    printf("  %-30s %s  measured=%.3f%s target=%s%.3f%s\n",
-           label,
-           pass ? "PASS" : "FAIL",
-           measured,
-           unit,
-           pass ? "<= " : "<= ",
-           target,
-           unit);
+static void print_score_line(const char *label, bool pass, double measured, double target,
+                             const char *unit) {
+    printf("  %-30s %s  measured=%.3f%s target=%s%.3f%s\n", label, pass ? "PASS" : "FAIL", measured,
+           unit, pass ? "<= " : "<= ", target, unit);
 }
 
-static void print_throughput_score_line(
-    const char *label,
-    bool pass,
-    double measured,
-    double target)
-{
-    printf("  %-30s %s  measured=%.0f ops/sec target=>= %.0f ops/sec\n",
-           label,
-           pass ? "PASS" : "FAIL",
-           measured,
-           target);
+static void print_throughput_score_line(const char *label, bool pass, double measured,
+                                        double target) {
+    printf("  %-30s %s  measured=%.0f ops/sec target=>= %.0f ops/sec\n", label,
+           pass ? "PASS" : "FAIL", measured, target);
 }
 
-static void print_rfc_scorecard(
-    bench_input_format_t input_format,
-    const bench_stats_t *render_stats,
-    const bench_stats_t *decode_stats,
-    const bench_stats_t *encode_stats,
-    const bench_stats_t *cold_stats)
-{
+static void print_rfc_scorecard(bench_input_format_t input_format,
+                                const bench_stats_t *render_stats,
+                                const bench_stats_t *decode_stats,
+                                const bench_stats_t *encode_stats,
+                                const bench_stats_t *cold_stats) {
     const double render_target_ms = 2.0;
     const double throughput_target = 100000.0;
 
     printf("\nRFC scorecard\n");
     printf("  target reference: docs/v2.0 RFC.md -> < 2 ms latency, 100K+ ops/sec\n");
 
-    if (render_stats)
-    {
+    if (render_stats) {
         print_score_line("prepared render avg", render_stats->avg_ms <= render_target_ms,
                          render_stats->avg_ms, render_target_ms, " ms");
         print_score_line("prepared render p99", render_stats->p99_ms <= render_target_ms,
@@ -259,8 +219,7 @@ static void print_rfc_scorecard(
         print_score_line("encode-only avg", encode_stats->avg_ms <= render_target_ms,
                          encode_stats->avg_ms, render_target_ms, " ms");
 
-    if (cold_stats)
-    {
+    if (cold_stats) {
         print_score_line("cold path avg", cold_stats->avg_ms <= render_target_ms,
                          cold_stats->avg_ms, render_target_ms, " ms");
         print_throughput_score_line("cold path throughput",
@@ -268,9 +227,7 @@ static void print_rfc_scorecard(
                                     cold_stats->throughput, throughput_target);
     }
 
-    if (input_format == BENCH_INPUT_FORMAT_ENCODED &&
-        render_stats && decode_stats && cold_stats)
-    {
+    if (input_format == BENCH_INPUT_FORMAT_ENCODED && render_stats && decode_stats && cold_stats) {
         double other_ms = cold_stats->avg_ms - decode_stats->avg_ms - render_stats->avg_ms;
         if (other_ms < 0.0)
             other_ms = 0.0;
@@ -279,15 +236,16 @@ static void print_rfc_scorecard(
         double render_pct = (render_stats->avg_ms / total_ms) * 100.0;
         double other_pct = (other_ms / total_ms) * 100.0;
 
-        printf("  bottleneck summary               decode=%.3f ms, render=%.3f ms, encode+other~=%.3f ms\n",
+        printf("  bottleneck summary               decode=%.3f ms, render=%.3f ms, "
+               "encode+other~=%.3f ms\n",
                decode_stats->avg_ms, render_stats->avg_ms, other_ms);
-        printf("  time share                       decode=%.1f%% render=%.1f%% encode+other~=%.1f%%\n",
-               decode_pct, render_pct, other_pct);
+        printf(
+            "  time share                       decode=%.1f%% render=%.1f%% encode+other~=%.1f%%\n",
+            decode_pct, render_pct, other_pct);
     }
 }
 
-static int parse_u32_arg(const char *text, uint32_t *out, const char *name)
-{
+static int parse_u32_arg(const char *text, uint32_t *out, const char *name) {
     char *end = NULL;
     unsigned long value;
 
@@ -295,8 +253,7 @@ static int parse_u32_arg(const char *text, uint32_t *out, const char *name)
         return -1;
 
     value = strtoul(text, &end, 10);
-    if (!end || *end != '\0' || value > UINT32_MAX)
-    {
+    if (!end || *end != '\0' || value > UINT32_MAX) {
         fprintf(stderr, "bench_lat: invalid %s '%s'\n", name, text ? text : "");
         return -1;
     }
@@ -305,10 +262,8 @@ static int parse_u32_arg(const char *text, uint32_t *out, const char *name)
     return 0;
 }
 
-static const char *bench_input_format_name(bench_input_format_t format)
-{
-    switch (format)
-    {
+static const char *bench_input_format_name(bench_input_format_t format) {
+    switch (format) {
     case BENCH_INPUT_FORMAT_RAW_RGB24:
         return "raw-rgb24";
     case BENCH_INPUT_FORMAT_ENCODED:
@@ -317,24 +272,17 @@ static const char *bench_input_format_name(bench_input_format_t format)
     }
 }
 
-static int benchmark_raw(
-    img_engine_t *engine,
-    const uint8_t *input,
-    size_t input_size,
-    bench_stats_t *stats_out)
-{
+static int benchmark_raw(img_engine_t *engine, const uint8_t *input, size_t input_size,
+                         bench_stats_t *stats_out) {
     uint64_t *samples = calloc(BENCH_ITERATIONS, sizeof(*samples));
     if (!samples)
         return 1;
 
-    for (int i = 0; i < BENCH_WARMUP; i++)
-    {
+    for (int i = 0; i < BENCH_WARMUP; i++) {
         uint8_t *out = NULL;
         size_t out_size = 0;
-        img_result_t r = img_api_process_raw(
-            engine, (uint8_t *)input, input_size, &out, &out_size);
-        if (r != IMG_SUCCESS)
-        {
+        img_result_t r = img_api_process_raw(engine, (uint8_t *)input, input_size, &out, &out_size);
+        if (r != IMG_SUCCESS) {
             fprintf(stderr, "bench_lat: raw warmup failed: %s\n", img_result_name(r));
             free(samples);
             img_encoded_free(out);
@@ -343,20 +291,16 @@ static int benchmark_raw(
         img_encoded_free(out);
     }
 
-    for (int i = 0; i < BENCH_ITERATIONS; i++)
-    {
+    for (int i = 0; i < BENCH_ITERATIONS; i++) {
         uint8_t *out = NULL;
         size_t out_size = 0;
 
         const uint64_t start_ns = monotonic_ns();
-        img_result_t r = img_api_process_raw(
-            engine, (uint8_t *)input, input_size, &out, &out_size);
+        img_result_t r = img_api_process_raw(engine, (uint8_t *)input, input_size, &out, &out_size);
         const uint64_t end_ns = monotonic_ns();
 
-        if (r != IMG_SUCCESS)
-        {
-            fprintf(stderr, "bench_lat: raw iteration %d failed: %s\n",
-                    i, img_result_name(r));
+        if (r != IMG_SUCCESS) {
+            fprintf(stderr, "bench_lat: raw iteration %d failed: %s\n", i, img_result_name(r));
             free(samples);
             img_encoded_free(out);
             return 1;
@@ -371,36 +315,27 @@ static int benchmark_raw(
     return 0;
 }
 
-static int benchmark_hot(
-    img_engine_t *engine,
-    const uint8_t *input,
-    size_t input_size,
-    img_job_template_t preset_template,
-    bench_stats_t *stats_out)
-{
+static int benchmark_hot(img_engine_t *engine, const uint8_t *input, size_t input_size,
+                         img_job_template_t preset_template, bench_stats_t *stats_out) {
     img_hot_bench_state_t state;
     uint64_t *samples = calloc(BENCH_ITERATIONS, sizeof(*samples));
-    if (!samples)
-    {
+    if (!samples) {
         fprintf(stderr, "bench_lat: hot benchmark allocation failed\n");
         free(samples);
         return 1;
     }
 
-    img_result_t r = img_api_hot_bench_init_with_template(
-        engine, input, input_size, preset_template, &state);
-    if (r != IMG_SUCCESS)
-    {
+    img_result_t r =
+        img_api_hot_bench_init_with_template(engine, input, input_size, preset_template, &state);
+    if (r != IMG_SUCCESS) {
         fprintf(stderr, "bench_lat: hot setup failed: %s\n", img_result_name(r));
         free(samples);
         return 1;
     }
 
-    for (int i = 0; i < BENCH_WARMUP; i++)
-    {
+    for (int i = 0; i < BENCH_WARMUP; i++) {
         r = img_api_hot_bench_step(&state);
-        if (r != IMG_SUCCESS)
-        {
+        if (r != IMG_SUCCESS) {
             fprintf(stderr, "bench_lat: hot warmup failed: %s\n", img_result_name(r));
             free(samples);
             img_api_hot_bench_destroy(engine, &state);
@@ -408,15 +343,12 @@ static int benchmark_hot(
         }
     }
 
-    for (int i = 0; i < BENCH_ITERATIONS; i++)
-    {
+    for (int i = 0; i < BENCH_ITERATIONS; i++) {
         const uint64_t start_ns = monotonic_ns();
         r = img_api_hot_bench_step(&state);
         const uint64_t end_ns = monotonic_ns();
-        if (r != IMG_SUCCESS)
-        {
-            fprintf(stderr, "bench_lat: hot iteration %d failed: %s\n",
-                    i, img_result_name(r));
+        if (r != IMG_SUCCESS) {
+            fprintf(stderr, "bench_lat: hot iteration %d failed: %s\n", i, img_result_name(r));
             free(samples);
             img_api_hot_bench_destroy(engine, &state);
             return 1;
@@ -425,13 +357,13 @@ static int benchmark_hot(
         samples[i] = end_ns - start_ns;
     }
 
-    if (preset_template != IMG_JOB_TEMPLATE_CUSTOM)
-    {
+    if (preset_template != IMG_JOB_TEMPLATE_CUSTOM) {
         printf("  preset:   %s\n", img_job_template_name(preset_template));
         fflush(stdout);
     }
 
-    print_stats("Prepared render stage (decoded input, final cache disabled)", samples, BENCH_ITERATIONS, stats_out);
+    print_stats("Prepared render stage (decoded input, final cache disabled)", samples,
+                BENCH_ITERATIONS, stats_out);
     fflush(stdout);
 
     free(samples);
@@ -439,37 +371,27 @@ static int benchmark_hot(
     return 0;
 }
 
-static int benchmark_hot_rgb24(
-    img_engine_t *engine,
-    const uint8_t *input,
-    uint32_t width,
-    uint32_t height,
-    uint32_t stride,
-    img_job_template_t preset_template,
-    bench_stats_t *stats_out)
-{
+static int benchmark_hot_rgb24(img_engine_t *engine, const uint8_t *input, uint32_t width,
+                               uint32_t height, uint32_t stride, img_job_template_t preset_template,
+                               bench_stats_t *stats_out) {
     img_hot_bench_state_t state;
     uint64_t *samples = calloc(BENCH_ITERATIONS, sizeof(*samples));
-    if (!samples)
-    {
+    if (!samples) {
         fprintf(stderr, "bench_lat: raw hot benchmark allocation failed\n");
         return 1;
     }
 
-    img_result_t r = img_api_hot_bench_init_rgb24_with_template(
-        engine, input, width, height, stride, preset_template, &state);
-    if (r != IMG_SUCCESS)
-    {
+    img_result_t r = img_api_hot_bench_init_rgb24_with_template(engine, input, width, height,
+                                                                stride, preset_template, &state);
+    if (r != IMG_SUCCESS) {
         fprintf(stderr, "bench_lat: raw hot setup failed: %s\n", img_result_name(r));
         free(samples);
         return 1;
     }
 
-    for (int i = 0; i < BENCH_WARMUP; i++)
-    {
+    for (int i = 0; i < BENCH_WARMUP; i++) {
         r = img_api_hot_bench_step(&state);
-        if (r != IMG_SUCCESS)
-        {
+        if (r != IMG_SUCCESS) {
             fprintf(stderr, "bench_lat: raw hot warmup failed: %s\n", img_result_name(r));
             free(samples);
             img_api_hot_bench_destroy(engine, &state);
@@ -477,15 +399,12 @@ static int benchmark_hot_rgb24(
         }
     }
 
-    for (int i = 0; i < BENCH_ITERATIONS; i++)
-    {
+    for (int i = 0; i < BENCH_ITERATIONS; i++) {
         const uint64_t start_ns = monotonic_ns();
         r = img_api_hot_bench_step(&state);
         const uint64_t end_ns = monotonic_ns();
-        if (r != IMG_SUCCESS)
-        {
-            fprintf(stderr, "bench_lat: raw hot iteration %d failed: %s\n",
-                    i, img_result_name(r));
+        if (r != IMG_SUCCESS) {
+            fprintf(stderr, "bench_lat: raw hot iteration %d failed: %s\n", i, img_result_name(r));
             free(samples);
             img_api_hot_bench_destroy(engine, &state);
             return 1;
@@ -494,13 +413,13 @@ static int benchmark_hot_rgb24(
         samples[i] = end_ns - start_ns;
     }
 
-    if (preset_template != IMG_JOB_TEMPLATE_CUSTOM)
-    {
+    if (preset_template != IMG_JOB_TEMPLATE_CUSTOM) {
         printf("  preset:   %s\n", img_job_template_name(preset_template));
         fflush(stdout);
     }
 
-    print_stats("Prepared render stage (raw ingress, final cache disabled)", samples, BENCH_ITERATIONS, stats_out);
+    print_stats("Prepared render stage (raw ingress, final cache disabled)", samples,
+                BENCH_ITERATIONS, stats_out);
     fflush(stdout);
 
     free(samples);
@@ -508,34 +427,26 @@ static int benchmark_hot_rgb24(
     return 0;
 }
 
-static int benchmark_decode_only(
-    img_engine_t *engine,
-    const uint8_t *input,
-    size_t input_size,
-    bench_stats_t *stats_out)
-{
+static int benchmark_decode_only(img_engine_t *engine, const uint8_t *input, size_t input_size,
+                                 bench_stats_t *stats_out) {
     img_prepared_decoder_t decoder;
     uint64_t *samples = calloc(BENCH_ITERATIONS, sizeof(*samples));
-    if (!samples)
-    {
+    if (!samples) {
         fprintf(stderr, "bench_lat: decode benchmark allocation failed\n");
         return 1;
     }
 
     img_result_t r = img_api_prepare_decoder(engine, &decoder);
-    if (r != IMG_SUCCESS)
-    {
+    if (r != IMG_SUCCESS) {
         fprintf(stderr, "bench_lat: decode prepare failed: %s\n", img_result_name(r));
         free(samples);
         return 1;
     }
 
-    for (int i = 0; i < BENCH_WARMUP; i++)
-    {
+    for (int i = 0; i < BENCH_WARMUP; i++) {
         img_buffer_t out = {0};
         r = img_api_decode_prepared(&decoder, input, input_size, &out);
-        if (r != IMG_SUCCESS)
-        {
+        if (r != IMG_SUCCESS) {
             fprintf(stderr, "bench_lat: decode warmup failed: %s\n", img_result_name(r));
             free(samples);
             img_api_release_raw_buffer(engine, &out);
@@ -545,18 +456,15 @@ static int benchmark_decode_only(
         img_api_release_raw_buffer(engine, &out);
     }
 
-    for (int i = 0; i < BENCH_ITERATIONS; i++)
-    {
+    for (int i = 0; i < BENCH_ITERATIONS; i++) {
         img_buffer_t out = {0};
 
         const uint64_t start_ns = monotonic_ns();
         r = img_api_decode_prepared(&decoder, input, input_size, &out);
         const uint64_t end_ns = monotonic_ns();
 
-        if (r != IMG_SUCCESS)
-        {
-            fprintf(stderr, "bench_lat: decode iteration %d failed: %s\n",
-                    i, img_result_name(r));
+        if (r != IMG_SUCCESS) {
+            fprintf(stderr, "bench_lat: decode iteration %d failed: %s\n", i, img_result_name(r));
             free(samples);
             img_api_release_raw_buffer(engine, &out);
             img_api_decoder_destroy(&decoder);
@@ -574,12 +482,8 @@ static int benchmark_decode_only(
     return 0;
 }
 
-static int benchmark_encode_only(
-    img_engine_t *engine,
-    const uint8_t *input,
-    size_t input_size,
-    bench_stats_t *stats_out)
-{
+static int benchmark_encode_only(img_engine_t *engine, const uint8_t *input, size_t input_size,
+                                 bench_stats_t *stats_out) {
     img_buffer_t decoded = {0};
     uint64_t *samples = calloc(BENCH_ITERATIONS, sizeof(*samples));
     img_ctx_t ctx = {0};
@@ -587,22 +491,20 @@ static int benchmark_encode_only(
         return 1;
 
     img_result_t r = decode_image_secure(engine, input, input_size, &decoded);
-    if (r != IMG_SUCCESS)
-    {
-        fprintf(stderr, "bench_lat: encode benchmark decode setup failed: %s\n", img_result_name(r));
+    if (r != IMG_SUCCESS) {
+        fprintf(stderr, "bench_lat: encode benchmark decode setup failed: %s\n",
+                img_result_name(r));
         free(samples);
         return 1;
     }
 
     img_ctx_bind_engine(engine, &ctx);
 
-    for (int i = 0; i < BENCH_WARMUP; i++)
-    {
+    for (int i = 0; i < BENCH_WARMUP; i++) {
         uint8_t *out = NULL;
         size_t out_size = 0;
         r = img_api_process_raw_encode(&ctx, &decoded, &out, &out_size);
-        if (r != IMG_SUCCESS)
-        {
+        if (r != IMG_SUCCESS) {
             fprintf(stderr, "bench_lat: encode warmup failed: %s\n", img_result_name(r));
             free(samples);
             img_encoded_free(out);
@@ -612,17 +514,14 @@ static int benchmark_encode_only(
         img_encoded_free(out);
     }
 
-    for (int i = 0; i < BENCH_ITERATIONS; i++)
-    {
+    for (int i = 0; i < BENCH_ITERATIONS; i++) {
         uint8_t *out = NULL;
         size_t out_size = 0;
         const uint64_t start_ns = monotonic_ns();
         r = img_api_process_raw_encode(&ctx, &decoded, &out, &out_size);
         const uint64_t end_ns = monotonic_ns();
-        if (r != IMG_SUCCESS)
-        {
-            fprintf(stderr, "bench_lat: encode iteration %d failed: %s\n",
-                    i, img_result_name(r));
+        if (r != IMG_SUCCESS) {
+            fprintf(stderr, "bench_lat: encode iteration %d failed: %s\n", i, img_result_name(r));
             free(samples);
             img_encoded_free(out);
             img_api_release_raw_buffer(engine, &decoded);
@@ -632,23 +531,17 @@ static int benchmark_encode_only(
         img_encoded_free(out);
     }
 
-    print_stats("Prepared encode only (decoded source frame)", samples, BENCH_ITERATIONS, stats_out);
+    print_stats("Prepared encode only (decoded source frame)", samples, BENCH_ITERATIONS,
+                stats_out);
     fflush(stdout);
     free(samples);
     img_api_release_raw_buffer(engine, &decoded);
     return 0;
 }
 
-static int benchmark_encode_variant(
-    img_engine_t *engine,
-    const uint8_t *input,
-    size_t input_size,
-    int quality,
-    int subsamp,
-    int iterations,
-    int warmup,
-    bench_stats_t *stats_out)
-{
+static int benchmark_encode_variant(img_engine_t *engine, const uint8_t *input, size_t input_size,
+                                    int quality, int subsamp, int iterations, int warmup,
+                                    bench_stats_t *stats_out) {
     img_buffer_t decoded = {0};
     uint64_t *samples = calloc((size_t)iterations, sizeof(*samples));
     img_ctx_t ctx = {0};
@@ -657,8 +550,7 @@ static int benchmark_encode_variant(
         return 1;
 
     img_result_t r = decode_image_secure(engine, input, input_size, &decoded);
-    if (r != IMG_SUCCESS)
-    {
+    if (r != IMG_SUCCESS) {
         fprintf(stderr, "bench_lat: encode variant decode setup failed: %s\n", img_result_name(r));
         free(samples);
         return 1;
@@ -666,14 +558,12 @@ static int benchmark_encode_variant(
 
     img_ctx_bind_engine(engine, &ctx);
 
-    for (int i = 0; i < warmup; i++)
-    {
+    for (int i = 0; i < warmup; i++) {
         uint8_t *out = NULL;
         size_t out_size = 0;
-        if (img_encode_from_buffer_ex(&ctx, &decoded, &out, &out_size, quality, subsamp) != 0)
-        {
-            fprintf(stderr, "bench_lat: encode variant warmup failed (q=%d %s)\n",
-                    quality, subsamp_name(subsamp));
+        if (img_encode_from_buffer_ex(&ctx, &decoded, &out, &out_size, quality, subsamp) != 0) {
+            fprintf(stderr, "bench_lat: encode variant warmup failed (q=%d %s)\n", quality,
+                    subsamp_name(subsamp));
             free(samples);
             img_encoded_free(out);
             img_api_release_raw_buffer(engine, &decoded);
@@ -682,15 +572,13 @@ static int benchmark_encode_variant(
         img_encoded_free(out);
     }
 
-    for (int i = 0; i < iterations; i++)
-    {
+    for (int i = 0; i < iterations; i++) {
         uint8_t *out = NULL;
         size_t out_size = 0;
         const uint64_t start_ns = monotonic_ns();
-        if (img_encode_from_buffer_ex(&ctx, &decoded, &out, &out_size, quality, subsamp) != 0)
-        {
-            fprintf(stderr, "bench_lat: encode variant iteration failed (q=%d %s)\n",
-                    quality, subsamp_name(subsamp));
+        if (img_encode_from_buffer_ex(&ctx, &decoded, &out, &out_size, quality, subsamp) != 0) {
+            fprintf(stderr, "bench_lat: encode variant iteration failed (q=%d %s)\n", quality,
+                    subsamp_name(subsamp));
             free(samples);
             img_encoded_free(out);
             img_api_release_raw_buffer(engine, &decoded);
@@ -701,8 +589,8 @@ static int benchmark_encode_variant(
         img_encoded_free(out);
     }
 
-    snprintf(label, sizeof(label),
-             "Encode sweep q=%d subsamp=%s (%d iters)", quality, subsamp_name(subsamp), iterations);
+    snprintf(label, sizeof(label), "Encode sweep q=%d subsamp=%s (%d iters)", quality,
+             subsamp_name(subsamp), iterations);
     print_stats(label, samples, (size_t)iterations, stats_out);
     fflush(stdout);
 
@@ -711,13 +599,8 @@ static int benchmark_encode_variant(
     return 0;
 }
 
-static int benchmark_encode_sweep(
-    img_engine_t *engine,
-    const uint8_t *input,
-    size_t input_size)
-{
-    struct
-    {
+static int benchmark_encode_sweep(img_engine_t *engine, const uint8_t *input, size_t input_size) {
+    struct {
         int quality;
         int subsamp;
     } variants[] = {
@@ -727,55 +610,38 @@ static int benchmark_encode_sweep(
         {92, TJSAMP_444},
     };
 
-    printf("\nEncode sweep (%d iterations + %d warmup each)\n",
-           BENCH_SWEEP_ITERATIONS, BENCH_SWEEP_WARMUP);
+    printf("\nEncode sweep (%d iterations + %d warmup each)\n", BENCH_SWEEP_ITERATIONS,
+           BENCH_SWEEP_WARMUP);
 
-    for (size_t i = 0; i < sizeof(variants) / sizeof(variants[0]); i++)
-    {
-        if (benchmark_encode_variant(
-                engine,
-                input,
-                input_size,
-                variants[i].quality,
-                variants[i].subsamp,
-                BENCH_SWEEP_ITERATIONS,
-                BENCH_SWEEP_WARMUP,
-                NULL) != 0)
+    for (size_t i = 0; i < sizeof(variants) / sizeof(variants[0]); i++) {
+        if (benchmark_encode_variant(engine, input, input_size, variants[i].quality,
+                                     variants[i].subsamp, BENCH_SWEEP_ITERATIONS,
+                                     BENCH_SWEEP_WARMUP, NULL) != 0)
             return 1;
     }
 
     return 0;
 }
 
-static int benchmark_rgb24_output(
-    img_engine_t *engine,
-    const uint8_t *input,
-    size_t input_size,
-    uint32_t width,
-    uint32_t height,
-    uint32_t stride,
-    img_job_template_t preset_template,
-    bench_stats_t *stats_out)
-{
+static int benchmark_rgb24_output(img_engine_t *engine, const uint8_t *input, size_t input_size,
+                                  uint32_t width, uint32_t height, uint32_t stride,
+                                  img_job_template_t preset_template, bench_stats_t *stats_out) {
     img_job_t job;
     uint64_t *samples = calloc(BENCH_ITERATIONS, sizeof(*samples));
     if (!samples)
         return 1;
 
-    if (img_api_resolve_template_job(engine, preset_template, &job) != IMG_SUCCESS)
-    {
+    if (img_api_resolve_template_job(engine, preset_template, &job) != IMG_SUCCESS) {
         img_job_defaults(&job);
         img_job_apply_template(&job, preset_template);
     }
 
-    for (int i = 0; i < BENCH_WARMUP; i++)
-    {
+    for (int i = 0; i < BENCH_WARMUP; i++) {
         uint8_t *out = NULL;
         size_t out_size = 0;
-        img_result_t r = img_api_run_job_rgb24_raw(
-            engine, input, input_size, width, height, stride, &job, &out, &out_size);
-        if (r != IMG_SUCCESS)
-        {
+        img_result_t r = img_api_run_job_rgb24_raw(engine, input, input_size, width, height, stride,
+                                                   &job, &out, &out_size);
+        if (r != IMG_SUCCESS) {
             fprintf(stderr, "bench_lat: raw-rgb24 warmup failed: %s\n", img_result_name(r));
             free(samples);
             img_encoded_free(out);
@@ -784,20 +650,18 @@ static int benchmark_rgb24_output(
         img_encoded_free(out);
     }
 
-    for (int i = 0; i < BENCH_ITERATIONS; i++)
-    {
+    for (int i = 0; i < BENCH_ITERATIONS; i++) {
         uint8_t *out = NULL;
         size_t out_size = 0;
 
         const uint64_t start_ns = monotonic_ns();
-        img_result_t r = img_api_run_job_rgb24_raw(
-            engine, input, input_size, width, height, stride, &job, &out, &out_size);
+        img_result_t r = img_api_run_job_rgb24_raw(engine, input, input_size, width, height, stride,
+                                                   &job, &out, &out_size);
         const uint64_t end_ns = monotonic_ns();
 
-        if (r != IMG_SUCCESS)
-        {
-            fprintf(stderr, "bench_lat: raw-rgb24 iteration %d failed: %s\n",
-                    i, img_result_name(r));
+        if (r != IMG_SUCCESS) {
+            fprintf(stderr, "bench_lat: raw-rgb24 iteration %d failed: %s\n", i,
+                    img_result_name(r));
             free(samples);
             img_encoded_free(out);
             return 1;
@@ -812,8 +676,7 @@ static int benchmark_rgb24_output(
     return 0;
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
     static struct option long_opts[] = {
         {"preset", required_argument, 0, 'p'},
         {"workers", required_argument, 0, 'w'},
@@ -840,16 +703,11 @@ int main(int argc, char **argv)
     int idx = 0;
 
     optind = 1;
-    while ((opt = getopt_long(argc, argv, "p:f:h", long_opts, &idx)) != -1)
-    {
-        switch (opt)
-        {
+    while ((opt = getopt_long(argc, argv, "p:f:h", long_opts, &idx)) != -1) {
+        switch (opt) {
         case 'p':
-            if (img_job_template_lookup(optarg, &preset_template) != 0)
-            {
-                fprintf(stderr,
-                        "bench_lat: unknown preset '%s' (use %s, %s, %s)\n",
-                        optarg,
+            if (img_job_template_lookup(optarg, &preset_template) != 0) {
+                fprintf(stderr, "bench_lat: unknown preset '%s' (use %s, %s, %s)\n", optarg,
                         img_job_template_name(IMG_JOB_TEMPLATE_PASSPORT_45X35),
                         img_job_template_name(IMG_JOB_TEMPLATE_PASSPORT_38X35),
                         img_job_template_name(IMG_JOB_TEMPLATE_PRINTREADY_6X6));
@@ -865,8 +723,7 @@ int main(int argc, char **argv)
                 input_format = BENCH_INPUT_FORMAT_ENCODED;
             else if (strcmp(optarg, "raw-rgb24") == 0)
                 input_format = BENCH_INPUT_FORMAT_RAW_RGB24;
-            else
-            {
+            else {
                 fprintf(stderr, "bench_lat: unsupported input format '%s'\n", optarg);
                 return 1;
             }
@@ -890,7 +747,10 @@ int main(int argc, char **argv)
             run_encode_sweep = true;
             break;
         case 'h':
-            printf("Usage: %s [--preset <name>] [--workers <n>] [--input-format encoded|raw-rgb24] [--input-width <px>] [--input-height <px>] [--input-stride <bytes>] [--encode-sweep] [file]\n", argv[0]);
+            printf("Usage: %s [--preset <name>] [--workers <n>] [--input-format encoded|raw-rgb24] "
+                   "[--input-width <px>] [--input-height <px>] [--input-stride <bytes>] "
+                   "[--encode-sweep] [file]\n",
+                   argv[0]);
             return 0;
         default:
             fprintf(stderr, "bench_lat: invalid arguments\n");
@@ -899,58 +759,46 @@ int main(int argc, char **argv)
     }
 
     const char *path = "tests/samples/4k_test.jpg";
-    if (optind < argc)
-    {
+    if (optind < argc) {
         path = argv[optind++];
-        if (optind < argc)
-        {
+        if (optind < argc) {
             fprintf(stderr, "bench_lat: unexpected extra arguments\n");
             return 1;
         }
     }
 
-    if (input_format == BENCH_INPUT_FORMAT_RAW_RGB24)
-    {
+    if (input_format == BENCH_INPUT_FORMAT_RAW_RGB24) {
         uint64_t min_stride;
 
-        if (!has_input_width || !has_input_height)
-        {
-            fprintf(stderr,
-                    "bench_lat: raw-rgb24 requires --input-width and --input-height\n");
+        if (!has_input_width || !has_input_height) {
+            fprintf(stderr, "bench_lat: raw-rgb24 requires --input-width and --input-height\n");
             return 1;
         }
 
         min_stride = (uint64_t)input_width * 3ull;
         if (!has_input_stride)
             input_stride = (uint32_t)min_stride;
-        else if ((uint64_t)input_stride < min_stride)
-        {
-            fprintf(stderr,
-                    "bench_lat: --input-stride must be at least width * 3 for raw-rgb24\n");
+        else if ((uint64_t)input_stride < min_stride) {
+            fprintf(stderr, "bench_lat: --input-stride must be at least width * 3 for raw-rgb24\n");
             return 1;
         }
-    }
-    else if (has_input_width || has_input_height || has_input_stride)
-    {
-        fprintf(stderr,
-                "bench_lat: raw dimension arguments require --input-format raw-rgb24\n");
+    } else if (has_input_width || has_input_height || has_input_stride) {
+        fprintf(stderr, "bench_lat: raw dimension arguments require --input-format raw-rgb24\n");
         return 1;
     }
 
     int fd = open(path, O_RDONLY);
-    if (fd < 0)
-    {
-        fprintf(stderr, "bench_lat: cannot open '%s' — "
-                        "create tests/samples/4k_test.jpg or pass path as arg\n",
+    if (fd < 0) {
+        fprintf(stderr,
+                "bench_lat: cannot open '%s' — "
+                "create tests/samples/4k_test.jpg or pass path as arg\n",
                 path);
         return 1;
     }
 
     off_t file_size = lseek(fd, 0, SEEK_END);
-    if (file_size <= 0)
-    {
-        fprintf(stderr, "bench_lat: invalid file size %lld\n",
-                (long long)file_size);
+    if (file_size <= 0) {
+        fprintf(stderr, "bench_lat: invalid file size %lld\n", (long long)file_size);
         close(fd);
         return 1;
     }
@@ -959,15 +807,13 @@ int main(int argc, char **argv)
     uint8_t *input = mmap(NULL, (size_t)file_size, PROT_READ, MAP_PRIVATE, fd, 0);
     close(fd);
 
-    if (input == MAP_FAILED)
-    {
+    if (input == MAP_FAILED) {
         perror("bench_lat: mmap failed");
         return 1;
     }
 
     img_engine_t *engine = img_api_init(workers);
-    if (!engine)
-    {
+    if (!engine) {
         fprintf(stderr, "bench_lat: engine init failed\n");
         munmap(input, (size_t)file_size);
         return 1;
@@ -989,34 +835,29 @@ int main(int argc, char **argv)
     bench_stats_t decode_stats = {0};
     bench_stats_t encode_stats = {0};
     bench_stats_t cold_stats = {0};
-    if (input_format == BENCH_INPUT_FORMAT_RAW_RGB24)
-    {
-        if (benchmark_hot_rgb24(
-                engine, input, input_width, input_height, input_stride, preset_template, &render_stats) != 0)
+    if (input_format == BENCH_INPUT_FORMAT_RAW_RGB24) {
+        if (benchmark_hot_rgb24(engine, input, input_width, input_height, input_stride,
+                                preset_template, &render_stats) != 0)
             rc = 1;
-        else
-        {
+        else {
             printf("Prepared decode ingress\n");
             printf("  skipped: raw-rgb24 input bypasses decoder\n");
             printf("Prepared encode only\n");
-            printf("  skipped: raw-rgb24 mode in this benchmark does not build a separate encode-only stage\n");
+            printf("  skipped: raw-rgb24 mode in this benchmark does not build a separate "
+                   "encode-only stage\n");
             printf("\n--- entering cold path (raw ingress + encode) ---\n");
             fflush(stdout);
-            if (benchmark_rgb24_output(
-                    engine, input, (size_t)file_size,
-                    input_width, input_height, input_stride,
-                    preset_template, &cold_stats) != 0)
+            if (benchmark_rgb24_output(engine, input, (size_t)file_size, input_width, input_height,
+                                       input_stride, preset_template, &cold_stats) != 0)
                 rc = 1;
         }
-    }
-    else if (benchmark_hot(engine, input, (size_t)file_size, preset_template, &render_stats) != 0)
+    } else if (benchmark_hot(engine, input, (size_t)file_size, preset_template, &render_stats) != 0)
         rc = 1;
     else if (benchmark_decode_only(engine, input, (size_t)file_size, &decode_stats) != 0)
         rc = 1;
     else if (benchmark_encode_only(engine, input, (size_t)file_size, &encode_stats) != 0)
         rc = 1;
-    else
-    {
+    else {
         printf("\n--- entering cold path (decode + encode) ---\n");
         fflush(stdout);
         if (benchmark_raw(engine, input, (size_t)file_size, &cold_stats) != 0)

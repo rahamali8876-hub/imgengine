@@ -6,8 +6,7 @@
 
 void img_io_register_defaults(void);
 
-img_engine_t *img_api_init(uint32_t workers)
-{
+img_engine_t *img_api_init(uint32_t workers) {
     if (img_api_init_enter_sandbox() != 0)
         return NULL;
 

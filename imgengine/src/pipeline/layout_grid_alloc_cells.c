@@ -8,11 +8,8 @@
 #include <stddef.h>
 #include <string.h>
 
-img_result_t img_layout_grid_alloc_cells(
-    const img_job_t *job,
-    img_arena_t *arena,
-    img_cell_t **cells_out)
-{
+img_result_t img_layout_grid_alloc_cells(const img_job_t *job, img_arena_t *arena,
+                                         img_cell_t **cells_out) {
     size_t cols = (size_t)job->cols;
     size_t rows = (size_t)job->rows;
     if (rows > SIZE_MAX / cols)

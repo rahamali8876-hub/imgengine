@@ -5,8 +5,7 @@
 #include "pipeline/jump_table.h"
 #include "core/opcodes.h"
 
-int main(void)
-{
+int main(void) {
     /* Register the generated pipelines explicitly */
     register_generated_pipelines();
 

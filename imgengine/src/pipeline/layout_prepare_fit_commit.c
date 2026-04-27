@@ -6,16 +6,9 @@
 #include <stddef.h>
 #include <string.h>
 
-img_result_t img_layout_prepare_fit_commit(
-    const img_buffer_t *tmp,
-    img_buffer_t *dst,
-    img_slab_pool_t *pool,
-    uint32_t cell_w,
-    uint32_t cell_h,
-    uint8_t bg_r,
-    uint8_t bg_g,
-    uint8_t bg_b)
-{
+img_result_t img_layout_prepare_fit_commit(const img_buffer_t *tmp, img_buffer_t *dst,
+                                           img_slab_pool_t *pool, uint32_t cell_w, uint32_t cell_h,
+                                           uint8_t bg_r, uint8_t bg_g, uint8_t bg_b) {
     if (tmp->width > cell_w || tmp->height > cell_h)
         return IMG_ERR_SECURITY;
 
@@ -33,14 +26,10 @@ img_result_t img_layout_prepare_fit_commit(
     if (!mem)
         return IMG_ERR_NOMEM;
 
-    if (bg_r == bg_g && bg_g == bg_b)
-    {
+    if (bg_r == bg_g && bg_g == bg_b) {
         memset(mem, bg_r, required);
-    }
-    else
-    {
-        for (size_t i = 0; i < required; i += 3)
-        {
+    } else {
+        for (size_t i = 0; i < required; i += 3) {
             mem[i] = bg_r;
             mem[i + 1] = bg_g;
             mem[i + 2] = bg_b;
@@ -56,8 +45,7 @@ img_result_t img_layout_prepare_fit_commit(
 
     uint32_t off_x = (cell_w - tmp->width) / 2;
     uint32_t off_y = (cell_h - tmp->height) / 2;
-    for (uint32_t dy = 0; dy < tmp->height; dy++)
-    {
+    for (uint32_t dy = 0; dy < tmp->height; dy++) {
         uint8_t *dst_row = mem + (off_y + dy) * dst->stride + off_x * 3;
         const uint8_t *src_row = tmp->data + dy * tmp->stride;
         memcpy(dst_row, src_row, tmp->width * 3);

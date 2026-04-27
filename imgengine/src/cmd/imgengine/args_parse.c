@@ -1,8 +1,7 @@
 // ./src/cmd/imgengine/args_parse.c
 #include "cmd/imgengine/args_internal.h"
 
-int img_parse_args(int argc, char **argv, img_cli_options_t *opts)
-{
+int img_parse_args(int argc, char **argv, img_cli_options_t *opts) {
     if (!opts)
         return -1;
 

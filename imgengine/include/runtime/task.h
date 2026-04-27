@@ -29,27 +29,23 @@ typedef struct img_engine img_engine_t;
 /*
  * Task state
  */
-typedef enum
-{
+typedef enum {
     IMG_TASK_READY = 0,
     IMG_TASK_RUNNING = 1,
     IMG_TASK_DONE = 2,
 } img_task_state_t;
 
-typedef enum
-{
+typedef enum {
     IMG_TASK_KIND_PIPELINE = 0,
     IMG_TASK_KIND_RENDER_STAGE = 1,
 } img_task_kind_t;
 
-typedef struct
-{
+typedef struct {
     img_buffer_t *buffer;
     img_pipeline_runtime_t *pipeline;
 } img_pipeline_task_payload_t;
 
-typedef struct
-{
+typedef struct {
     img_engine_t *engine;
     img_ctx_t *ctx;
     img_canvas_t *canvas;
@@ -77,15 +73,13 @@ typedef struct
  *   buffer   — returned to slab by caller after task->status written
  *   pipeline — owned by arena, valid for lifetime of request
  */
-typedef struct __attribute__((aligned(64)))
-{
+typedef struct __attribute__((aligned(64))) {
     img_task_kind_t kind;
     img_task_state_t state;
     uint32_t op_index;
 
     int status;
-    union
-    {
+    union {
         img_pipeline_task_payload_t pipeline;
         img_render_task_payload_t render;
     } payload;

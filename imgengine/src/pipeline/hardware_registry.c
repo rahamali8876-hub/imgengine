@@ -6,11 +6,9 @@
 #include "arch/arch_interface.h"
 #include "core/opcodes.h"
 
-void img_hw_register_kernels(cpu_caps_t caps)
-{
+void img_hw_register_kernels(cpu_caps_t caps) {
     // ================= AVX512 =================
-    if (img_cpu_has_avx512(caps))
-    {
+    if (img_cpu_has_avx512(caps)) {
         g_jump_table[OP_RESIZE] = img_arch_avx2_resize;
         // 🔥 fallback to AVX2 for now
         g_jump_table[OP_RESIZE_H] = img_arch_resize_h_avx2;
@@ -19,8 +17,7 @@ void img_hw_register_kernels(cpu_caps_t caps)
     }
 
     // ================= AVX2 =================
-    else if (img_cpu_has_avx2(caps))
-    {
+    else if (img_cpu_has_avx2(caps)) {
         g_jump_table[OP_RESIZE] = img_arch_avx2_resize;
         g_jump_table[OP_RESIZE_H] = img_arch_resize_h_avx2;
         g_jump_table[OP_RESIZE_V] = img_arch_resize_v_avx2;
@@ -28,8 +25,7 @@ void img_hw_register_kernels(cpu_caps_t caps)
     }
 
     // ================= NEON =================
-    else if (img_cpu_has_neon(caps))
-    {
+    else if (img_cpu_has_neon(caps)) {
         g_jump_table[OP_RESIZE] = resize_scalar;
         g_jump_table[OP_RESIZE_H] = img_arch_resize_h_avx2;
         g_jump_table[OP_RESIZE_V] = img_arch_resize_v_avx2;
@@ -37,8 +33,7 @@ void img_hw_register_kernels(cpu_caps_t caps)
     }
 
     // ================= SCALAR =================
-    else
-    {
+    else {
         g_jump_table[OP_RESIZE] = resize_scalar;
         g_jump_table[OP_RESIZE_H] = img_arch_resize_h_scalar;
         g_jump_table[OP_RESIZE_V] = img_arch_resize_v_scalar;

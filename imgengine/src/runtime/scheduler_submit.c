@@ -5,8 +5,7 @@
 #include "core/context_internal.h"
 #include <immintrin.h>
 
-int img_scheduler_submit(img_scheduler_t *sched, img_task_t *task)
-{
+int img_scheduler_submit(img_scheduler_t *sched, img_task_t *task) {
     if (!sched || !task)
         return -1;
 
@@ -19,23 +18,20 @@ int img_scheduler_submit(img_scheduler_t *sched, img_task_t *task)
     return img_mpmc_push(&sched->global_queue, task);
 }
 
-int img_runtime_submit_task(img_engine_t *engine, img_task_t *task)
-{
+int img_runtime_submit_task(img_engine_t *engine, img_task_t *task) {
     if (!engine || !task || !engine->scheduler || engine->worker_count == 0)
         return -1;
 
     return img_scheduler_submit(engine->scheduler, task);
 }
 
-img_result_t img_runtime_wait_task(img_task_t *task)
-{
+img_result_t img_runtime_wait_task(img_task_t *task) {
     uint32_t spin = 0;
 
     if (!task)
         return IMG_ERR_SECURITY;
 
-    while (__builtin_expect(task->state != IMG_TASK_DONE, 1))
-    {
+    while (__builtin_expect(task->state != IMG_TASK_DONE, 1)) {
         if (spin++ < 100000)
             _mm_pause();
         else

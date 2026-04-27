@@ -4,116 +4,159 @@
 
 This document maps the major headers in `include/` to their implementing sources in `src/`, outlines the main call flows, and highlights key files to inspect when working on a subsystem.
 
+
 ## How this LLD was produced
 
-Scanned `include/` and `src/` directories to identify module boundaries and representative implementation files. This LLD is a starting point — function-level diagrams and call graphs can be added next.
+This document is an expanded, production-ready mapping derived from the v2.0 RFC and the current repository layout. It focuses on concrete data structures, call-sites, and implementation points required to implement the HLD rules in code.
 
 ## Navigation cheat-sheet (where to look)
 
-- Public API surface: `include/api/v1` -> implementations under `src/api/` (e.g. `src/api/api.c`, `src/api/api_job_run.c`).
-- Core/context & buffers: `include/core/*` -> `src/core/*` (e.g. `include/core/buffer.h` -> `src/core/buffer_lifecycle.c`).
-- Pipeline engine: `include/pipeline/*` -> `src/pipeline/*` (jump_table, fused kernels, pipeline executor).
-- IO layer: `include/io/*` -> `src/io/decoder/*`, `src/io/encoder/*`, `src/io/vfs/*`.
-- Memory allocators: `include/memory/*` -> `src/memory/*` (slab, arena, numa, hugepage).
-- Runtime & scheduler: `include/runtime/*` -> `src/runtime/*` (scheduler, queues, worker loop, RPC glue).
-- Plugins: `include/plugins/*` and `include/pipeline/plugin_abi.h` -> `src/plugins/*` and `src/runtime/plugin_loader.c`.
-- Arch-specific kernels: `include/arch/*` -> `src/arch/<arch>/*` (AVX2/AVX512/Scalar/NEON implementations).
-- Observability: `include/observability/*` -> `src/observability/*` (logger, binlog, metrics, tracing).
-- Security: `include/security/*` -> `src/security/*` (input validation, sandbox helpers).
+- Public API surface: `include/api/v1` → implementations under `src/api/` (e.g. [src/api/api_init.c](src/api/api_init.c#L1)).
+- Core/context & buffers: `include/core/*` → `src/core/*` (e.g. `include/core/buffer.h` → [src/core/buffer_lifecycle.c](src/core/buffer_lifecycle.c#L1)).
+- Pipeline engine: `include/pipeline/*` → `src/pipeline/*` (jump-table, fused kernels, pipeline executor).
+- IO layer: `include/io/*` → `src/io/decoder/*`, `src/io/encoder/*`, `src/io/vfs/*`.
+- Memory allocators: `include/memory/*` → `src/memory/*` (slab, arena, numa, hugepage).
+- Runtime & scheduler: `include/runtime/*` → `src/runtime/*` (scheduler, queues, worker loop).
+- Arch-specific kernels: `include/arch/*` → `src/arch/<arch>/*` (AVX2/AVX512/Scalar/NEON implementations).
 
-## Representative file mappings (quick reference)
+## Representative mappings and key symbols
 
-- API: `include/api/v1/img_api.h`, `include/api/v1/img_job.h`  ⇄ `src/api/api.c`, `src/api/api_job.c`, `src/api/api_job_run.c`
-- Pipeline: `include/pipeline/pipeline.h`, `include/pipeline/pipeline_compiled.h` ⇄ `src/pipeline/pipeline_executor.c`, `src/pipeline/pipeline_build.c`, `src/pipeline/pipeline_fuse*.c`
-- Hot execution: `include/hot/pipeline_exec.h` ⇄ `src/hot/pipeline_exec.c`, `src/hot/batch_exec.c`
-- Memory: `include/memory/slab.h` ⇄ `src/memory/slab.c`, `src/memory/slab_create.c`, `src/memory/slab_lifecycle.c`
-- IO: `include/io/decoder/decoder_entry.h` ⇄ `src/io/decoder/decoder_entry.c`, `src/io/encoder/encoder_entry.c`
-- Runtime: `include/runtime/scheduler.h` ⇄ `src/runtime/scheduler.c`, `src/runtime/worker.c`, `src/runtime/queue_mpmc.c`
-- Plugins: `include/pipeline/plugin_abi.h` ⇄ `src/runtime/plugin_loader.c`, `src/plugins/plugin_registry.c`
+- `img_api_init` — [src/api/api_init.c](src/api/api_init.c#L9)
+- `img_api_shutdown` — [src/api/api_shutdown.c](src/api/api_shutdown.c#L6)
+- `img_api_run_job_impl` — [src/api/api_job_run.c](src/api/api_job_run.c#L99)
+- `g_jump_table` — [src/pipeline/jump_table_register.c](src/pipeline/jump_table_register.c#L4)
+- `img_register_op` — [src/pipeline/jump_table_register.c](src/pipeline/jump_table_register.c#L7)
+- `img_slab_alloc` / `img_slab_free` — [src/memory/slab_hot.c](src/memory/slab_hot.c#L1)
 
-## Common call flow (detailed example)
+## Data structures (conceptual LLD)
 
-CLI path (simplified):
+### Prepared template registry
 
-1. `src/cmd/imgengine/main.c` parses args and constructs a job via `job_builder.c`.
-2. Job is submitted to API layer (`src/api/api_task_submit.c`, `src/api/api_job_run.c`).
-3. API enqueues work via `src/runtime/scheduler_submit.c` into runtime queues.
-4. Worker thread (`src/runtime/worker.c`) dequeues a job and prepares a batch.
-5. If pipeline is compiled/fused, `src/pipeline/pipeline_executor.c` / `src/hot/pipeline_exec.c` execute fused kernels.
-6. Execution routes to arch-specific kernels under `src/arch/<arch>/` (e.g. `src/arch/x86_64/avx2/resize_avx2.c`).
-7. Result buffers flow through encoder (`src/io/encoder/jpeg_encoder.c`) and job finalization (`src/api/api_job_finish_output.c`).
+Concept:
 
-## Memory & Buffer lifecycle (notes)
+```
+typedef struct {
+	img_job_template_t template_id; // stable id
+	img_job_t job;                  // fully populated job template
+	uint32_t caps;                  // capability bits (SIMD, alignments)
+} img_template_entry_t;
 
-- Buffers are allocated via arena/slab APIs (`include/memory/*` and `src/memory/*`).
-- Buffer ownership and release are tracked in `include/core/buffer.h` and lifecycle helpers in `src/core/buffer_lifecycle.c` and runtime raw buffer release in `src/runtime/raw_buffer_release.c`.
-
-## Plugin ABI and discovery
-
-- ABI spec: `include/pipeline/plugin_abi.h` (defines expected plugin exports and version compatibility).
-- Loader: `src/runtime/plugin_loader.c` (reads descriptors, validates ABI and registers plugins into `plugin_registry`).
-- Registrations: `src/plugins/plugin_registry*.c` implement registry bookkeeping and validation.
-
-## Jump-table, fused kernels and codegen
-
-- `include/pipeline/jump_table.h` and `src/pipeline/jump_table*.c` implement function pointer selection for resize/fused ops.
-- Fused kernel registry and generated kernels appear under `src/pipeline/fused_*` and `src/pipeline/generated.c` (the latter is produced by DSL codegen when enabled).
-
-## Observability hooks
-
-- Instrumentation points are sprinkled across `src/api`, `src/runtime` and `src/pipeline` using `include/observability/*` primitives (binlog, metrics and tracing). Logger lifecycle and async writer live in `src/observability/logger_*.c`.
-
-## How to find the implementing file for a header / symbol
-
-Use ripgrep (or grep) from the repo root:
-
-```bash
-# find headers quickly
-find include -name '*.h' | sed -e 's:^:include/:g' | sort
-
-# locate implementations for a header name (example: buffer.h)
-rg "buffer_lifecycle|buffer_" src -n || rg "buffer_" src -S
-
-# find where a public API function is defined
-rg "\bIMG_\w+\b" src include || rg "img_job_" src -n
+// runtime registry (constant-time lookup)
+img_template_entry_t *registry; // allocated at startup, indexed by TemplateKey
 ```
 
-## Recommended next steps to expand LLD
+Responsibilities:
 
-- Generate function-level call graphs for critical flows (job run, pipeline execution) using cscope/clangd or callgraph extraction.
-- Populate per-file responsibilities and list of exported symbols in `include/*` with direct links to implementation lines in `src/*`.
-- Add sequence diagrams for the job lifecycle and plugin load lifecycle.
+- constant-time lookup during API handling
+- pre-populated job templates with safe defaults
+- thread-local overrides applied at submit time
 
-## Appendix — quick pointers
+Relevant files: [src/pipeline/fused_registry.c](src/pipeline/fused_registry.c#L1)
 
-- Public API headers: `include/api/v1/*`
-- CLI entry and builders: `src/cmd/imgengine/main.c`, `src/cmd/imgengine/job_builder.c`
-- Scheduler & workers: `src/runtime/scheduler.c`, `src/runtime/worker.c`
-- Hot execution: `src/hot/pipeline_exec.c`, `src/hot/batch_exec.c`
-- Pipeline runtime: `src/pipeline/pipeline_executor.c`, `src/pipeline/pipeline_build.c`
-- Encoders/Decoders: `src/io/encoder/*`, `src/io/decoder/*`
+### Prepared decoder
 
-## Problem → Pattern Map (LLD)
+Concept:
 
-This section maps concrete low-level files and hotspots to the design patterns you should consider when implementing fixes or new features.
+```
+typedef struct {
+	img_engine_t *engine;
+	img_ctx_t ctx; // bound API context
+	// preallocated thread-local decode state (slab + arena)
+} img_prepared_decoder_t;
+```
 
-- **Strategy** — multiple algorithms/kernels: inspect `src/pipeline/jump_table.c`, `src/pipeline/jump_table_select_resize_avx2.c`, `src/pipeline/hardware_registry.c`. How to apply: ensure `img_jump_table_init` selects best kernel and is invoked early in startup.
-- **Factory** — complex object creation: inspect `src/pipeline/pipeline_executor.c` (`img_pipeline_create`) and `src/api/api_init.c` (`img_api_init`). How to apply: centralize allocation/config for pipelines and engine contexts.
-- **Observer** — metrics/tracing: inspect `src/observability/logger_write.c`, `src/observability` hooks. How to apply: add sampled hooks into `src/runtime` and `src/pipeline` (low-overhead paths).
-- **Decorator** — add behavior without changing kernel code: inspect `src/pipeline/generated.c` and `src/runtime/plugin_loader.c`. How to apply: implement thin wrapper functions that call kernels and perform pre/post actions.
-- **Singleton** — global registries: `g_jump_table` (`src/pipeline/jump_table_register.c`), `g_io_vtable` (`src/io/io_register.c`). How to apply: keep init order strict and provide clear lifecycle APIs.
-- **Proxy** — layered IO access control & caching: inspect `src/io/io_register.c` and `src/io/decoder/*`. How to apply: add a proxy layer for remote fetches and a small in-memory cache with size limits.
-- **Pipeline / Chain-of-Responsibility** — flexible op ordering and batching: `src/pipeline/pipeline_executor.c`, `src/hot/pipeline_exec.c`. How to apply: represent ops as compact commands for reuse, batching and replay.
-- **Data-Oriented Design (DOD)** — hot kernels like `src/arch/x86_64/avx2/resize_avx2.c` benefit from contiguous layouts and struct-of-arrays.
-- **Lock-free messaging + work-stealing** — runtime core: `src/runtime/scheduler_submit.c`, `src/runtime/worker_loop.c`, `src/runtime/scheduler.c`.
+APIs:
 
-## Bench findings → LLD action items
+- `img_api_prepare_decoder(engine, &decoder)` — prepare decoder state for a thread
+- `img_api_decode_prepared(&decoder, input, size, &out)` — decode using prepared state
 
-- **Decode hotspot (`src/io/decoder/*`)**: add a `Factory` + `Strategy` to choose streaming vs bulk decoder; consider prefetching and a decoder worker pool.
-- **Encode hotspot (`src/io/encoder/*`)**: offload encode to a dedicated worker pool; instrument with microbenchmarks and thresholds in CI.
-- **Throughput**: verify per-worker SPSC queues and `img_scheduler_steal` behavior under load; add targeted microbench for SPSC throughput and lock-free paths.
+Relevant files: [src/api/api_process_fast_decode.c](src/api/api_process_fast_decode.c#L1)
 
-## Next LLD steps
+### Jump-table and Dispatch
 
-- Implement decoder factory & simple strategy toggle; microbench it and commit results.
-- Add a `Decorator` example wrapping one kernel (small patch) to demonstrate caching and validation without changing kernel implementations.
+Conceptual hot-path:
+
+```
+extern void (*g_jump_table[])(img_ctx_t*, void*, const void* params);
+
+// Dispatch inside pipeline hot path
+g_jump_table[op_code](ctx, buffer, params);
+```
+
+Properties:
+
+- O(1) dispatch
+- branch-free selection when combined with preselected jump-table index
+- jump-table populated at deterministic startup via `img_register_op`
+
+Files: [src/pipeline/jump_table_register.c](src/pipeline/jump_table_register.c#L1), [src/pipeline/jump_table_init.c](src/pipeline/jump_table_init.c#L1)
+
+### SPSC queue (hot path messaging)
+
+Key properties: lock-free, cache-line aligned atomics, ABA avoidance via single-producer/single-consumer contract.
+
+Minimal sketch (LLD):
+
+```
+typedef struct {
+	alignas(64) atomic_uint head;
+	char pad1[64];
+	alignas(64) atomic_uint tail;
+	char pad2[64];
+	void* slots[QUEUE_SIZE];
+} spsc_queue_t;
+```
+
+Files: [src/runtime/queue_spsc.c](src/runtime/queue_spsc.c#L1)
+
+### Slab allocator (hot path)
+
+Conceptual API:
+
+```
+img_slab_t *img_slab_create(size_t block_size, size_t nblocks);
+void *img_slab_alloc(img_slab_t *s);
+void img_slab_recycle(img_slab_t *s, void *ptr);
+```
+
+Properties:
+
+- O(1) allocation from a preallocated pool
+- No locking when used thread-locally
+- Owned by a thread-local arena or global NUMA pool
+
+Files: [src/memory/slab_create.c](src/memory/slab_create.c#L1), [src/memory/slab_hot.c](src/memory/slab_hot.c#L1)
+
+## Call flows (detailed)
+
+### CLI submit → run (render-only)
+
+1. `src/cmd/imgengine/job_builder.c` builds a `img_job_t` from CLI args.
+2. `src/api/api_job_run.c` resolves TemplateKey via the prepared registry.
+3. `src/runtime/scheduler_submit.c` enqueues the prepared `img_job_t` into a per-worker SPSC or global MPMC queue.
+4. Worker thread in `src/runtime/worker.c` dequeues and constructs ephemeral `img_ctx_t` and execution batch.
+5. `src/pipeline/pipeline_executor.c`/`src/hot/pipeline_exec.c` execute fused pipeline using `g_jump_table` dispatch into `src/arch/*` kernels.
+6. Output is encoded via `src/io/encoder/*` and finalized in `src/api/api_job_finish_output.c`.
+
+### Prepared decode path
+
+1. A prepared decoder is created at API or startup time (`img_api_prepare_decoder`).
+2. Incoming bytes are passed to `img_api_decode_prepared` which uses thread-local slab buffers and returns ownership to caller.
+3. Ownership contracts ensure decoded buffers are recycled back to the same slab pool after pipeline execution.
+
+## Testing & CI LLD guidance
+
+- Add unit tests for `img_slab_*` (allocate/recycle) and SPSC/MPMC queue semantics.
+- Add microbench harness per-kernel (AVX2/AVX-512/Scalar) with regression thresholds tracked in CI.
+- Add a tool to compare current exported symbols against `docs/abi/exported_symbols.json` and fail CI on unexpected ABI changes.
+
+## LLD Action Items (concrete)
+
+1. Implement a deterministic `img_jump_table_init` ordering and record it in startup logs.
+2. Harden the prepared template registry with clear ownership and thread-safety invariants.
+3. Add regression microbenchmarks for `resize_avx2`, `resize_avx512` and fused kernels.
+4. Provide a `sanitizer` build (ASan/UBSan) for CI and verify fallbacks to scalar kernels succeed.
+
+---
+
+This LLD is intended to be the canonical mapping engineers use when authoring kernel changes, adding registers, or implementing new pipelines. It focuses on deterministic initialization, ownership semantics, and small, testable hot-path primitives.

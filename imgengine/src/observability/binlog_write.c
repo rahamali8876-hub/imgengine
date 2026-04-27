@@ -17,13 +17,8 @@ extern uint32_t img_binlog_tls_cpu_id(void);
  * Drop policy: if ring is full, drop the entry silently.
  * Never blocks. Never allocates.
  */
-void img_binlog_write(
-    img_binlog_t *log,
-    uint32_t event,
-    uint64_t arg0,
-    uint64_t arg1,
-    uint64_t arg2)
-{
+void img_binlog_write(img_binlog_t *log, uint32_t event, uint64_t arg0, uint64_t arg1,
+                      uint64_t arg2) {
     uint32_t cpu = img_binlog_tls_cpu_id();
 
     if (__builtin_expect(cpu >= log->cpu_count, 0))

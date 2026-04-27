@@ -3,8 +3,7 @@
 
 #include <sys/socket.h>
 
-int img_rpc_client_recv_response(int sock, img_buffer_t *buf)
-{
+int img_rpc_client_recv_response(int sock, img_buffer_t *buf) {
     img_rpc_response_t res;
     if (recv(sock, &res, sizeof(res), 0) < 0)
         return -1;

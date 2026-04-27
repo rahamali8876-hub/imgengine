@@ -5,11 +5,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-img_result_t img_write_buffer_file(
-    const char *output_path,
-    const uint8_t *data,
-    size_t size)
-{
+img_result_t img_write_buffer_file(const char *output_path, const uint8_t *data, size_t size) {
     if (!output_path || !data)
         return IMG_ERR_SECURITY;
 
@@ -23,19 +19,16 @@ img_result_t img_write_buffer_file(
         return IMG_ERR_IO;
 
     size_t written = 0;
-    while (written < size)
-    {
+    while (written < size) {
         ssize_t rc = write(fd, data + written, size - written);
-        if (rc < 0)
-        {
+        if (rc < 0) {
             if (errno == EINTR)
                 continue;
             close(fd);
             return IMG_ERR_IO;
         }
 
-        if (rc == 0)
-        {
+        if (rc == 0) {
             close(fd);
             return IMG_ERR_IO;
         }

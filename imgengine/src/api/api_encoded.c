@@ -5,13 +5,11 @@
 
 #include <stdlib.h>
 
-void img_api_release_raw_buffer(img_engine_t *engine, img_buffer_t *buf)
-{
+void img_api_release_raw_buffer(img_engine_t *engine, img_buffer_t *buf) {
     img_runtime_release_raw_buffer(engine, buf);
 }
 
-void img_encoded_free(uint8_t *ptr)
-{
+void img_encoded_free(uint8_t *ptr) {
     if (ptr)
         free(ptr);
 }

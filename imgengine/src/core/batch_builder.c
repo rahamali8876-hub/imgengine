@@ -8,13 +8,8 @@
 #include "memory/arena.h"
 #include "core/context_internal.h"
 
-img_batch_t *img_batch_create(
-    img_ctx_t *ctx,
-    uint32_t count)
-{
-    img_batch_t *batch = img_arena_alloc(
-        ctx->scratch_arena,
-        sizeof(img_batch_t));
+img_batch_t *img_batch_create(img_ctx_t *ctx, uint32_t count) {
+    img_batch_t *batch = img_arena_alloc(ctx->scratch_arena, sizeof(img_batch_t));
 
     if (!batch)
         return NULL;

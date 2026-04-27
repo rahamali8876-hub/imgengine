@@ -5,8 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int img_mpmc_init(img_mpmc_queue_t *q, size_t size)
-{
+int img_mpmc_init(img_mpmc_queue_t *q, size_t size) {
     if (!q || size == 0)
         return -1;
 
@@ -21,8 +20,7 @@ int img_mpmc_init(img_mpmc_queue_t *q, size_t size)
 
     memset(q->cells, 0, sizeof(cell_t) * size);
 
-    for (size_t i = 0; i < size; i++)
-    {
+    for (size_t i = 0; i < size; i++) {
         atomic_init(&q->cells[i].seq, i);
         q->cells[i].data = NULL;
     }

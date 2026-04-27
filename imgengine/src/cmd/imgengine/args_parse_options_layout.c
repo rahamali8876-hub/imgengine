@@ -1,10 +1,8 @@
 // ./src/cmd/imgengine/args_parse_options_layout.c
 #include "cmd/imgengine/args_internal.h"
 
-int img_cli_parse_options_layout(int opt, const char *optarg, img_cli_options_t *opts)
-{
-    switch (opt)
-    {
+int img_cli_parse_options_layout(int opt, const char *optarg, img_cli_options_t *opts) {
+    switch (opt) {
     case 1:
         if (img_cli_parse_u32(optarg, &opts->cols, "cols") != 0)
             return -1;

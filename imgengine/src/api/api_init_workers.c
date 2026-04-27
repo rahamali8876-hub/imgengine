@@ -27,8 +27,7 @@
  */
 img_scheduler_t g_scheduler;
 
-int img_api_init_boot_workers(uint32_t workers)
-{
+int img_api_init_boot_workers(uint32_t workers) {
     if (workers == 0 || workers > 64)
         return -1;
 
@@ -43,8 +42,7 @@ int img_api_init_boot_workers(uint32_t workers)
      * STEP 2: Initialize scheduler (allocates worker array,
      * creates per-worker SPSC queues, does NOT start threads).
      */
-    if (img_scheduler_init(&g_scheduler, workers) != 0)
-    {
+    if (img_scheduler_init(&g_scheduler, workers) != 0) {
         img_mpmc_destroy(&g_task_queue);
         return -1;
     }
@@ -55,8 +53,7 @@ int img_api_init_boot_workers(uint32_t workers)
      * These must be set BEFORE pthread_create so the thread never
      * sees a NULL ctx when it picks up its first task.
      */
-    for (uint32_t i = 0; i < workers; i++)
-    {
+    for (uint32_t i = 0; i < workers; i++) {
         g_worker_ctxs[i].thread_id = i;
         g_worker_ctxs[i].caps = g_engine.caps;
         g_worker_ctxs[i].local_pool = g_engine.global_pool;
@@ -81,18 +78,15 @@ int img_api_init_boot_workers(uint32_t workers)
      *   w->queue      = per-worker SPSC  (created in scheduler_init)
      *   w->running    = 1
      */
-    for (uint32_t i = 0; i < workers; i++)
-    {
+    for (uint32_t i = 0; i < workers; i++) {
         img_worker_t *w = &g_scheduler.workers[i];
         w->running = 1;
 
         img_pin_thread_to_core(i);
 
-        if (pthread_create(&w->thread, NULL, img_worker_loop, w) != 0)
-        {
+        if (pthread_create(&w->thread, NULL, img_worker_loop, w) != 0) {
             /* stop already-started threads */
-            for (uint32_t j = 0; j < i; j++)
-            {
+            for (uint32_t j = 0; j < i; j++) {
                 g_scheduler.workers[j].running = 0;
                 pthread_join(g_scheduler.workers[j].thread, NULL);
             }
@@ -100,7 +94,6 @@ int img_api_init_boot_workers(uint32_t workers)
             img_mpmc_destroy(&g_task_queue);
             return -1;
         }
-
     }
 
     g_engine.scheduler = &g_scheduler;

@@ -13,13 +13,13 @@
 
 #include <turbojpeg.h>
 
-#define HEADER_SIZE 1024
+#include <stdlib.h>
+#include <stdio.h>
 
-img_result_t img_decode_stream_core(
-    img_slab_pool_t *pool,
-    img_stream_t *stream,
-    img_buffer_t *out)
-{
+#define HEADER_SIZE 8192
+
+img_result_t img_decode_stream_core(img_slab_pool_t *pool, img_stream_t *stream,
+                                    img_buffer_t *out) {
     if (!pool || !stream || !out)
         return IMG_ERR_INTERNAL;
 
@@ -36,15 +36,18 @@ img_result_t img_decode_stream_core(
 
     int w = 0, h = 0, subsamp = 0, cs = 0;
 
-    if (tjDecompressHeader3(tj, header, read_bytes, &w, &h, &subsamp, &cs) != 0)
-    {
+    if (tjDecompressHeader3(tj, header, read_bytes, &w, &h, &subsamp, &cs) != 0) {
         tjDestroy(tj);
         return IMG_ERR_FORMAT;
     }
 
+    if (getenv("IMGENGINE_DEBUG"))
+        fprintf(stderr, "[DBG] stream: w=%d h=%d file_size=%zu\n", w, h, stream->size);
+
     img_result_t sec = img_security_validate_request(w, h, stream->size);
-    if (sec != IMG_SUCCESS)
-    {
+    if (sec != IMG_SUCCESS) {
+        if (getenv("IMGENGINE_DEBUG"))
+            fprintf(stderr, "[DBG] stream: img_security_validate_request -> %d\n", sec);
         tjDestroy(tj);
         return sec;
     }
@@ -53,55 +56,50 @@ img_result_t img_decode_stream_core(
     size_t required = stride * (size_t)h;
 
     size_t block = img_slab_block_size(pool);
-    if (required > block)
-    {
+    if (required > block) {
+        tjDestroy(tj);
+        return IMG_ERR_NOMEM;
+    }
+
+    /* Ensure compressed input fits in one slab block as well */
+    if (stream->size > block) {
         tjDestroy(tj);
         return IMG_ERR_NOMEM;
     }
 
     uint8_t *mem = img_slab_alloc(pool);
-    if (!mem)
-    {
+    if (!mem) {
         tjDestroy(tj);
         return IMG_ERR_NOMEM;
     }
 
     uint8_t *tmp = img_slab_alloc(pool);
-    if (!tmp)
-    {
+    if (!tmp) {
         img_slab_free(pool, mem);
         tjDestroy(tj);
         return IMG_ERR_NOMEM;
     }
 
-    rc = img_vfs_read(stream, tmp, required, &read_bytes);
-    if (rc != IMG_SUCCESS)
-    {
+    /* Read the full compressed JPEG blob (reset pos to include header) */
+    stream->pos = 0;
+    rc = img_vfs_read(stream, tmp, stream->size, &read_bytes);
+    if (rc != IMG_SUCCESS) {
         img_slab_free(pool, tmp);
         img_slab_free(pool, mem);
         tjDestroy(tj);
         return rc;
     }
 
-    if (!img_bounds_check(tmp, read_bytes, stream->data, stream->size))
-    {
+    /* tmp contains a copy of the compressed blob; ensure we read something sensible */
+    if (read_bytes == 0 || read_bytes > stream->size) {
         img_slab_free(pool, tmp);
         img_slab_free(pool, mem);
         tjDestroy(tj);
-        return IMG_ERR_SECURITY;
+        return IMG_ERR_FORMAT;
     }
 
-    if (tjDecompress2(
-            tj,
-            tmp,
-            read_bytes,
-            mem,
-            w,
-            stride,
-            h,
-            TJPF_RGB,
-            TJFLAG_FASTDCT | TJFLAG_FASTUPSAMPLE) != 0)
-    {
+    if (tjDecompress2(tj, tmp, read_bytes, mem, w, stride, h, TJPF_RGB,
+                      TJFLAG_FASTDCT | TJFLAG_FASTUPSAMPLE) != 0) {
         img_slab_free(pool, tmp);
         img_slab_free(pool, mem);
         tjDestroy(tj);

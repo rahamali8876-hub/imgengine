@@ -1,10 +1,8 @@
 // ./src/cmd/imgengine/args_parse_options_io.c
 #include "cmd/imgengine/args_internal.h"
 
-int img_cli_parse_options_io(int opt, const char *optarg, img_cli_options_t *opts)
-{
-    switch (opt)
-    {
+int img_cli_parse_options_io(int opt, const char *optarg, img_cli_options_t *opts) {
+    switch (opt) {
     case 'i':
         opts->input_path = optarg;
         return 0;

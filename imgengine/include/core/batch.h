@@ -21,8 +21,7 @@ typedef struct img_buffer img_buffer_t;
  */
 #define IMG_BATCH_MAX 64
 
-typedef struct img_batch
-{
+typedef struct img_batch {
     img_buffer_t *buffers[IMG_BATCH_MAX];
     uint32_t count;
 } img_batch_t;

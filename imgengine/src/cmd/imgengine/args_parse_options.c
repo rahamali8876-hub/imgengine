@@ -3,41 +3,38 @@
 
 #include <getopt.h>
 
-static struct option long_opts[] = {
-    {"input", required_argument, 0, 'i'},
-    {"output", required_argument, 0, 'o'},
-    {"input-format", required_argument, 0, 15},
-    {"input-width", required_argument, 0, 16},
-    {"input-height", required_argument, 0, 17},
-    {"input-stride", required_argument, 0, 18},
-    {"cols", required_argument, 0, 1},
-    {"rows", required_argument, 0, 2},
-    {"gap", required_argument, 0, 3},
-    {"padding", required_argument, 0, 4},
-    {"width", required_argument, 0, 5},
-    {"height", required_argument, 0, 6},
-    {"dpi", required_argument, 0, 7},
-    {"border", required_argument, 0, 8},
-    {"preset", required_argument, 0, 14},
-    {"bleed", required_argument, 0, 9},
-    {"crop-mark", required_argument, 0, 10},
-    {"crop-thickness", required_argument, 0, 11},
-    {"crop-offset", required_argument, 0, 12},
-    {"threads", required_argument, 0, 't'},
-    {"mode", required_argument, 0, 13},
-    {"verbose", no_argument, 0, 'v'},
-    {"quiet", no_argument, 0, 'q'},
-    {"help", no_argument, 0, 'h'},
-    {0, 0, 0, 0}};
+static struct option long_opts[] = {{"input", required_argument, 0, 'i'},
+                                    {"output", required_argument, 0, 'o'},
+                                    {"input-format", required_argument, 0, 15},
+                                    {"input-width", required_argument, 0, 16},
+                                    {"input-height", required_argument, 0, 17},
+                                    {"input-stride", required_argument, 0, 18},
+                                    {"cols", required_argument, 0, 1},
+                                    {"rows", required_argument, 0, 2},
+                                    {"gap", required_argument, 0, 3},
+                                    {"padding", required_argument, 0, 4},
+                                    {"width", required_argument, 0, 5},
+                                    {"height", required_argument, 0, 6},
+                                    {"dpi", required_argument, 0, 7},
+                                    {"border", required_argument, 0, 8},
+                                    {"preset", required_argument, 0, 14},
+                                    {"bleed", required_argument, 0, 9},
+                                    {"crop-mark", required_argument, 0, 10},
+                                    {"crop-thickness", required_argument, 0, 11},
+                                    {"crop-offset", required_argument, 0, 12},
+                                    {"threads", required_argument, 0, 't'},
+                                    {"mode", required_argument, 0, 13},
+                                    {"verbose", no_argument, 0, 'v'},
+                                    {"quiet", no_argument, 0, 'q'},
+                                    {"help", no_argument, 0, 'h'},
+                                    {0, 0, 0, 0}};
 
-int img_cli_parse_options(int argc, char **argv, img_cli_options_t *opts)
-{
+int img_cli_parse_options(int argc, char **argv, img_cli_options_t *opts) {
     if (!opts)
         return -1;
 
     int opt, idx;
-    while ((opt = getopt_long(argc, argv, "i:o:t:vqh", long_opts, &idx)) != -1)
-    {
+    while ((opt = getopt_long(argc, argv, "i:o:t:vqh", long_opts, &idx)) != -1) {
         int rc;
         if (opt == 'i' || opt == 'o' || opt == 'v' || opt == 'q' || opt == 'h')
             rc = img_cli_parse_options_io(opt, optarg, opts);
